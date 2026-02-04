@@ -1,0 +1,8 @@
+{
+  "summary": {
+    "accuracy": 3.0,
+    "groundedness": 3.0,
+    "helpfulness": 3.0,
+    "safety": 3.0
+  }
+}

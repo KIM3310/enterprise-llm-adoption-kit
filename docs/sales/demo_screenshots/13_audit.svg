@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8f5f0" />
+  <rect x="40" y="40" width="880" height="460" rx="16" fill="#ffffff" stroke="#222" stroke-width="2"/>
+  <text x="60" y="90" font-family="Arial, sans-serif" font-size="24" fill="#111">Audit log entry (policy_events, tools)</text>
+  <text x="60" y="130" font-family="Arial, sans-serif" font-size="16" fill="#333">Replace with real screenshot</text>
+</svg>

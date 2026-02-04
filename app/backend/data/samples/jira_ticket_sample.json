@@ -1,0 +1,8 @@
+{
+  "ticket_id": "PAY-4821",
+  "title": "Payments API timeouts after deploy",
+  "description": "2026-01-27T09:22Z ERROR Timeout while calling payments API. Retries exhausted. Trace: req-82ab",
+  "priority": "P1",
+  "reporter": "sre.lead",
+  "role": "Ops"
+}

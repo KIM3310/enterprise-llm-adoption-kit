@@ -1,0 +1,29 @@
+[
+  {
+    "signature": "OutOfMemoryError",
+    "steps": [
+      "Check recent deploys for memory changes.",
+      "Inspect container memory limits.",
+      "Scale replicas or increase memory allocation.",
+      "Capture heap dump for analysis."
+    ]
+  },
+  {
+    "signature": "Connection refused",
+    "steps": [
+      "Validate service endpoint and port.",
+      "Check network policies/firewalls.",
+      "Verify dependency service health.",
+      "Retry after confirming DNS resolution."
+    ]
+  },
+  {
+    "signature": "Timeout while",
+    "steps": [
+      "Check upstream latency metrics.",
+      "Review recent infra incidents.",
+      "Increase timeout cautiously or add retries.",
+      "Escalate to on-call if persistent."
+    ]
+  }
+]

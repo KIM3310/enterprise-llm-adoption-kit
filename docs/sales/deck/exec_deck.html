@@ -1,0 +1,21 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Exec Deck</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #e2e8f0; }
+    .slide { page-break-after: always; padding: 60px; min-height: 720px; }
+    h1, h2 { color: #f97316; }
+    ul { line-height: 1.6; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <section class="slide">
+    <h1>Enterprise LLM Adoption Kit (Korea)</h1>
+    <p>Executive PoC Deck</p>
+  </section>
+  <section class='slide'><h2>Goal</h2><ul><li>Show safe enterprise adoption with clear business impact and governance.</li></ul></section><section class='slide'><h2>Steps (with clicks/commands)</h2><ul><li>1) Open UI: http://localhost:5173</li><li>- Screenshot: "00_login.png"</li><li>2) Click "Issue JWT" with role=Ops</li><li>- Say: "Access is role-based and audited"</li><li>3) UC1: enter "Summarize handover risks for payments prod" -> Run</li><li>- Screenshot: "01_uc1_citations.png" (shows citations)</li><li>4) Toggle citation-only mode -> Run</li><li>- Say: "Sensitive mode limits output to citations"</li><li>5) UC2: paste error log -> Run</li><li>- Screenshot: "02_uc2_tools.png" (shows tool calls)</li><li>6) Open metrics: http://localhost:8000/metrics</li><li>- Screenshot: "03_metrics.png"</li><li>7) Open audit log: `app/backend/data/audit.log`</li><li>- Screenshot: "04_audit_log.png"</li></ul></section><section class='slide'><h2>Closing</h2><ul><li>- "LLM adapter is pluggable; security controls are already integrated"</li><li>- "Evals and LLMOps are built in to reduce risk"</li></ul></section>
+</body>
+</html>
