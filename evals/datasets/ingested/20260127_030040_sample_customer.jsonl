@@ -1,0 +1,12 @@
+{"id": "c1", "use_case": "uc1", "input": "Summarize handover risks for payments prod", "expected": "", "role": "Employee", "sensitivity": "low"}
+{"id": "c2", "use_case": "uc2", "input": "ERROR Timeout while calling payments API", "expected": "", "role": "Ops", "sensitivity": "medium"}
+{"id": "auto-uc1-01", "use_case": "uc1", "input": "Summarize handover risks for payments prod", "expected": "", "role": "Employee", "sensitivity": "low", "tags": ["auto_suggested"]}
+{"id": "auto-uc1-02", "use_case": "uc1", "input": "List runbook steps for identity staging", "expected": "", "role": "Employee", "sensitivity": "low", "tags": ["auto_suggested"]}
+{"id": "auto-uc1-03", "use_case": "uc1", "input": "Provide handover summary for analytics prod", "expected": "", "role": "Employee", "sensitivity": "low", "tags": ["auto_suggested"]}
+{"id": "auto-uc1-04", "use_case": "uc1", "input": "Highlight dependencies for inventory dev", "expected": "", "role": "Employee", "sensitivity": "low", "tags": ["auto_suggested"]}
+{"id": "auto-uc1-05", "use_case": "uc1", "input": "Summarize handover notes for notifications prod", "expected": "", "role": "Employee", "sensitivity": "low", "tags": ["auto_suggested"]}
+{"id": "auto-uc2-01", "use_case": "uc2", "input": "ERROR Timeout while calling payments API", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["auto_suggested"]}
+{"id": "auto-uc2-02", "use_case": "uc2", "input": "Build failed: Connection refused to redis", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["auto_suggested"]}
+{"id": "auto-uc2-03", "use_case": "uc2", "input": "OutOfMemoryError in worker", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["auto_suggested"]}
+{"id": "auto-uc2-04", "use_case": "uc2", "input": "Permission denied writing to /var/log", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["auto_suggested"]}
+{"id": "auto-uc2-05", "use_case": "uc2", "input": "Deployment error 502 Server Error", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["auto_suggested"]}

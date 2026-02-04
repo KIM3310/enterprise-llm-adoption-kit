@@ -1,0 +1,30 @@
+{"id": "kr-uc1-01", "use_case": "uc1", "input": "payments prod 인수인계 리스크를 요약해줘", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-02", "use_case": "uc1", "input": "identity staging 운영 인수인계 요약", "expected": "", "role": "Admin", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-03", "use_case": "uc1", "input": "analytics prod 의존성/리스크 요약", "expected": "", "role": "Employee", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-04", "use_case": "uc1", "input": "inventory dev handover 노트 요약", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-05", "use_case": "uc1", "input": "notifications prod 런북 단계 알려줘", "expected": "", "role": "Admin", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-06", "use_case": "uc1", "input": "K-ISMS 대응 관점에서 payments prod 리스크 요약", "expected": "", "role": "Employee", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-07", "use_case": "uc1", "input": "PIPA 관점에서 고객정보 처리 관련 handover 항목 알려줘", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-08", "use_case": "uc1", "input": "금융보안원 기준에 영향 있는 변경사항 요약", "expected": "", "role": "Admin", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-09", "use_case": "uc1", "input": "VPC/PrivateLink 전환 시 영향 받을 시스템 handover 정리", "expected": "", "role": "Employee", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-10", "use_case": "uc1", "input": "온프렘 커넥터 연동 관련 리스크 요약", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-11", "use_case": "uc1", "input": "운영팀 교대 인수인계 중 미해결 이슈 요약", "expected": "", "role": "Admin", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-12", "use_case": "uc1", "input": "SRE 관점 주요 알람/지표 인수인계 요약", "expected": "", "role": "Employee", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-13", "use_case": "uc1", "input": "staging 환경에서 자주 발생한 장애와 대응 노트", "expected": "", "role": "Ops", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-14", "use_case": "uc1", "input": "프로덕션 배포 전 체크리스트 handover 항목", "expected": "", "role": "Admin", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc1-15", "use_case": "uc1", "input": "최근 30일간 주요 장애 관련 handover 요약", "expected": "", "role": "Employee", "sensitivity": "medium", "tags": ["kr", "enterprise", "handover"]}
+{"id": "kr-uc2-01", "use_case": "uc2", "input": "ERROR Timeout while calling payments API", "expected": "", "role": "Ops", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-02", "use_case": "uc2", "input": "빌드 실패: Connection refused to redis", "expected": "", "role": "Admin", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-03", "use_case": "uc2", "input": "배포 오류 502 Server Error", "expected": "", "role": "Employee", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-04", "use_case": "uc2", "input": "OutOfMemoryError in worker", "expected": "", "role": "Ops", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-05", "use_case": "uc2", "input": "Permission denied writing to /var/log", "expected": "", "role": "Admin", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-06", "use_case": "uc2", "input": "TLS handshake failed during deploy", "expected": "", "role": "Employee", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-07", "use_case": "uc2", "input": "staging 디스크 용량 초과", "expected": "", "role": "Ops", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-08", "use_case": "uc2", "input": "DB timeout while executing query", "expected": "", "role": "Admin", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-09", "use_case": "uc2", "input": "Kubernetes pod crashloop backoff", "expected": "", "role": "Employee", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-10", "use_case": "uc2", "input": "Nginx 504 Gateway Timeout", "expected": "", "role": "Ops", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-11", "use_case": "uc2", "input": "배포 후 서비스 unreachable", "expected": "", "role": "Admin", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-12", "use_case": "uc2", "input": "Helm upgrade failed in prod", "expected": "", "role": "Employee", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-13", "use_case": "uc2", "input": "Secrets mount failed (권한 문제)", "expected": "", "role": "Ops", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-14", "use_case": "uc2", "input": "CI 파이프라인 fail: artifact missing", "expected": "", "role": "Admin", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}
+{"id": "kr-uc2-15", "use_case": "uc2", "input": "CPU throttling detected in worker", "expected": "", "role": "Employee", "sensitivity": "high", "tags": ["kr", "enterprise", "logs"]}

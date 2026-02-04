@@ -1,0 +1,16 @@
+Audit Viewer Summary
+Requests: 167
+Total cost (USD): 0.056388
+Top users:
+- eval-ops: 56
+- eval-admin: 42
+- eval-employee: 42
+- acc-employee: 20
+- acc-admin: 4
+Tools used:
+- log_signature_extract: 79
+- runbook_lookup: 79
+- knowledge_search: 79
+Policy events:
+- redaction_applied: 5
+- injection_detected: 4

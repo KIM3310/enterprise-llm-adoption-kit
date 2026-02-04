@@ -1,0 +1,7 @@
+{
+  "sub": "user-1234",
+  "email": "ops.user@korea-enterprise.example",
+  "groups": ["it-ops", "sre"],
+  "roles": ["ops"],
+  "issuer": "https://mock-oidc.example"
+}

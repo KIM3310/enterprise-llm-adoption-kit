@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8f5f0" />
+  <rect x="40" y="40" width="880" height="460" rx="16" fill="#ffffff" stroke="#222" stroke-width="2"/>
+  <text x="60" y="85" font-family="Arial, sans-serif" font-size="28" fill="#111">Executive Value Dashboard (Snapshot)</text>
+
+  <rect x="60" y="120" width="260" height="140" rx="10" fill="#f2efe9" stroke="#333"/>
+  <text x="80" y="150" font-family="Arial, sans-serif" font-size="18" fill="#111">ROI Snapshot</text>
+  <text x="80" y="180" font-family="Arial, sans-serif" font-size="14" fill="#333">Monthly savings: $___</text>
+  <text x="80" y="205" font-family="Arial, sans-serif" font-size="14" fill="#333">Breakeven: __ months</text>
+
+  <rect x="350" y="120" width="260" height="140" rx="10" fill="#f2efe9" stroke="#333"/>
+  <text x="370" y="150" font-family="Arial, sans-serif" font-size="18" fill="#111">Quality Snapshot</text>
+  <text x="370" y="180" font-family="Arial, sans-serif" font-size="14" fill="#333">Accuracy / Groundedness</text>
+  <text x="370" y="205" font-family="Arial, sans-serif" font-size="14" fill="#333">Safety / Helpfulness</text>
+
+  <rect x="640" y="120" width="260" height="140" rx="10" fill="#f2efe9" stroke="#333"/>
+  <text x="660" y="150" font-family="Arial, sans-serif" font-size="18" fill="#111">Ops Snapshot</text>
+  <text x="660" y="180" font-family="Arial, sans-serif" font-size="14" fill="#333">P95 latency target</text>
+  <text x="660" y="205" font-family="Arial, sans-serif" font-size="14" fill="#333">Error rate target</text>
+
+  <rect x="60" y="290" width="840" height="190" rx="10" fill="#f7f2e8" stroke="#333"/>
+  <text x="80" y="320" font-family="Arial, sans-serif" font-size="18" fill="#111">Key Story</text>
+  <text x="80" y="350" font-family="Arial, sans-serif" font-size="14" fill="#333">- Enterprise readiness: RBAC, audit, redaction, eval gates</text>
+  <text x="80" y="375" font-family="Arial, sans-serif" font-size="14" fill="#333">- PoC to production path with governance & observability</text>
+  <text x="80" y="400" font-family="Arial, sans-serif" font-size="14" fill="#333">- Evidence: reports, demos, screenshots</text>
+</svg>

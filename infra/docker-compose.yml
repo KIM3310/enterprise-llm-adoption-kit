@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: ../app/backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../app/backend/data:/app/data
+    environment:
+      - JWT_SECRET=dev-secret-change
+      - JWT_ISSUER=enterprise-llm-adoption-kit
+      - LLM_PROVIDER=stub
+
+  frontend:
+    build:
+      context: ../app/frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE=http://localhost:8000
+    depends_on:
+      - backend

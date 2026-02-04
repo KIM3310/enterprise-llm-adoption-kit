@@ -1,0 +1,50 @@
+{"id": "uc1-01", "use_case": "uc1", "input": "Summarize risks for payments staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-02", "use_case": "uc1", "input": "List runbook steps for identity prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-03", "use_case": "uc1", "input": "What is the handover summary for analytics dev?", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-04", "use_case": "uc1", "input": "Any incidents noted for inventory prod?", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-05", "use_case": "uc1", "input": "Give dependencies for notifications staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-06", "use_case": "uc1", "input": "Highlight risks for identity dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-07", "use_case": "uc1", "input": "Summarize handover notes for inventory prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-08", "use_case": "uc1", "input": "List contacts for payments staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-09", "use_case": "uc1", "input": "Provide handover summary for analytics prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-10", "use_case": "uc1", "input": "Runbook steps for notifications prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-11", "use_case": "uc1", "input": "Summarize handover risks for inventory staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-12", "use_case": "uc1", "input": "Dependencies for identity staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-13", "use_case": "uc1", "input": "Owner contact for analytics prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-14", "use_case": "uc1", "input": "Recent changes for payments dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-15", "use_case": "uc1", "input": "Handover summary for notifications staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-16", "use_case": "uc1", "input": "List risks for identity prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-17", "use_case": "uc1", "input": "Runbook steps for payments prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-18", "use_case": "uc1", "input": "Dependencies for inventory dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-19", "use_case": "uc1", "input": "Handover notes for analytics staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-20", "use_case": "uc1", "input": "Owner contact for notifications prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-21", "use_case": "uc1", "input": "Summarize risks for payments dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-22", "use_case": "uc1", "input": "Runbook steps for analytics prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-23", "use_case": "uc1", "input": "Handover summary for inventory dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-24", "use_case": "uc1", "input": "Dependencies for payments prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-25", "use_case": "uc1", "input": "Latest handover summary for identity prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc2-01", "use_case": "uc2", "input": "Timeout while contacting auth service", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-02", "use_case": "uc2", "input": "Connection refused to postgres", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-03", "use_case": "uc2", "input": "Build pipeline failed with exit code 137", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-04", "use_case": "uc2", "input": "OutOfMemoryError in batch job", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-05", "use_case": "uc2", "input": "Permission denied reading /etc/ssl", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-06", "use_case": "uc2", "input": "HTTP 503 from upstream service", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-07", "use_case": "uc2", "input": "Latency spike detected in prod", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-08", "use_case": "uc2", "input": "Kube API rate limit exceeded", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-09", "use_case": "uc2", "input": "Container image pull failed", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-10", "use_case": "uc2", "input": "CPU throttling detected in worker", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-11", "use_case": "uc2", "input": "TLS certificate expired", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-12", "use_case": "uc2", "input": "Disk IO errors in node", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-13", "use_case": "uc2", "input": "Webhook delivery failed", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-14", "use_case": "uc2", "input": "Redis connection pool exhausted", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-15", "use_case": "uc2", "input": "Service health check failing", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-16", "use_case": "uc2", "input": "Timeout while writing to kafka", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-17", "use_case": "uc2", "input": "Build failed: missing artifact", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-18", "use_case": "uc2", "input": "Daemon crash after deploy", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-19", "use_case": "uc2", "input": "Network policy denied traffic", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-20", "use_case": "uc2", "input": "Secrets mount failed", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-21", "use_case": "uc2", "input": "OOMKilled in pod", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-22", "use_case": "uc2", "input": "Gateway 504 error", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-23", "use_case": "uc2", "input": "Helm upgrade failed", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-24", "use_case": "uc2", "input": "Staging environment down", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-25", "use_case": "uc2", "input": "Database deadlock detected", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
