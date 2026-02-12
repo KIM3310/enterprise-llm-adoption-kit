@@ -109,9 +109,35 @@ make demo
 pytest -q
 ```
 
+## 백엔드 품질 게이트
+```bash
+make quality-backend
+```
+
 ## Metrics
 - Prometheus endpoint: `GET /metrics`
 - Request counters, latency histogram, token usage, cost estimates, policy events
+
+## 프로덕션 런타임 옵션 (구현됨)
+- 인증 모드:
+  - `AUTH_MODE=local_jwt` (기본) 또는 `AUTH_MODE=oidc`
+  - OIDC 검증: `OIDC_ISSUER`, 선택 `OIDC_AUDIENCE`, 선택 `OIDC_JWKS_URL`
+- JWT 키 회전:
+  - `JWT_ACTIVE_KID=v2`
+  - `JWT_SECRETS="v1:old-secret,v2:new-secret"` (또는 `JWT_SECRETS_FILE` JSON)
+- OIDC 토큰 교환:
+  - `POST /auth/oidc/exchange` with `{ "id_token": "..." }`
+- LLM provider:
+  - `LLM_PROVIDER=openai`
+  - `LLM_OPENAI_API_KEY` (또는 `LLM_OPENAI_API_KEY_FILE`)
+  - 선택 `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
+- 운영 정책/알림:
+  - `GET /ops/policy`
+  - `GET /ops/alerts` 및 `GET /ops/alerts?deliver=true`
+  - 선택 웹훅: `OPS_ALERT_WEBHOOK_URL`
+- 저장소 백엔드:
+  - `EVENT_STORAGE_BACKEND=sqlite` (기본) 또는 `EVENT_STORAGE_BACKEND=jsonl`
+  - JSONL 경로: `SERVICE_EVENTS_JSONL_PATH`, `CONTROL_TOWER_DECISIONS_JSONL_PATH`, `DAILY_COST_JSON_PATH`
 
 ## Role alignment
 - Employee: limited docs
