@@ -1,9 +1,11 @@
 import json
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+
 
 def test_sample_audit_schema():
-    path = Path("/Users/s/enterprise-llm-adoption-kit/app/backend/data/sample_audit.json")
+    path = ROOT_DIR / "app/backend/data/sample_audit.json"
     assert path.exists()
     data = json.loads(path.read_text())
 

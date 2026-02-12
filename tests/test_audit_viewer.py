@@ -2,6 +2,8 @@ import json
 import importlib.util
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+
 
 def _load_module(path: Path):
     spec = importlib.util.spec_from_file_location("audit_viewer", path)
@@ -27,7 +29,7 @@ def test_audit_viewer_summary():
         },
     ]
     lines = [json.dumps(e) for e in events]
-    module = _load_module(Path("/Users/s/enterprise-llm-adoption-kit/app/backend/scripts/audit_viewer.py"))
+    module = _load_module(ROOT_DIR / "app/backend/scripts/audit_viewer.py")
     summary = module.summarize_events(lines)
 
     assert summary["requests"] == 2

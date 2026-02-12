@@ -2,10 +2,12 @@ import logging
 import time
 import uuid
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
@@ -27,7 +29,11 @@ from .control_tower_service import (
 )
 from .diagnostics import run_startup_diagnostics
 from .injection import detect_injection
-from .llm_adapter import get_llm_adapter
+from .llm_adapter import (
+    get_llm_adapter,
+    get_llm_runtime_settings,
+    update_llm_runtime_settings,
+)
 from .metrics import (
     COST_COUNTER,
     LATENCY_HIST,
@@ -37,6 +43,10 @@ from .metrics import (
     TOKENS_OUT_COUNTER,
 )
 from .models import (
+    AdminLLMRuntimeUpdate,
+    AdminLLMRuntimeView,
+    ArchitectureCatalogResponse,
+    ArchitectureImportRequest,
     AuthRequest,
     AuthResponse,
     ControlTowerDecisionRequest,
@@ -50,19 +60,29 @@ from .models import (
     OIDCTokenExchangeRequest,
     OIDCLoginRequest,
     OpsAlertsResponse,
+    OpsDiagnosticsRefreshResponse,
+    OpsRuntimeResponse,
     SlackEvent,
     ToolCall,
     UserContext,
 )
 from .oidc import map_oidc_claims_to_roles
 from .rbac import allowed_access_groups
-from .rag import RAGStore
+from .rag import (
+    RAGStore,
+    load_normalized_docs,
+    parse_jsonl_to_normalized_docs,
+    summarize_normalized_docs,
+    write_normalized_docs,
+)
 from .rate_limit import RateLimiter
 from .redaction import redact_text
 from .safety import REFUSAL_MESSAGE, should_refuse
 from .storage import (
     add_cost,
     get_daily_cost,
+    get_recent_control_tower_decisions,
+    get_recent_service_events,
     init_db,
     record_control_tower_decision,
     record_service_event,
@@ -72,7 +92,6 @@ from .tools import ToolRouter
 logger = logging.getLogger("service")
 
 rag_store = RAGStore()
-llm_adapter = get_llm_adapter()
 rate_limiter = RateLimiter(settings.rate_limit_capacity, settings.rate_limit_refill_per_sec)
 control_tower_service = ControlTowerService()
 LLM_MAX_RETRIES = 3
@@ -102,6 +121,70 @@ def _policy_event(event: str, triggered: bool) -> None:
         POLICY_EVENT_COUNTER.labels(event=event).inc()
 
 
+def _safe_limit(value: int, default: int, *, min_value: int = 1, max_value: int = 200) -> int:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        parsed = default
+    return max(min_value, min(parsed, max_value))
+
+
+def _now_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _parse_iso_datetime(value: str) -> Optional[datetime]:
+    raw = str(value).strip()
+    if not raw:
+        return None
+    if raw.endswith("Z"):
+        raw = f"{raw[:-1]}+00:00"
+    try:
+        parsed = datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _within_minutes(created_at: str, minutes: int, *, now: Optional[datetime] = None) -> bool:
+    if minutes <= 0:
+        return True
+    parsed = _parse_iso_datetime(created_at)
+    if parsed is None:
+        return False
+    safe_minutes = max(1, int(minutes))
+    reference = now or _now_utc()
+    return parsed >= reference - timedelta(minutes=safe_minutes)
+
+
+def _contains_ci(value: object, needle: str) -> bool:
+    return needle in str(value or "").lower()
+
+
+def _normalize_ops_level(value: str) -> str:
+    normalized = str(value or "").strip().upper()
+    if normalized in {"WARN", "WARNING"}:
+        return "WARN"
+    if normalized in {"ERR", "ERROR"}:
+        return "ERROR"
+    if normalized in {"INFO", "INFORMATION"}:
+        return "INFO"
+    return normalized
+
+
+def _sort_rows_by_created_at(rows: List[Dict], sort: str) -> List[Dict]:
+    descending = str(sort).strip().lower() != "asc"
+    return sorted(
+        rows,
+        key=lambda item: _parse_iso_datetime(str(item.get("created_at", ""))) or datetime.min.replace(
+            tzinfo=timezone.utc
+        ),
+        reverse=descending,
+    )
+
+
 def _build_citations(chunks) -> List[Dict[str, str]]:
     citations: List[Dict[str, str]] = []
     for chunk in chunks:
@@ -109,17 +192,35 @@ def _build_citations(chunks) -> List[Dict[str, str]]:
     return citations
 
 
+def _llm_model_config() -> Dict[str, object]:
+    runtime = get_llm_runtime_settings()
+    return {
+        "provider": runtime.get("provider", "stub"),
+        "model": runtime.get("model", "stub-llm"),
+        "temperature": runtime.get("temperature", settings.llm_temperature),
+        "max_tokens": runtime.get("max_tokens", settings.llm_max_tokens),
+    }
+
+
 def _call_llm_with_retry(messages, use_case: str):
     backoff = 0.2
     last_exc = None
     for _ in range(LLM_MAX_RETRIES):
         try:
-            return llm_adapter.generate(messages, use_case=use_case)
+            adapter = get_llm_adapter()
+            return adapter.generate(messages, use_case=use_case)
         except Exception as exc:  # noqa: BLE001
             last_exc = exc
             time.sleep(backoff)
             backoff *= 2
     raise HTTPException(status_code=502, detail=f"LLM call failed: {last_exc}")
+
+
+def _architecture_catalog_payload() -> Dict[str, object]:
+    docs = load_normalized_docs()
+    summary = summarize_normalized_docs(docs)
+    summary["chunk_count"] = int(rag_store.collection.count())
+    return summary
 
 
 def _safe_record_service_event(level: str, component: str, message: str, context: Dict) -> None:
@@ -192,6 +293,17 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.middleware("http")
@@ -276,7 +388,13 @@ def metrics() -> PlainTextResponse:
 
 @app.get("/audit/summary")
 def audit_summary() -> Dict:
-    return summarize_log(Path(settings.audit_log_path))
+    max_lines = _safe_limit(
+        getattr(settings, "audit_summary_max_lines", 5000),
+        default=5000,
+        min_value=1,
+        max_value=50000,
+    )
+    return summarize_log(Path(settings.audit_log_path), max_lines=max_lines)
 
 
 @app.get("/costs/daily")
@@ -300,6 +418,7 @@ def ops_policy(user=Depends(get_current_user)) -> Dict[str, object]:
         },
         "allowed_tools": settings.allowed_tools,
         "storage_backend": settings.event_storage_backend,
+        "audit_summary_max_lines": settings.audit_summary_max_lines,
         "alert_thresholds": {
             "min_requests": settings.ops_alert_min_requests,
             "refusal_ratio": settings.ops_alert_refusal_ratio_threshold,
@@ -319,7 +438,13 @@ def ops_alerts(deliver: bool = False, user=Depends(get_current_user)) -> OpsAler
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     _ensure_rate_limit(user.user_id, role, "ops_alerts")
 
-    summary = summarize_log(Path(settings.audit_log_path))
+    max_lines = _safe_limit(
+        getattr(settings, "audit_summary_max_lines", 5000),
+        default=5000,
+        min_value=1,
+        max_value=50000,
+    )
+    summary = summarize_log(Path(settings.audit_log_path), max_lines=max_lines)
     daily_cost_usd = float(get_daily_cost())
     alerts = evaluate_ops_alerts(summary, daily_cost_usd)
 
@@ -343,6 +468,193 @@ def ops_alerts(deliver: bool = False, user=Depends(get_current_user)) -> OpsAler
         alerts=alerts,
         webhook_sent=delivery["sent"],
         webhook_failed=delivery["failed"],
+    )
+
+
+@app.get("/ops/runtime", response_model=OpsRuntimeResponse)
+def ops_runtime(
+    events_limit: int = 25,
+    decisions_limit: int = 15,
+    events_since_minutes: int = 0,
+    decisions_since_minutes: int = 0,
+    component: str = "",
+    level: str = "",
+    search: str = "",
+    sort: str = "desc",
+    user=Depends(get_current_user),
+) -> OpsRuntimeResponse:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Ops", "Admin"])
+    _ensure_rate_limit(user.user_id, role, "ops_runtime")
+
+    max_lines = _safe_limit(
+        getattr(settings, "audit_summary_max_lines", 5000),
+        default=5000,
+        min_value=1,
+        max_value=50000,
+    )
+    summary = summarize_log(Path(settings.audit_log_path), max_lines=max_lines)
+    daily_cost_usd = float(get_daily_cost())
+    alerts = evaluate_ops_alerts(summary, daily_cost_usd)
+
+    safe_events_since = _safe_limit(events_since_minutes, default=0, min_value=0, max_value=10080)
+    safe_decisions_since = _safe_limit(
+        decisions_since_minutes,
+        default=0,
+        min_value=0,
+        max_value=10080,
+    )
+    search_term = str(search).strip().lower()
+    sort_order = str(sort).strip().lower()
+    if sort_order not in {"asc", "desc"}:
+        sort_order = "desc"
+    reference_now = _now_utc()
+
+    events = get_recent_service_events(limit=_safe_limit(events_limit, default=25, max_value=500))
+    if safe_events_since > 0:
+        events = [
+            event
+            for event in events
+            if _within_minutes(
+                str(event.get("created_at", "")),
+                safe_events_since,
+                now=reference_now,
+            )
+        ]
+    if component.strip():
+        component_lower = component.strip().lower()
+        events = [
+            event
+            for event in events
+            if component_lower in str(event.get("component", "")).lower()
+        ]
+    if level.strip():
+        expected_level = _normalize_ops_level(level)
+        events = [
+            event
+            for event in events
+            if _normalize_ops_level(str(event.get("level", ""))) == expected_level
+        ]
+    if search_term:
+        events = [
+            event
+            for event in events
+            if _contains_ci(event.get("created_at"), search_term)
+            or _contains_ci(event.get("level"), search_term)
+            or _contains_ci(event.get("component"), search_term)
+            or _contains_ci(event.get("message"), search_term)
+            or _contains_ci(event.get("context"), search_term)
+        ]
+    events = _sort_rows_by_created_at(events, sort_order)
+
+    decision_rows = get_recent_control_tower_decisions(
+        limit=_safe_limit(decisions_limit, default=15, max_value=200)
+    )
+    decisions = [
+        {
+            "decision_id": str(item.get("decision_id", "")),
+            "created_at": str(item.get("created_at", "")),
+            "scenario_id": str(item.get("scenario_id", "")),
+            "user_id": str(item.get("user_id", "")),
+            "role": str(item.get("role", "")),
+            "risk_score": float(item.get("risk_score", 0.0)),
+            "risk_level": str(item.get("risk_level", "")),
+            "spec_version": str(item.get("spec_version", "")),
+            "refusal": bool(item.get("refusal", False)),
+        }
+        for item in decision_rows
+    ]
+    if safe_decisions_since > 0:
+        decisions = [
+            decision
+            for decision in decisions
+            if _within_minutes(
+                str(decision.get("created_at", "")),
+                safe_decisions_since,
+                now=reference_now,
+            )
+        ]
+    if search_term:
+        decisions = [
+            decision
+            for decision in decisions
+            if _contains_ci(decision.get("created_at"), search_term)
+            or _contains_ci(decision.get("decision_id"), search_term)
+            or _contains_ci(decision.get("scenario_id"), search_term)
+            or _contains_ci(decision.get("risk_level"), search_term)
+            or _contains_ci(decision.get("user_id"), search_term)
+            or _contains_ci(decision.get("role"), search_term)
+        ]
+    decisions = _sort_rows_by_created_at(decisions, sort_order)
+
+    if search_term:
+        alerts = [
+            alert
+            for alert in alerts
+            if _contains_ci(alert.get("code"), search_term)
+            or _contains_ci(alert.get("severity"), search_term)
+            or _contains_ci(alert.get("message"), search_term)
+        ]
+
+    startup_report = getattr(app.state, "startup_report", None)
+    if not isinstance(startup_report, dict):
+        startup_report = run_startup_diagnostics(
+            rag_store=rag_store,
+            sqlite_path=settings.sqlite_path,
+            audit_log_path=settings.audit_log_path,
+        )
+        app.state.startup_report = startup_report
+    startup_status = str(startup_report.get("overall_status", "unknown"))
+
+    latency_s = time.time() - start
+    _record_metrics("/ops/runtime", "ops", role, "200", latency_s)
+
+    return OpsRuntimeResponse(
+        startup_status=startup_status,
+        startup_report=startup_report,
+        audit_summary=summary,
+        daily_cost_usd=round(daily_cost_usd, 6),
+        alerts=alerts,
+        service_events=events,
+        recent_decisions=decisions,
+    )
+
+
+@app.post("/ops/diagnostics/refresh", response_model=OpsDiagnosticsRefreshResponse)
+def ops_diagnostics_refresh(user=Depends(get_current_user)) -> OpsDiagnosticsRefreshResponse:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Ops", "Admin"])
+    _ensure_rate_limit(user.user_id, role, "ops_diagnostics_refresh")
+
+    report = run_startup_diagnostics(
+        rag_store=rag_store,
+        sqlite_path=settings.sqlite_path,
+        audit_log_path=settings.audit_log_path,
+    )
+    app.state.startup_report = report
+    startup_status = str(report.get("overall_status", "unknown"))
+
+    if startup_status == "healthy":
+        event_level = "INFO"
+    elif startup_status == "degraded":
+        event_level = "WARN"
+    else:
+        event_level = "ERROR"
+    _safe_record_service_event(
+        level=event_level,
+        component="diagnostics",
+        message=f"startup diagnostics refreshed ({startup_status})",
+        context=report,
+    )
+
+    latency_s = time.time() - start
+    _record_metrics("/ops/diagnostics/refresh", "ops", role, "200", latency_s)
+
+    return OpsDiagnosticsRefreshResponse(
+        startup_status=startup_status,
+        startup_report=report,
     )
 
 
@@ -514,6 +826,146 @@ def auth_keys(user=Depends(get_current_user)) -> Dict[str, object]:
     return auth_key_metadata()
 
 
+@app.get("/admin/runtime/llm", response_model=AdminLLMRuntimeView)
+def admin_runtime_llm(user=Depends(get_current_user)) -> AdminLLMRuntimeView:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Admin"])
+    _ensure_rate_limit(user.user_id, role, "admin_runtime_llm_get")
+
+    runtime = get_llm_runtime_settings()
+    latency_s = time.time() - start
+    _record_metrics("/admin/runtime/llm", "admin", role, "200", latency_s)
+    return AdminLLMRuntimeView(**runtime)
+
+
+@app.post("/admin/runtime/llm", response_model=AdminLLMRuntimeView)
+def admin_runtime_llm_update(
+    payload: AdminLLMRuntimeUpdate,
+    user=Depends(get_current_user),
+) -> AdminLLMRuntimeView:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Admin"])
+    _ensure_rate_limit(user.user_id, role, "admin_runtime_llm_update")
+
+    try:
+        runtime = update_llm_runtime_settings(
+            provider=payload.provider,
+            model=payload.model,
+            temperature=payload.temperature,
+            max_tokens=payload.max_tokens,
+            timeout_sec=payload.timeout_sec,
+            openai_base_url=payload.openai_base_url,
+            openai_org=payload.openai_org,
+            openai_api_key=payload.openai_api_key,
+            reset_to_env=payload.reset_to_env,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    _safe_record_service_event(
+        level="INFO",
+        component="admin_runtime",
+        message="llm runtime updated",
+        context={
+            "user_id": user.user_id,
+            "provider": runtime.get("provider"),
+            "model": runtime.get("model"),
+            "reset_to_env": payload.reset_to_env,
+            "api_key_configured": runtime.get("openai_api_key_configured", False),
+        },
+    )
+
+    latency_s = time.time() - start
+    _record_metrics("/admin/runtime/llm", "admin", role, "200", latency_s)
+    return AdminLLMRuntimeView(**runtime)
+
+
+@app.get("/admin/architecture/catalog", response_model=ArchitectureCatalogResponse)
+def admin_architecture_catalog(user=Depends(get_current_user)) -> ArchitectureCatalogResponse:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Admin"])
+    _ensure_rate_limit(user.user_id, role, "admin_architecture_catalog")
+
+    payload = _architecture_catalog_payload()
+    latency_s = time.time() - start
+    _record_metrics("/admin/architecture/catalog", "admin", role, "200", latency_s)
+    return ArchitectureCatalogResponse(**payload)
+
+
+@app.post("/admin/architecture/import", response_model=ArchitectureCatalogResponse)
+def admin_architecture_import(
+    payload: ArchitectureImportRequest,
+    user=Depends(get_current_user),
+) -> ArchitectureCatalogResponse:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Admin"])
+    _ensure_rate_limit(user.user_id, role, "admin_architecture_import")
+
+    try:
+        docs = parse_jsonl_to_normalized_docs(payload.jsonl)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    write_normalized_docs(docs)
+    rag_store.rebuild_index(docs)
+    app.state.startup_report = run_startup_diagnostics(
+        rag_store=rag_store,
+        sqlite_path=settings.sqlite_path,
+        audit_log_path=settings.audit_log_path,
+    )
+
+    summary = _architecture_catalog_payload()
+    _safe_record_service_event(
+        level="INFO",
+        component="admin_dataset",
+        message="architecture dataset imported",
+        context={
+            "user_id": user.user_id,
+            "doc_count": summary.get("doc_count", 0),
+            "chunk_count": summary.get("chunk_count", 0),
+        },
+    )
+
+    latency_s = time.time() - start
+    _record_metrics("/admin/architecture/import", "admin", role, "200", latency_s)
+    return ArchitectureCatalogResponse(**summary)
+
+
+@app.post("/admin/architecture/reindex", response_model=ArchitectureCatalogResponse)
+def admin_architecture_reindex(user=Depends(get_current_user)) -> ArchitectureCatalogResponse:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_any_role(user.roles, ["Admin"])
+    _ensure_rate_limit(user.user_id, role, "admin_architecture_reindex")
+
+    docs = load_normalized_docs()
+    rag_store.rebuild_index(docs)
+    app.state.startup_report = run_startup_diagnostics(
+        rag_store=rag_store,
+        sqlite_path=settings.sqlite_path,
+        audit_log_path=settings.audit_log_path,
+    )
+    summary = _architecture_catalog_payload()
+    _safe_record_service_event(
+        level="INFO",
+        component="admin_dataset",
+        message="architecture dataset reindexed",
+        context={
+            "user_id": user.user_id,
+            "doc_count": summary.get("doc_count", 0),
+            "chunk_count": summary.get("chunk_count", 0),
+        },
+    )
+
+    latency_s = time.time() - start
+    _record_metrics("/admin/architecture/reindex", "admin", role, "200", latency_s)
+    return ArchitectureCatalogResponse(**summary)
+
+
 @app.post("/integrations/slack/events")
 def slack_events(payload: SlackEvent) -> Dict[str, str]:
     start = time.time()
@@ -605,11 +1057,7 @@ def handover(
                 "user_id": user.user_id,
                 "roles": user.roles,
                 "use_case": "uc1",
-                "model_config": {
-                    "model": settings.llm_model,
-                    "temperature": settings.llm_temperature,
-                    "max_tokens": settings.llm_max_tokens,
-                },
+                "model_config": _llm_model_config(),
                 "retrieval_doc_ids": citations,
                 "tool_calls": [],
                 "latency_ms": int(latency_s * 1000),
@@ -674,11 +1122,7 @@ def handover(
             "user_id": user.user_id,
             "roles": user.roles,
             "use_case": "uc1",
-            "model_config": {
-                "model": settings.llm_model,
-                "temperature": settings.llm_temperature,
-                "max_tokens": settings.llm_max_tokens,
-            },
+            "model_config": _llm_model_config(),
             "retrieval_doc_ids": citations,
             "tool_calls": [],
             "latency_ms": int(latency_s * 1000),
@@ -738,11 +1182,7 @@ def log_intel(
                 "user_id": user.user_id,
                 "roles": user.roles,
                 "use_case": "uc2",
-                "model_config": {
-                    "model": settings.llm_model,
-                    "temperature": settings.llm_temperature,
-                    "max_tokens": settings.llm_max_tokens,
-                },
+                "model_config": _llm_model_config(),
                 "retrieval_doc_ids": [],
                 "tool_calls": [],
                 "latency_ms": int(latency_s * 1000),
@@ -843,11 +1283,7 @@ def log_intel(
             "user_id": user.user_id,
             "roles": user.roles,
             "use_case": "uc2",
-            "model_config": {
-                "model": settings.llm_model,
-                "temperature": settings.llm_temperature,
-                "max_tokens": settings.llm_max_tokens,
-            },
+            "model_config": _llm_model_config(),
             "retrieval_doc_ids": knowledge_result.get("results", []),
             "tool_calls": [tool_call.model_dump() for tool_call in tool_calls],
             "latency_ms": int(latency_s * 1000),
