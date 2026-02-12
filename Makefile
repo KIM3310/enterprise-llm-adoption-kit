@@ -1,5 +1,5 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo
+.PHONY: eval-gate demo quality-backend
 
 eval-gate:
 	python3 evals/runner/eval_gate.py
@@ -30,3 +30,6 @@ demo:
 	@echo "[6/6] tests..."
 	@python3 -m pytest -q
 	@echo "DEMO OK"
+
+quality-backend:
+	@cd app/backend && ./scripts/quality_gate.sh

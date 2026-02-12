@@ -3,13 +3,15 @@ import os
 import re
 from typing import Dict, List, Tuple
 
-from .config import DATA_DIR
+from .config import DATA_DIR, settings
 
-ALLOWED_TOOLS = {
-    "runbook_lookup",
-    "log_signature_extract",
-    "knowledge_search",
-}
+ALLOWED_TOOLS = frozenset(
+    getattr(
+        settings,
+        "allowed_tools",
+        ["runbook_lookup", "log_signature_extract", "knowledge_search"],
+    )
+)
 
 RUNBOOK_PATH = str(DATA_DIR / "runbooks.json")
 
@@ -54,5 +56,9 @@ class ToolRouter:
 def _load_runbooks() -> List[Dict]:
     if not os.path.exists(RUNBOOK_PATH):
         return []
-    with open(RUNBOOK_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(RUNBOOK_PATH, "r", encoding="utf-8") as f:
+            loaded = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return []
+    return loaded if isinstance(loaded, list) else []
