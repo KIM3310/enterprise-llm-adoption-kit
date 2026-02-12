@@ -1,0 +1,93 @@
+{
+  "version": "1.0.0",
+  "weights": {
+    "demand_volatility": 0.18,
+    "inventory_pressure": 0.2,
+    "machine_health_risk": 0.2,
+    "sla_risk": 0.17,
+    "margin_pressure": 0.15,
+    "gpu_pressure": 0.1
+  },
+  "thresholds": {
+    "demand_delta_alert_ratio": 0.3,
+    "inventory_days_alert": 7.0,
+    "inventory_days_critical": 3.0,
+    "machine_anomaly_alert": 0.7,
+    "sla_breach_alert": 0.5,
+    "target_margin_ratio": 0.2,
+    "gpu_utilization_alert": 0.85
+  },
+  "risk_bands": [
+    {
+      "level": "low",
+      "min": 0.0,
+      "max": 0.35
+    },
+    {
+      "level": "medium",
+      "min": 0.35,
+      "max": 0.6
+    },
+    {
+      "level": "high",
+      "min": 0.6,
+      "max": 0.8
+    },
+    {
+      "level": "critical",
+      "min": 0.8,
+      "max": 1.01
+    }
+  ],
+  "primary_actions": {
+    "low": [
+      "Keep current operating plan and monitor baseline drift."
+    ],
+    "medium": [
+      "Increase safety stock for top at-risk SKUs.",
+      "Run targeted health checks on noisy machines."
+    ],
+    "high": [
+      "Trigger temporary capacity scale-out and expedite logistics.",
+      "Prioritize at-risk orders and allocate fallback inventory.",
+      "Launch focused model recalibration run."
+    ],
+    "critical": [
+      "Activate incident command and hourly control tower cadence.",
+      "Freeze low-priority workloads and reserve GPU for SLA-critical jobs.",
+      "Open executive escalation and execute contingency runbook."
+    ]
+  },
+  "platform_actions": {
+    "aws": {
+      "low": "No immediate scaling action. Keep EKS autoscaling policy unchanged.",
+      "medium": "Raise EKS worker floor and pre-warm inference pods.",
+      "high": "Scale EKS GPU node group and invoke incident Step Functions workflow.",
+      "critical": "Execute regional failover playbook and lock capacity reservations."
+    },
+    "databricks": {
+      "low": "Continue scheduled feature freshness checks.",
+      "medium": "Run incremental feature pipeline and drift diagnostics.",
+      "high": "Run emergency retraining notebook and publish candidate model.",
+      "critical": "Force supervised retraining workflow and block stale model promotion."
+    },
+    "snowflake": {
+      "low": "Persist daily KPI snapshot only.",
+      "medium": "Increase KPI snapshot cadence to hourly.",
+      "high": "Write incident KPI stream and expose high-risk dashboard view.",
+      "critical": "Enable war-room dashboard and lock incident data mart branch."
+    },
+    "palantir": {
+      "low": "Keep ontology action queue in monitor mode.",
+      "medium": "Create operator task objects for top risk entities.",
+      "high": "Trigger ontology action set for expediting and maintenance dispatch.",
+      "critical": "Launch executive decision app workflow with mandatory acknowledgements."
+    },
+    "mariadb": {
+      "low": "Store decision snapshot in control_tower_decisions table.",
+      "medium": "Store decision snapshot and create follow-up task records.",
+      "high": "Persist incident decision set and lock affected order rows for review.",
+      "critical": "Persist emergency decision journal and activate strict write-audit mode."
+    }
+  }
+}

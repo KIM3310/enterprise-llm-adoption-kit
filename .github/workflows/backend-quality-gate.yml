@@ -1,0 +1,41 @@
+name: backend-quality-gate
+
+on:
+  pull_request:
+    paths:
+      - "app/backend/**"
+      - ".github/workflows/backend-quality-gate.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "app/backend/**"
+      - ".github/workflows/backend-quality-gate.yml"
+
+jobs:
+  backend-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app/backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run quality gate
+        env:
+          QUALITY_SQLITE_PATH: /tmp/ellm_backend_quality_ci.db
+          QUALITY_AUDIT_LOG_PATH: /tmp/ellm_backend_quality_ci_audit.log
+          QUALITY_CHROMA_DIR: /tmp/ellm_backend_quality_ci_chroma
+        run: ./scripts/quality_gate.sh

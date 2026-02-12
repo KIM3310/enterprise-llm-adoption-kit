@@ -109,9 +109,35 @@ make demo
 pytest -q
 ```
 
+## Backend quality gate
+```bash
+make quality-backend
+```
+
 ## Metrics
 - Prometheus endpoint: `GET /metrics`
 - Request counters, latency histogram, token usage, cost estimates, policy events
+
+## Production Runtime Options (implemented)
+- Auth mode:
+  - `AUTH_MODE=local_jwt` (default) or `AUTH_MODE=oidc`
+  - OIDC verify: `OIDC_ISSUER`, optional `OIDC_AUDIENCE`, optional `OIDC_JWKS_URL`
+- JWT key rotation:
+  - `JWT_ACTIVE_KID=v2`
+  - `JWT_SECRETS="v1:old-secret,v2:new-secret"` (or `JWT_SECRETS_FILE` JSON map)
+- OIDC token exchange:
+  - `POST /auth/oidc/exchange` with `{ "id_token": "..." }`
+- LLM provider:
+  - `LLM_PROVIDER=openai`
+  - `LLM_OPENAI_API_KEY` (or `LLM_OPENAI_API_KEY_FILE`)
+  - optional `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
+- Ops policy and alerts:
+  - `GET /ops/policy`
+  - `GET /ops/alerts` and `GET /ops/alerts?deliver=true`
+  - optional webhook: `OPS_ALERT_WEBHOOK_URL`
+- Storage backend:
+  - `EVENT_STORAGE_BACKEND=sqlite` (default) or `EVENT_STORAGE_BACKEND=jsonl`
+  - JSONL paths: `SERVICE_EVENTS_JSONL_PATH`, `CONTROL_TOWER_DECISIONS_JSONL_PATH`, `DAILY_COST_JSON_PATH`
 
 ## Role alignment
 - Employee: limited docs
