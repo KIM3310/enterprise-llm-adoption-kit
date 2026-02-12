@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
@@ -6,6 +7,7 @@ from typing import Dict, List, Optional, Tuple
 import chromadb
 import hashlib
 import numpy as np
+from chromadb.config import Settings as ChromaSettings
 
 from .config import settings, DATA_DIR
 
@@ -60,7 +62,11 @@ class RetrievedChunk:
 class RAGStore:
     def __init__(self) -> None:
         os.makedirs(settings.chroma_persist_dir, exist_ok=True)
-        self.client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
+        logging.getLogger("chromadb.telemetry.product.posthog").disabled = True
+        self.client = chromadb.PersistentClient(
+            path=settings.chroma_persist_dir,
+            settings=ChromaSettings(anonymized_telemetry=False),
+        )
         self.collection = self.client.get_or_create_collection(
             COLLECTION_NAME, embedding_function=HashEmbedding()
         )
