@@ -2,6 +2,8 @@ from pathlib import Path
 import importlib.util
 import tempfile
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+
 
 def _load_module(path: Path):
     spec = importlib.util.spec_from_file_location("dataset_ingest", path)
@@ -12,7 +14,7 @@ def _load_module(path: Path):
 
 
 def test_dataset_ingest_adds_suggestions():
-    script_path = Path("/Users/s/enterprise-llm-adoption-kit/evals/runner/dataset_ingest.py")
+    script_path = ROOT_DIR / "evals/runner/dataset_ingest.py"
     module = _load_module(script_path)
 
     with tempfile.TemporaryDirectory() as tmpdir:
