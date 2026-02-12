@@ -109,6 +109,7 @@ class Settings:
     audit_log_path: str = os.getenv(
         "AUDIT_LOG_PATH", str(DATA_DIR / "audit.log")
     )
+    audit_summary_max_lines: int = int(os.getenv("AUDIT_SUMMARY_MAX_LINES", "5000"))
 
     sqlite_path: str = os.getenv("SQLITE_PATH", str(DATA_DIR / "app.db"))
     control_tower_spec_path: str = os.getenv(

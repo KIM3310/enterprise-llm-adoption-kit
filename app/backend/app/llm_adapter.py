@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import List, Dict
+from threading import Lock
+from typing import Dict, List, Optional
 
 import requests
 
@@ -12,6 +13,21 @@ class LLMResult:
     tokens_in: int
     tokens_out: int
     cost: float
+
+
+RUNTIME_PROVIDER_OPTIONS = {"stub", "openai", "openai_compatible"}
+
+_runtime_lock = Lock()
+_runtime_overrides: Dict[str, Optional[object]] = {
+    "provider": None,
+    "model": None,
+    "temperature": None,
+    "max_tokens": None,
+    "timeout_sec": None,
+    "openai_base_url": None,
+    "openai_org": None,
+    "openai_api_key": None,
+}
 
 
 def _estimate_tokens(text: str) -> int:
@@ -29,12 +45,112 @@ class LLMAdapter:
         raise NotImplementedError
 
 
+def _normalize_provider(value: str) -> str:
+    provider = str(value or "stub").strip().lower()
+    if provider not in RUNTIME_PROVIDER_OPTIONS:
+        raise ValueError(f"provider must be one of {sorted(RUNTIME_PROVIDER_OPTIONS)}")
+    return provider
+
+
+def _active_runtime_config() -> Dict[str, object]:
+    with _runtime_lock:
+        provider_raw = _runtime_overrides["provider"]
+        model_raw = _runtime_overrides["model"]
+        temperature_raw = _runtime_overrides["temperature"]
+        max_tokens_raw = _runtime_overrides["max_tokens"]
+        timeout_raw = _runtime_overrides["timeout_sec"]
+        base_url_raw = _runtime_overrides["openai_base_url"]
+        org_raw = _runtime_overrides["openai_org"]
+        api_key_raw = _runtime_overrides["openai_api_key"]
+
+    provider = _normalize_provider(str(provider_raw or settings.llm_provider or "stub"))
+    model = str(model_raw or settings.llm_model).strip()
+    if not model:
+        model = "stub-llm"
+    temperature = float(
+        settings.llm_temperature if temperature_raw is None else temperature_raw
+    )
+    max_tokens = int(settings.llm_max_tokens if max_tokens_raw is None else max_tokens_raw)
+    timeout_sec = float(settings.llm_timeout_sec if timeout_raw is None else timeout_raw)
+    base_url = str(base_url_raw or settings.llm_openai_base_url).strip()
+    org = str(org_raw or settings.llm_openai_org).strip()
+    api_key = str(api_key_raw or settings.llm_openai_api_key).strip()
+
+    return {
+        "provider": provider,
+        "model": model,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "timeout_sec": timeout_sec,
+        "openai_base_url": base_url,
+        "openai_org": org,
+        "openai_api_key": api_key,
+    }
+
+
+def get_llm_runtime_settings() -> Dict[str, object]:
+    config = _active_runtime_config()
+    api_key = str(config.pop("openai_api_key", "")).strip()
+    config["openai_api_key_configured"] = bool(api_key)
+    return config
+
+
+def reset_llm_runtime_settings() -> Dict[str, object]:
+    with _runtime_lock:
+        for key in _runtime_overrides:
+            _runtime_overrides[key] = None
+    return get_llm_runtime_settings()
+
+
+def update_llm_runtime_settings(
+    *,
+    provider: Optional[str] = None,
+    model: Optional[str] = None,
+    temperature: Optional[float] = None,
+    max_tokens: Optional[int] = None,
+    timeout_sec: Optional[float] = None,
+    openai_base_url: Optional[str] = None,
+    openai_org: Optional[str] = None,
+    openai_api_key: Optional[str] = None,
+    reset_to_env: bool = False,
+) -> Dict[str, object]:
+    if reset_to_env:
+        return reset_llm_runtime_settings()
+
+    with _runtime_lock:
+        if provider is not None:
+            _runtime_overrides["provider"] = _normalize_provider(provider)
+        if model is not None:
+            model_value = str(model).strip()
+            if not model_value:
+                raise ValueError("model cannot be empty")
+            _runtime_overrides["model"] = model_value
+        if temperature is not None:
+            _runtime_overrides["temperature"] = float(temperature)
+        if max_tokens is not None:
+            _runtime_overrides["max_tokens"] = int(max_tokens)
+        if timeout_sec is not None:
+            _runtime_overrides["timeout_sec"] = float(timeout_sec)
+        if openai_base_url is not None:
+            _runtime_overrides["openai_base_url"] = str(openai_base_url).strip()
+        if openai_org is not None:
+            _runtime_overrides["openai_org"] = str(openai_org).strip()
+        if openai_api_key is not None:
+            _runtime_overrides["openai_api_key"] = str(openai_api_key).strip()
+
+    return get_llm_runtime_settings()
+
+
 class OpenAICompatibleAdapter(LLMAdapter):
     def __init__(self) -> None:
-        self.base_url = settings.llm_openai_base_url.rstrip("/")
-        self.api_key = settings.llm_openai_api_key
-        self.organization = settings.llm_openai_org
-        self.timeout_sec = max(1.0, settings.llm_timeout_sec)
+        runtime = _active_runtime_config()
+        self.base_url = str(runtime["openai_base_url"]).rstrip("/")
+        self.api_key = str(runtime["openai_api_key"]).strip()
+        self.organization = str(runtime["openai_org"]).strip()
+        self.timeout_sec = max(1.0, float(runtime["timeout_sec"]))
+        self.model = str(runtime["model"])
+        self.temperature = float(runtime["temperature"])
+        self.max_tokens = int(runtime["max_tokens"])
 
     def generate(self, messages: List[Dict[str, str]], use_case: str) -> LLMResult:
         if not self.api_key:
@@ -48,10 +164,10 @@ class OpenAICompatibleAdapter(LLMAdapter):
             headers["OpenAI-Organization"] = self.organization
 
         payload = {
-            "model": settings.llm_model,
+            "model": self.model,
             "messages": messages,
-            "temperature": settings.llm_temperature,
-            "max_tokens": settings.llm_max_tokens,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
         }
 
         try:
@@ -119,7 +235,7 @@ def _extract_response_text(data: Dict) -> str:
 
 
 def get_llm_adapter() -> LLMAdapter:
-    provider = (settings.llm_provider or "stub").strip().lower()
+    provider = str(_active_runtime_config()["provider"])
     if provider in {"openai", "openai_compatible"}:
         return OpenAICompatibleAdapter()
     return StubLLMAdapter()
