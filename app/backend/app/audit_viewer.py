@@ -1,7 +1,7 @@
 import json
-from collections import Counter
+from collections import Counter, deque
 from pathlib import Path
-from typing import Dict, List
+from typing import Deque, Dict, List, Optional
 
 
 def summarize_events(lines: List[str]) -> Dict:
@@ -41,14 +41,34 @@ def summarize_events(lines: List[str]) -> Dict:
     }
 
 
-def summarize_log(path: Path) -> Dict:
+def _empty_summary() -> Dict:
+    return {
+        "requests": 0,
+        "top_users": [],
+        "tools_used": [],
+        "policy_events": [],
+        "total_cost": 0.0,
+    }
+
+
+def _read_recent_lines(path: Path, max_lines: Optional[int]) -> List[str]:
+    if max_lines is None:
+        with path.open("r", encoding="utf-8", errors="ignore") as handle:
+            return handle.read().splitlines()
+
+    safe_limit = max(1, min(int(max_lines), 50000))
+    recent: Deque[str] = deque(maxlen=safe_limit)
+    with path.open("r", encoding="utf-8", errors="ignore") as handle:
+        for line in handle:
+            recent.append(line.rstrip("\n"))
+    return list(recent)
+
+
+def summarize_log(path: Path, max_lines: Optional[int] = None) -> Dict:
     if not path.exists():
-        return {
-            "requests": 0,
-            "top_users": [],
-            "tools_used": [],
-            "policy_events": [],
-            "total_cost": 0.0,
-        }
-    lines = path.read_text().splitlines()
+        return _empty_summary()
+    try:
+        lines = _read_recent_lines(path, max_lines=max_lines)
+    except OSError:
+        return _empty_summary()
     return summarize_events(lines)

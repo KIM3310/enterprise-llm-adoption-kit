@@ -31,6 +31,8 @@ CANONICAL_SCHEMA = {
     "last_updated": "",
 }
 
+VALID_ACCESS_GROUPS = {"employee", "ops", "admin"}
+
 
 class HashEmbedding:
     def __init__(self, dim: int = 384) -> None:
@@ -75,6 +77,23 @@ class RAGStore:
         if self.collection.count() > 0:
             return
         docs = load_normalized_docs()
+        self._index_docs(docs)
+
+    def rebuild_index(self, docs: Optional[List[Dict]] = None) -> int:
+        normalized_docs = docs if docs is not None else load_normalized_docs()
+        self._reset_collection()
+        return self._index_docs(normalized_docs)
+
+    def _reset_collection(self) -> None:
+        try:
+            self.client.delete_collection(COLLECTION_NAME)
+        except Exception:
+            pass
+        self.collection = self.client.get_or_create_collection(
+            COLLECTION_NAME, embedding_function=HashEmbedding()
+        )
+
+    def _index_docs(self, docs: List[Dict]) -> int:
         ids = []
         documents = []
         metadatas = []
@@ -96,6 +115,7 @@ class RAGStore:
                 )
         if ids:
             self.collection.add(ids=ids, documents=documents, metadatas=metadatas)
+        return len(ids)
 
     def query(
         self,
@@ -154,7 +174,82 @@ def normalize_doc(raw: Dict) -> Dict:
     for key in doc.keys():
         if key in raw:
             doc[key] = raw[key]
+    doc["access_group"] = str(doc.get("access_group", "")).strip().lower()
+    doc["system"] = str(doc.get("system", "")).strip().lower()
+    doc["env"] = str(doc.get("env", "")).strip().lower()
+    doc["doc_id"] = str(doc.get("doc_id", "")).strip()
+    doc["title"] = str(doc.get("title", "")).strip()
+    doc["summary"] = str(doc.get("summary", "")).strip()
+    doc["handover_notes"] = str(doc.get("handover_notes", "")).strip()
+    doc["last_updated"] = str(doc.get("last_updated", "")).strip()
+
+    if not isinstance(doc.get("runbook_steps"), list):
+        doc["runbook_steps"] = []
+    if not isinstance(doc.get("dependencies"), list):
+        doc["dependencies"] = []
+    if not isinstance(doc.get("risks"), list):
+        doc["risks"] = []
+    if not isinstance(doc.get("owner"), dict):
+        doc["owner"] = {"name": "", "team": "", "contact": ""}
     return doc
+
+
+def validate_normalized_doc(doc: Dict) -> None:
+    if not doc.get("doc_id"):
+        raise ValueError("doc_id is required")
+    if not doc.get("system"):
+        raise ValueError("system is required")
+    if not doc.get("env"):
+        raise ValueError("env is required")
+    if not doc.get("access_group"):
+        raise ValueError("access_group is required")
+    if doc["access_group"] not in VALID_ACCESS_GROUPS:
+        raise ValueError(
+            f"access_group must be one of {sorted(VALID_ACCESS_GROUPS)}"
+        )
+
+
+def parse_jsonl_to_normalized_docs(jsonl_text: str) -> List[Dict]:
+    docs: List[Dict] = []
+    raw_lines = str(jsonl_text or "").splitlines()
+    for index, raw_line in enumerate(raw_lines, start=1):
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            raw_doc = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"line {index}: invalid JSON ({exc.msg})") from exc
+        if not isinstance(raw_doc, dict):
+            raise ValueError(f"line {index}: JSON object required")
+        doc = normalize_doc(raw_doc)
+        validate_normalized_doc(doc)
+        docs.append(doc)
+    if not docs:
+        raise ValueError("no valid JSONL records found")
+    return docs
+
+
+def write_normalized_docs(docs: List[Dict]) -> int:
+    with open(NORM_DOCS_PATH, "w", encoding="utf-8") as f:
+        for doc in docs:
+            f.write(json.dumps(doc, ensure_ascii=True) + "\n")
+    return len(docs)
+
+
+def summarize_normalized_docs(docs: List[Dict]) -> Dict[str, object]:
+    systems = sorted({str(doc.get("system", "")).strip().lower() for doc in docs if doc.get("system")})
+    envs = sorted({str(doc.get("env", "")).strip().lower() for doc in docs if doc.get("env")})
+    groups = sorted(
+        {str(doc.get("access_group", "")).strip().lower() for doc in docs if doc.get("access_group")}
+    )
+    return {
+        "doc_count": len(docs),
+        "systems": systems,
+        "envs": envs,
+        "access_groups": groups,
+        "source_path": NORM_DOCS_PATH,
+    }
 
 
 def load_normalized_docs() -> List[Dict]:

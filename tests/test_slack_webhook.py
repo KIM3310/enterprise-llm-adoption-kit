@@ -10,7 +10,7 @@ def test_slack_uc1_route():
         role="Ops",
     )
     body = slack_events(payload)
-    assert "UC1 Summary" in body["text"]
+    assert "Architecture Summary" in body["text"]
 
 
 def test_slack_unknown_command():

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -101,9 +101,139 @@ const scenarioSteps = [
   }
 ];
 
+const SAMPLE_ARCHITECTURE_JSONL = [
+  JSON.stringify({
+    doc_id: "ACME-0001",
+    title: "Payments Production Handover",
+    system: "payments",
+    env: "prod",
+    access_group: "ops",
+    owner: { name: "Platform Owner", team: "Payments", contact: "owner@acme.local" },
+    summary: "Payments service architecture with external gateway dependency.",
+    handover_notes: "Monitor timeout spikes and queue depth after deployment.",
+    runbook_steps: [
+      "Check API latency dashboard.",
+      "Validate recent deployment diff.",
+      "Rollback if p95 exceeds threshold."
+    ],
+    dependencies: ["postgres", "redis", "gateway"],
+    risks: ["traffic spike", "upstream timeout"],
+    last_updated: "2026-02-12"
+  }),
+  JSON.stringify({
+    doc_id: "ACME-0002",
+    title: "Analytics Staging Handover",
+    system: "analytics",
+    env: "staging",
+    access_group: "admin",
+    owner: { name: "Data Lead", team: "Analytics", contact: "data@acme.local" },
+    summary: "Analytics pipeline architecture for staged model validation.",
+    handover_notes: "Validate schema drift alerts before production sync.",
+    runbook_steps: [
+      "Run drift diagnostics.",
+      "Check staging job failures.",
+      "Approve sync window with ops."
+    ],
+    dependencies: ["spark", "object-storage"],
+    risks: ["schema drift", "job backlog"],
+    last_updated: "2026-02-12"
+  })
+].join("\n");
+
 function getPageFromHash() {
   const hash = window.location.hash.replace("#", "").trim().toLowerCase();
   return pages.includes(hash) ? hash : "home";
+}
+
+function parseApiError(payload, fallback) {
+  const detail = payload?.detail;
+  if (typeof detail === "string" && detail.trim()) {
+    return detail.trim();
+  }
+  if (detail && typeof detail === "object") {
+    if (typeof detail.message === "string" && detail.message.trim()) {
+      return detail.message.trim();
+    }
+    if (typeof detail.error === "string" && detail.error.trim()) {
+      return detail.error.trim();
+    }
+  }
+  if (typeof payload?.error === "string" && payload.error.trim()) {
+    return payload.error.trim();
+  }
+  return fallback;
+}
+
+function withRequestId(message, requestId) {
+  return requestId ? `${message} (${requestId})` : message;
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return `"${text.replace(/"/g, "\"\"")}"`;
+}
+
+function exportCsvFile(filename, columns, rows, metadata = []) {
+  const lines = [];
+  if (Array.isArray(metadata) && metadata.length > 0) {
+    lines.push([csvCell("__meta__"), csvCell("key"), csvCell("value")].join(","));
+    metadata.forEach(([key, value]) => {
+      lines.push([csvCell("__meta__"), csvCell(key), csvCell(value)].join(","));
+    });
+    lines.push("");
+  }
+  lines.push(columns.map((column) => csvCell(column)).join(","));
+  rows.forEach((row) => {
+    lines.push(row.map((item) => csvCell(item)).join(","));
+  });
+  const csv = `\uFEFF${lines.join("\n")}`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+const SEVERITY_ORDER = {
+  critical: 3,
+  warning: 2,
+  info: 1
+};
+
+function parseIsoTime(value) {
+  const parsed = Date.parse(String(value || ""));
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function formatRuntimeTime(value) {
+  const parsed = parseIsoTime(value);
+  return parsed ? new Date(parsed).toLocaleString() : String(value || "-");
+}
+
+function severityBadgeClass(value) {
+  const severity = String(value || "info").trim().toLowerCase();
+  if (severity === "critical" || severity === "blocked") {
+    return "pill pill-critical";
+  }
+  if (severity === "warning" || severity === "high") {
+    return "pill pill-warning";
+  }
+  return "pill pill-info";
+}
+
+function levelBadgeClass(value) {
+  const level = String(value || "INFO").trim().toUpperCase();
+  if (level === "ERROR") {
+    return "pill pill-critical";
+  }
+  if (level === "WARN" || level === "WARNING") {
+    return "pill pill-warning";
+  }
+  return "pill pill-info";
 }
 
 function Reveal({ children, className = "", delay = 0 }) {
@@ -146,6 +276,7 @@ export default function App() {
   const [token, setToken] = useState("");
   const [activeTab, setActiveTab] = useState("architecture");
   const [status, setStatus] = useState("Atelier console ready");
+  const [lastRequestId, setLastRequestId] = useState("");
 
   const [diagnosisQuery, setDiagnosisQuery] = useState(
     "우리 조직의 LLM 도입 아키텍처에서 보안/운영 리스크를 우선순위로 정리해줘"
@@ -160,6 +291,40 @@ export default function App() {
 
   const [governanceSummary, setGovernanceSummary] = useState(null);
   const [governanceError, setGovernanceError] = useState("");
+  const [runtimeSnapshot, setRuntimeSnapshot] = useState(null);
+  const [runtimeError, setRuntimeError] = useState("");
+  const [isRefreshingDiagnostics, setIsRefreshingDiagnostics] = useState(false);
+  const [runtimeEventsLimit, setRuntimeEventsLimit] = useState(20);
+  const [runtimeDecisionsLimit, setRuntimeDecisionsLimit] = useState(10);
+  const [runtimeWindowMinutes, setRuntimeWindowMinutes] = useState(60);
+  const [runtimeLevelFilter, setRuntimeLevelFilter] = useState("");
+  const [runtimeComponentFilter, setRuntimeComponentFilter] = useState("");
+  const [runtimeAutoRefresh, setRuntimeAutoRefresh] = useState(false);
+  const [runtimeAutoRefreshSec, setRuntimeAutoRefreshSec] = useState(15);
+  const [runtimeLastLoadedAt, setRuntimeLastLoadedAt] = useState("");
+  const [runtimeSnapshotRequestId, setRuntimeSnapshotRequestId] = useState("");
+  const [runtimeSearchTerm, setRuntimeSearchTerm] = useState("");
+  const [runtimeAlertSeverity, setRuntimeAlertSeverity] = useState("all");
+  const [runtimeSortOrder, setRuntimeSortOrder] = useState("desc");
+  const [runtimeOnlyErrors, setRuntimeOnlyErrors] = useState(false);
+  const [llmRuntime, setLlmRuntime] = useState(null);
+  const [llmRuntimeError, setLlmRuntimeError] = useState("");
+  const [llmRuntimeForm, setLlmRuntimeForm] = useState({
+    provider: "stub",
+    model: "stub-llm",
+    temperature: "0.2",
+    max_tokens: "512",
+    timeout_sec: "30",
+    openai_base_url: "https://api.openai.com/v1",
+    openai_org: "",
+    openai_api_key: ""
+  });
+  const [isSavingLlmRuntime, setIsSavingLlmRuntime] = useState(false);
+  const [architectureCatalog, setArchitectureCatalog] = useState(null);
+  const [architectureJsonl, setArchitectureJsonl] = useState("");
+  const [architectureError, setArchitectureError] = useState("");
+  const [isImportingArchitecture, setIsImportingArchitecture] = useState(false);
+  const [isReindexingArchitecture, setIsReindexingArchitecture] = useState(false);
 
   useEffect(() => {
     const onHashChange = () => setPage(getPageFromHash());
@@ -176,22 +341,36 @@ export default function App() {
     setPage(nextPage);
   }
 
+  async function fetchJson(path, options = {}) {
+    const { errorMessage = "Request failed", ...fetchOptions } = options;
+    const res = await fetch(`${API_BASE}${path}`, fetchOptions);
+    const data = await res.json().catch(() => ({}));
+    const requestId = res.headers.get("x-request-id") || data.request_id || "";
+    if (requestId) {
+      setLastRequestId(requestId);
+    }
+    if (!res.ok) {
+      const error = new Error(parseApiError(data, errorMessage));
+      error.status = res.status;
+      error.requestId = requestId;
+      throw error;
+    }
+    return { data, requestId };
+  }
+
   async function login() {
     setStatus("Authenticating...");
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const { data, requestId } = await fetchJson("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, role })
+        body: JSON.stringify({ user_id: userId, role }),
+        errorMessage: "Login failed"
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.detail || "Login failed");
-      }
       setToken(data.access_token);
-      setStatus("Authentication complete");
+      setStatus(withRequestId("Authentication complete", requestId));
     } catch (error) {
-      setStatus(error.message || "Login failed");
+      setStatus(withRequestId(error.message || "Login failed", error.requestId));
     }
   }
 
@@ -205,60 +384,52 @@ export default function App() {
         env: targetEnv || null
       });
 
-      let res = await fetch(`${API_BASE}/uc1/architecture`, {
+      const requestOptions = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body
-      });
+        body,
+        errorMessage: "Architecture diagnosis failed"
+      };
 
-      // Backward compatibility for older backend route names.
-      if (res.status === 404) {
-        res = await fetch(`${API_BASE}/uc1/handover`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body
-        });
+      let result;
+      try {
+        result = await fetchJson("/uc1/architecture", requestOptions);
+      } catch (error) {
+        // Backward compatibility for older backend route names.
+        if (error.status === 404) {
+          result = await fetchJson("/uc1/handover", requestOptions);
+        } else {
+          throw error;
+        }
       }
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.detail || "Architecture diagnosis failed");
-      }
-
-      setDiagnosisResponse(data);
-      setStatus("Architecture diagnosis complete");
+      setDiagnosisResponse(result.data);
+      setStatus(withRequestId("Architecture diagnosis complete", result.requestId));
     } catch (error) {
-      setStatus(error.message || "Architecture diagnosis failed");
+      setStatus(withRequestId(error.message || "Architecture diagnosis failed", error.requestId));
     }
   }
 
   async function runOpsRiskAnalysis() {
     setStatus("Running operations risk analysis...");
     try {
-      const res = await fetch(`${API_BASE}/uc2/log-intel`, {
+      const { data, requestId } = await fetchJson("/uc2/log-intel", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ logs: opsLogs })
+        body: JSON.stringify({ logs: opsLogs }),
+        errorMessage: "Operations risk analysis failed"
       });
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.detail || "Operations risk analysis failed");
-      }
-
       setOpsResponse(data);
-      setStatus("Operations risk analysis complete");
+      setStatus(withRequestId("Operations risk analysis complete", requestId));
     } catch (error) {
-      setStatus(error.message || "Operations risk analysis failed");
+      setStatus(withRequestId(error.message || "Operations risk analysis failed", error.requestId));
     }
   }
 
@@ -267,17 +438,550 @@ export default function App() {
     setGovernanceError("");
 
     try {
-      const res = await fetch(`${API_BASE}/audit/summary`);
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.detail || "Governance summary failed");
-      }
+      const { data, requestId } = await fetchJson("/audit/summary", {
+        errorMessage: "Governance summary failed"
+      });
       setGovernanceSummary(data);
-      setStatus("Governance summary loaded");
+      setStatus(withRequestId("Governance summary loaded", requestId));
     } catch (error) {
       setGovernanceError(error.message || "Governance summary failed");
-      setStatus("Governance summary error");
+      setStatus(withRequestId("Governance summary error", error.requestId));
     }
+  }
+
+  function applyLlmRuntimeToForm(data) {
+    if (!data) {
+      return;
+    }
+    setLlmRuntimeForm({
+      provider: String(data.provider || "stub"),
+      model: String(data.model || "stub-llm"),
+      temperature: String(data.temperature ?? "0.2"),
+      max_tokens: String(data.max_tokens ?? "512"),
+      timeout_sec: String(data.timeout_sec ?? "30"),
+      openai_base_url: String(data.openai_base_url || "https://api.openai.com/v1"),
+      openai_org: String(data.openai_org || ""),
+      openai_api_key: ""
+    });
+  }
+
+  async function loadAdminLlmRuntime(options = {}) {
+    const { silent = false } = options;
+    if (!token) {
+      setLlmRuntimeError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      return;
+    }
+    if (!silent) {
+      setStatus("Loading LLM runtime settings...");
+    }
+    setLlmRuntimeError("");
+    try {
+      const { data, requestId } = await fetchJson("/admin/runtime/llm", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "LLM runtime load failed"
+      });
+      setLlmRuntime(data);
+      applyLlmRuntimeToForm(data);
+      if (!silent) {
+        setStatus(withRequestId("LLM runtime settings loaded", requestId));
+      }
+    } catch (error) {
+      setLlmRuntimeError(error.message || "LLM runtime load failed");
+      if (!silent) {
+        setStatus(withRequestId("LLM runtime load error", error.requestId));
+      }
+    }
+  }
+
+  async function saveAdminLlmRuntime(resetToEnv = false) {
+    if (!token) {
+      setLlmRuntimeError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      return;
+    }
+    setIsSavingLlmRuntime(true);
+    setLlmRuntimeError("");
+    setStatus(resetToEnv ? "Resetting LLM runtime..." : "Saving LLM runtime settings...");
+
+    try {
+      const payload = resetToEnv
+        ? { reset_to_env: true }
+        : {
+            provider: llmRuntimeForm.provider,
+            model: llmRuntimeForm.model.trim(),
+            temperature: Number(llmRuntimeForm.temperature),
+            max_tokens: Number(llmRuntimeForm.max_tokens),
+            timeout_sec: Number(llmRuntimeForm.timeout_sec),
+            openai_base_url: llmRuntimeForm.openai_base_url.trim(),
+            openai_org: llmRuntimeForm.openai_org.trim(),
+            openai_api_key: llmRuntimeForm.openai_api_key.trim() || null
+          };
+
+      const { data, requestId } = await fetchJson("/admin/runtime/llm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+        errorMessage: "LLM runtime update failed"
+      });
+      setLlmRuntime(data);
+      applyLlmRuntimeToForm(data);
+      setStatus(
+        withRequestId(
+          resetToEnv ? "LLM runtime reset to environment defaults" : "LLM runtime settings updated",
+          requestId
+        )
+      );
+    } catch (error) {
+      setLlmRuntimeError(error.message || "LLM runtime update failed");
+      setStatus(withRequestId("LLM runtime update error", error.requestId));
+    } finally {
+      setIsSavingLlmRuntime(false);
+    }
+  }
+
+  function onArchitectureFileSelected(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setArchitectureJsonl(String(reader.result || ""));
+    };
+    reader.onerror = () => {
+      setArchitectureError("파일을 읽지 못했습니다.");
+    };
+    reader.readAsText(file, "utf-8");
+  }
+
+  async function loadArchitectureCatalog(options = {}) {
+    const { silent = false } = options;
+    if (!token) {
+      setArchitectureError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      return;
+    }
+    if (!silent) {
+      setStatus("Loading architecture catalog...");
+    }
+    setArchitectureError("");
+
+    try {
+      const { data, requestId } = await fetchJson("/admin/architecture/catalog", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "Architecture catalog load failed"
+      });
+      setArchitectureCatalog(data);
+      if (!silent) {
+        setStatus(withRequestId("Architecture catalog loaded", requestId));
+      }
+    } catch (error) {
+      setArchitectureError(error.message || "Architecture catalog load failed");
+      if (!silent) {
+        setStatus(withRequestId("Architecture catalog load error", error.requestId));
+      }
+    }
+  }
+
+  async function importArchitectureDataset() {
+    if (!token) {
+      setArchitectureError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      return;
+    }
+    if (!architectureJsonl.trim()) {
+      setArchitectureError("JSONL 데이터를 입력하거나 파일을 선택하세요.");
+      return;
+    }
+    setIsImportingArchitecture(true);
+    setArchitectureError("");
+    setStatus("Importing architecture dataset...");
+
+    try {
+      const { data, requestId } = await fetchJson("/admin/architecture/import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ jsonl: architectureJsonl }),
+        errorMessage: "Architecture import failed"
+      });
+      setArchitectureCatalog(data);
+      setStatus(withRequestId("Architecture dataset imported and indexed", requestId));
+      await loadRuntimeSnapshot({ silent: true });
+    } catch (error) {
+      setArchitectureError(error.message || "Architecture import failed");
+      setStatus(withRequestId("Architecture import error", error.requestId));
+    } finally {
+      setIsImportingArchitecture(false);
+    }
+  }
+
+  async function reindexArchitectureDataset() {
+    if (!token) {
+      setArchitectureError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      return;
+    }
+    setIsReindexingArchitecture(true);
+    setArchitectureError("");
+    setStatus("Reindexing architecture dataset...");
+
+    try {
+      const { data, requestId } = await fetchJson("/admin/architecture/reindex", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "Architecture reindex failed"
+      });
+      setArchitectureCatalog(data);
+      setStatus(withRequestId("Architecture dataset reindexed", requestId));
+      await loadRuntimeSnapshot({ silent: true });
+    } catch (error) {
+      setArchitectureError(error.message || "Architecture reindex failed");
+      setStatus(withRequestId("Architecture reindex error", error.requestId));
+    } finally {
+      setIsReindexingArchitecture(false);
+    }
+  }
+
+  function loadSampleArchitectureDataset() {
+    setArchitectureJsonl(SAMPLE_ARCHITECTURE_JSONL);
+    setArchitectureError("");
+  }
+
+  function buildRuntimeQuery() {
+    const params = new URLSearchParams();
+    const safeEvents = Math.max(1, Number(runtimeEventsLimit) || 20);
+    const safeDecisions = Math.max(1, Number(runtimeDecisionsLimit) || 10);
+    const safeWindow = Math.max(0, Number(runtimeWindowMinutes) || 0);
+    params.set("events_limit", String(safeEvents));
+    params.set("decisions_limit", String(safeDecisions));
+    if (safeWindow > 0) {
+      params.set("events_since_minutes", String(safeWindow));
+      params.set("decisions_since_minutes", String(safeWindow));
+    }
+    if (runtimeLevelFilter.trim()) {
+      params.set("level", runtimeLevelFilter.trim());
+    }
+    if (runtimeComponentFilter.trim()) {
+      params.set("component", runtimeComponentFilter.trim());
+    }
+    if (runtimeSearchTerm.trim()) {
+      params.set("search", runtimeSearchTerm.trim());
+    }
+    params.set("sort", runtimeSortOrder);
+    return `?${params.toString()}`;
+  }
+
+  async function loadRuntimeSnapshot(options = {}) {
+    const { silent = false } = options;
+    if (!token) {
+      setRuntimeError("JWT가 필요합니다. 먼저 Access Control에서 토큰을 발급하세요.");
+      return;
+    }
+    if (!silent) {
+      setStatus("Loading runtime debug snapshot...");
+    }
+    setRuntimeError("");
+
+    try {
+      const { data, requestId } = await fetchJson(`/ops/runtime${buildRuntimeQuery()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "Runtime snapshot failed"
+      });
+      setRuntimeSnapshot(data);
+      setRuntimeLastLoadedAt(new Date().toLocaleString());
+      setRuntimeSnapshotRequestId(requestId || "");
+      if (!silent) {
+        setStatus(withRequestId("Runtime snapshot loaded", requestId));
+      }
+    } catch (error) {
+      setRuntimeError(error.message || "Runtime snapshot failed");
+      if (!silent) {
+        setStatus(withRequestId("Runtime snapshot error", error.requestId));
+      }
+    }
+  }
+
+  async function refreshDiagnostics() {
+    if (!token) {
+      setRuntimeError("JWT가 필요합니다. 먼저 Access Control에서 토큰을 발급하세요.");
+      return;
+    }
+    setIsRefreshingDiagnostics(true);
+    setStatus("Refreshing diagnostics...");
+    setRuntimeError("");
+    try {
+      const { requestId } = await fetchJson("/ops/diagnostics/refresh", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "Diagnostics refresh failed"
+      });
+      setStatus(withRequestId("Diagnostics refreshed", requestId));
+      await loadRuntimeSnapshot();
+    } catch (error) {
+      setRuntimeError(error.message || "Diagnostics refresh failed");
+      setStatus(withRequestId("Diagnostics refresh error", error.requestId));
+    } finally {
+      setIsRefreshingDiagnostics(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!(page === "console" && activeTab === "governance" && runtimeAutoRefresh && token)) {
+      return undefined;
+    }
+    const intervalSec = Math.max(5, Number(runtimeAutoRefreshSec) || 15);
+    const timerId = window.setInterval(() => {
+      void loadRuntimeSnapshot({ silent: true });
+    }, intervalSec * 1000);
+    return () => window.clearInterval(timerId);
+  }, [
+    page,
+    activeTab,
+    runtimeAutoRefresh,
+    runtimeAutoRefreshSec,
+    token,
+    runtimeEventsLimit,
+    runtimeDecisionsLimit,
+    runtimeWindowMinutes,
+    runtimeLevelFilter,
+    runtimeComponentFilter,
+    runtimeSearchTerm,
+    runtimeSortOrder
+  ]);
+
+  useEffect(() => {
+    if (!(page === "console" && activeTab === "governance" && token)) {
+      return;
+    }
+    void loadAdminLlmRuntime({ silent: true });
+    void loadArchitectureCatalog({ silent: true });
+  }, [page, activeTab, token]);
+
+  const runtimeView = useMemo(() => {
+    const snapshot = runtimeSnapshot || {};
+    const search = runtimeSearchTerm.trim().toLowerCase();
+
+    const matchesSearch = (parts) => {
+      if (!search) {
+        return true;
+      }
+      const blob = parts
+        .map((part) => String(part || "").toLowerCase())
+        .join(" ");
+      return blob.includes(search);
+    };
+
+    const sortDirection = runtimeSortOrder === "asc" ? 1 : -1;
+    const byTime = (a, b) => {
+      const left = parseIsoTime(a.created_at);
+      const right = parseIsoTime(b.created_at);
+      return (left - right) * sortDirection;
+    };
+
+    const baseAlerts = Array.isArray(snapshot.alerts) ? snapshot.alerts : [];
+    const baseEvents = Array.isArray(snapshot.service_events) ? snapshot.service_events : [];
+    const baseDecisions = Array.isArray(snapshot.recent_decisions) ? snapshot.recent_decisions : [];
+
+    const alerts = baseAlerts
+      .filter((alert) => {
+        if (runtimeAlertSeverity === "all") {
+          return true;
+        }
+        return String(alert.severity || "").toLowerCase() === runtimeAlertSeverity;
+      })
+      .filter((alert) => matchesSearch([alert.code, alert.message, alert.severity]))
+      .filter((alert) => {
+        if (!runtimeOnlyErrors) {
+          return true;
+        }
+        const severity = String(alert.severity || "").toLowerCase();
+        return severity === "critical";
+      })
+      .sort((a, b) => {
+        const left = SEVERITY_ORDER[String(a.severity || "").toLowerCase()] || 0;
+        const right = SEVERITY_ORDER[String(b.severity || "").toLowerCase()] || 0;
+        if (left !== right) {
+          return right - left;
+        }
+        return String(a.code || "").localeCompare(String(b.code || ""));
+      });
+
+    const events = baseEvents
+      .filter((event) =>
+        matchesSearch([event.created_at, event.level, event.component, event.message])
+      )
+      .filter((event) => {
+        if (!runtimeOnlyErrors) {
+          return true;
+        }
+        return String(event.level || "").toUpperCase() === "ERROR";
+      })
+      .sort(byTime);
+
+    const decisions = baseDecisions
+      .filter((decision) =>
+        matchesSearch([
+          decision.created_at,
+          decision.decision_id,
+          decision.scenario_id,
+          decision.risk_level,
+          decision.user_id
+        ])
+      )
+      .filter((decision) => {
+        if (!runtimeOnlyErrors) {
+          return true;
+        }
+        const risk = String(decision.risk_level || "").toLowerCase();
+        return risk === "critical" || risk === "blocked";
+      })
+      .sort(byTime);
+
+    return {
+      baseAlerts,
+      baseEvents,
+      baseDecisions,
+      alerts,
+      events,
+      decisions
+    };
+  }, [
+    runtimeSnapshot,
+    runtimeSearchTerm,
+    runtimeAlertSeverity,
+    runtimeSortOrder,
+    runtimeOnlyErrors
+  ]);
+
+  function runtimeCsvRows(type = "all") {
+    const rows = [];
+    const includeAlerts = type === "all" || type === "alerts";
+    const includeEvents = type === "all" || type === "events";
+    const includeDecisions = type === "all" || type === "decisions";
+
+    if (includeAlerts) {
+      runtimeView.alerts.forEach((alert) => {
+        rows.push([
+          "alert",
+          "",
+          String(alert.severity || ""),
+          String(alert.code || ""),
+          "",
+          String(alert.message || ""),
+          String(alert.value ?? ""),
+          String(alert.threshold ?? "")
+        ]);
+      });
+    }
+
+    if (includeEvents) {
+      runtimeView.events.forEach((event) => {
+        rows.push([
+          "service_event",
+          String(event.created_at || ""),
+          String(event.level || ""),
+          String(event.id ?? ""),
+          String(event.component || ""),
+          String(event.message || ""),
+          "",
+          ""
+        ]);
+      });
+    }
+
+    if (includeDecisions) {
+      runtimeView.decisions.forEach((decision) => {
+        rows.push([
+          "control_tower_decision",
+          String(decision.created_at || ""),
+          String(decision.risk_level || ""),
+          String(decision.decision_id || ""),
+          String(decision.scenario_id || ""),
+          "",
+          String(decision.risk_score ?? ""),
+          String(decision.spec_version ?? "")
+        ]);
+      });
+    }
+
+    return rows;
+  }
+
+  function runtimeCsvMetadata(type, rowCount) {
+    const exportType =
+      type === "alerts"
+        ? "alerts"
+        : type === "events"
+          ? "events"
+          : type === "decisions"
+            ? "decisions"
+            : "snapshot";
+    return [
+      ["exported_at_utc", new Date().toISOString()],
+      ["export_type", exportType],
+      ["rows_exported", rowCount],
+      ["api_base", API_BASE],
+      ["auth_role", role || ""],
+      ["request_id", runtimeSnapshotRequestId || lastRequestId || ""],
+      ["startup_status", runtimeSnapshot?.startup_status || ""],
+      ["daily_cost_usd", runtimeSnapshot?.daily_cost_usd ?? ""],
+      ["requests", runtimeSnapshot?.audit_summary?.requests ?? ""],
+      ["last_refresh_local", runtimeLastLoadedAt || ""],
+      ["filter_events_limit", runtimeEventsLimit],
+      ["filter_decisions_limit", runtimeDecisionsLimit],
+      ["filter_window_minutes", runtimeWindowMinutes],
+      ["filter_level", runtimeLevelFilter || "all"],
+      ["filter_component", runtimeComponentFilter || "all"],
+      ["filter_search", runtimeSearchTerm || ""],
+      ["filter_alert_severity", runtimeAlertSeverity || "all"],
+      ["filter_sort", runtimeSortOrder || "desc"],
+      ["filter_only_errors", runtimeOnlyErrors ? "true" : "false"],
+      ["visible_alerts", `${runtimeView.alerts.length}/${runtimeView.baseAlerts.length}`],
+      ["visible_events", `${runtimeView.events.length}/${runtimeView.baseEvents.length}`],
+      ["visible_decisions", `${runtimeView.decisions.length}/${runtimeView.baseDecisions.length}`]
+    ];
+  }
+
+  function exportRuntimeSnapshotCsv(type = "all") {
+    const rows = runtimeCsvRows(type);
+    if (rows.length === 0) {
+      setRuntimeError("CSV로 내보낼 데이터가 없습니다.");
+      return;
+    }
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const suffix =
+      type === "alerts"
+        ? "alerts"
+        : type === "events"
+          ? "events"
+          : type === "decisions"
+            ? "decisions"
+            : "snapshot";
+
+    exportCsvFile(
+      `runtime-${suffix}-${stamp}.csv`,
+      ["record_type", "time", "severity_or_level", "id_or_code", "scope", "message", "value", "meta"],
+      rows,
+      runtimeCsvMetadata(type, rows.length)
+    );
+    setStatus(
+      type === "all"
+        ? "Runtime snapshot CSV exported"
+        : `Runtime ${suffix} CSV exported`
+    );
   }
 
   return (
@@ -501,7 +1205,7 @@ export default function App() {
         )}
 
         {page === "console" && (
-          <div className="page-view">
+          <div className="page-view console-view">
             <section className="section-block console-header">
               <Reveal className="section-head">
                 <p className="eyebrow">Live Console</p>
@@ -516,10 +1220,11 @@ export default function App() {
                 <img src={IMG_SIGNAL} alt="Live validation signal visual" />
                 <span>System Status</span>
                 <strong>{status || "Ready"}</strong>
+                {lastRequestId && <code className="signal-request-id">request_id: {lastRequestId}</code>}
               </Reveal>
             </section>
 
-            <section className="panel">
+            <section className="panel access-panel">
               <h3 className="panel-title">Access Control</h3>
               <div className="form-grid">
                 <label>
@@ -546,7 +1251,7 @@ export default function App() {
               </div>
             </section>
 
-            <section className="panel">
+            <section className="panel workbench-panel">
               <div className="tab-strip">
                 <button
                   className={activeTab === "architecture" ? "tab-btn active" : "tab-btn"}
@@ -569,7 +1274,7 @@ export default function App() {
               </div>
 
               {activeTab === "architecture" && (
-                <div className="tab-content">
+                <div className="tab-content tab-architecture">
                   <label>
                     Diagnostic Prompt
                     <textarea
@@ -622,7 +1327,7 @@ export default function App() {
               )}
 
               {activeTab === "ops" && (
-                <div className="tab-content">
+                <div className="tab-content tab-ops">
                   <label>
                     Operations Logs
                     <textarea value={opsLogs} onChange={(event) => setOpsLogs(event.target.value)} />
@@ -661,7 +1366,7 @@ export default function App() {
               )}
 
               {activeTab === "governance" && (
-                <div className="tab-content">
+                <div className="tab-content tab-governance">
                   <div className="result-card">
                     <h4>Discovery Wizard (CLI)</h4>
                     <p>도입 브리프, 리스크 노트, 평가 계획을 자동 생성합니다.</p>
@@ -677,7 +1382,7 @@ export default function App() {
                     <button className="cta-primary" onClick={loadGovernanceSummary}>
                       Load Governance Summary
                     </button>
-                    {governanceError && <p>{governanceError}</p>}
+                    {governanceError && <p className="error-text">{governanceError}</p>}
                     {governanceSummary && (
                       <div>
                         <p>Requests: {governanceSummary.requests}</p>
@@ -706,6 +1411,458 @@ export default function App() {
                             </li>
                           ))}
                         </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="result-card admin-card">
+                    <h4>Admin Runtime LLM Settings</h4>
+                    <p>
+                      브라우저에서 LLM provider/model/runtime 파라미터를 변경할 수 있습니다. 실제 운영에서는
+                      Secret Manager 연동이 필요합니다.
+                    </p>
+                    <p className="admin-note">
+                      현재 선택 Role: <strong>{role}</strong> (Admin 권한 필요)
+                    </p>
+                    <div className="admin-grid">
+                      <label>
+                        Provider
+                        <select
+                          value={llmRuntimeForm.provider}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, provider: event.target.value }))
+                          }
+                        >
+                          <option value="stub">stub</option>
+                          <option value="openai">openai</option>
+                          <option value="openai_compatible">openai_compatible</option>
+                        </select>
+                      </label>
+                      <label>
+                        Model
+                        <input
+                          value={llmRuntimeForm.model}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, model: event.target.value }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        Temperature
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="2"
+                          value={llmRuntimeForm.temperature}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, temperature: event.target.value }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        Max Tokens
+                        <input
+                          type="number"
+                          min="1"
+                          max="8192"
+                          value={llmRuntimeForm.max_tokens}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, max_tokens: event.target.value }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        Timeout (sec)
+                        <input
+                          type="number"
+                          min="1"
+                          max="600"
+                          value={llmRuntimeForm.timeout_sec}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, timeout_sec: event.target.value }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        OpenAI Base URL
+                        <input
+                          value={llmRuntimeForm.openai_base_url}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, openai_base_url: event.target.value }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        OpenAI Org
+                        <input
+                          value={llmRuntimeForm.openai_org}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, openai_org: event.target.value }))
+                          }
+                        />
+                      </label>
+                      <label>
+                        OpenAI API Key (Optional)
+                        <input
+                          type="password"
+                          placeholder="sk-..."
+                          value={llmRuntimeForm.openai_api_key}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, openai_api_key: event.target.value }))
+                          }
+                        />
+                      </label>
+                    </div>
+                    <div className="action-row">
+                      <button className="cta-ghost" onClick={() => loadAdminLlmRuntime()} disabled={!token}>
+                        Reload Runtime
+                      </button>
+                      <button
+                        className="cta-primary"
+                        onClick={() => saveAdminLlmRuntime(false)}
+                        disabled={!token || isSavingLlmRuntime}
+                      >
+                        {isSavingLlmRuntime ? "Saving..." : "Save Runtime Settings"}
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={() => saveAdminLlmRuntime(true)}
+                        disabled={!token || isSavingLlmRuntime}
+                      >
+                        Reset To Env Defaults
+                      </button>
+                    </div>
+                    {llmRuntimeError && <p className="error-text">{llmRuntimeError}</p>}
+                    {llmRuntime && (
+                      <div className="admin-meta">
+                        <p>
+                          Active: {llmRuntime.provider} / {llmRuntime.model}
+                        </p>
+                        <p>
+                          API key configured: {llmRuntime.openai_api_key_configured ? "yes" : "no"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="result-card admin-card">
+                    <h4>Architecture Dataset Manager</h4>
+                    <p>
+                      운영 중에도 아키텍처 JSONL 데이터를 교체하고 즉시 재인덱싱할 수 있습니다. `system/env/access_group`
+                      필드는 필수입니다.
+                    </p>
+                    <div className="action-row">
+                      <button className="cta-ghost" onClick={loadSampleArchitectureDataset}>
+                        Load Sample JSONL
+                      </button>
+                      <label className="file-btn">
+                        Choose JSONL File
+                        <input type="file" accept=".jsonl,.txt,application/json" onChange={onArchitectureFileSelected} />
+                      </label>
+                    </div>
+                    <label>
+                      JSONL Payload
+                      <textarea
+                        className="admin-jsonl"
+                        placeholder='{"doc_id":"ACME-0001","system":"payments","env":"prod","access_group":"ops",...}'
+                        value={architectureJsonl}
+                        onChange={(event) => setArchitectureJsonl(event.target.value)}
+                      />
+                    </label>
+                    <div className="action-row">
+                      <button
+                        className="cta-primary"
+                        onClick={importArchitectureDataset}
+                        disabled={!token || isImportingArchitecture}
+                      >
+                        {isImportingArchitecture ? "Importing..." : "Import + Reindex"}
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={reindexArchitectureDataset}
+                        disabled={!token || isReindexingArchitecture}
+                      >
+                        {isReindexingArchitecture ? "Reindexing..." : "Reindex Existing Dataset"}
+                      </button>
+                      <button className="cta-ghost" onClick={() => loadArchitectureCatalog()} disabled={!token}>
+                        Reload Catalog
+                      </button>
+                    </div>
+                    {architectureError && <p className="error-text">{architectureError}</p>}
+                    {architectureCatalog && (
+                      <div className="admin-meta">
+                        <p>Docs: {architectureCatalog.doc_count}</p>
+                        <p>Indexed chunks: {architectureCatalog.chunk_count}</p>
+                        <p>Systems: {architectureCatalog.systems?.join(", ") || "-"}</p>
+                        <p>Envs: {architectureCatalog.envs?.join(", ") || "-"}</p>
+                        <p>Access groups: {architectureCatalog.access_groups?.join(", ") || "-"}</p>
+                        <code className="mono-inline">{architectureCatalog.source_path}</code>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="result-card runtime-card">
+                    <h4>Runtime Debug Snapshot</h4>
+                    <p>
+                      운영 디버깅용 스냅샷입니다. 최근 서비스 이벤트, 최근 Control Tower 결정, 현재 경보 상태를
+                      한 번에 확인할 수 있습니다.
+                    </p>
+                    <div className="runtime-filters">
+                      <label>
+                        Event Limit
+                        <input
+                          type="number"
+                          min="1"
+                          max="500"
+                          value={runtimeEventsLimit}
+                          onChange={(event) => setRuntimeEventsLimit(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Decision Limit
+                        <input
+                          type="number"
+                          min="1"
+                          max="200"
+                          value={runtimeDecisionsLimit}
+                          onChange={(event) => setRuntimeDecisionsLimit(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Window (min)
+                        <input
+                          type="number"
+                          min="0"
+                          max="10080"
+                          value={runtimeWindowMinutes}
+                          onChange={(event) => setRuntimeWindowMinutes(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Level
+                        <select
+                          value={runtimeLevelFilter}
+                          onChange={(event) => setRuntimeLevelFilter(event.target.value)}
+                        >
+                          <option value="">All</option>
+                          <option value="INFO">INFO</option>
+                          <option value="WARN">WARN</option>
+                          <option value="ERROR">ERROR</option>
+                        </select>
+                      </label>
+                      <label>
+                        Component
+                        <input
+                          placeholder="startup | alerts | diagnostics"
+                          value={runtimeComponentFilter}
+                          onChange={(event) => setRuntimeComponentFilter(event.target.value)}
+                        />
+                      </label>
+                      <label className="toggle runtime-auto-toggle">
+                        <input
+                          type="checkbox"
+                          checked={runtimeAutoRefresh}
+                          onChange={(event) => setRuntimeAutoRefresh(event.target.checked)}
+                        />
+                        Auto Refresh
+                      </label>
+                      <label>
+                        Interval (sec)
+                        <input
+                          type="number"
+                          min="5"
+                          max="600"
+                          value={runtimeAutoRefreshSec}
+                          onChange={(event) => setRuntimeAutoRefreshSec(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Search
+                        <input
+                          placeholder="message, component, scenario..."
+                          value={runtimeSearchTerm}
+                          onChange={(event) => setRuntimeSearchTerm(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Alert Severity
+                        <select
+                          value={runtimeAlertSeverity}
+                          onChange={(event) => setRuntimeAlertSeverity(event.target.value)}
+                        >
+                          <option value="all">All</option>
+                          <option value="critical">Critical</option>
+                          <option value="warning">Warning</option>
+                          <option value="info">Info</option>
+                        </select>
+                      </label>
+                      <label>
+                        Sort Time
+                        <select
+                          value={runtimeSortOrder}
+                          onChange={(event) => setRuntimeSortOrder(event.target.value)}
+                        >
+                          <option value="desc">Newest first</option>
+                          <option value="asc">Oldest first</option>
+                        </select>
+                      </label>
+                      <label className="toggle runtime-auto-toggle">
+                        <input
+                          type="checkbox"
+                          checked={runtimeOnlyErrors}
+                          onChange={(event) => setRuntimeOnlyErrors(event.target.checked)}
+                        />
+                        Only Errors
+                      </label>
+                    </div>
+                    <div className="action-row">
+                      <button className="cta-primary" onClick={loadRuntimeSnapshot} disabled={!token}>
+                        Load Runtime Snapshot
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={refreshDiagnostics}
+                        disabled={!token || isRefreshingDiagnostics}
+                      >
+                        {isRefreshingDiagnostics ? "Refreshing..." : "Refresh Diagnostics"}
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={exportRuntimeSnapshotCsv}
+                        disabled={
+                          !runtimeSnapshot ||
+                          (runtimeView.alerts.length === 0 &&
+                            runtimeView.events.length === 0 &&
+                            runtimeView.decisions.length === 0)
+                        }
+                      >
+                        Export Visible CSV
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={() => exportRuntimeSnapshotCsv("alerts")}
+                        disabled={runtimeView.alerts.length === 0}
+                      >
+                        Export Alerts CSV
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={() => exportRuntimeSnapshotCsv("events")}
+                        disabled={runtimeView.events.length === 0}
+                      >
+                        Export Events CSV
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={() => exportRuntimeSnapshotCsv("decisions")}
+                        disabled={runtimeView.decisions.length === 0}
+                      >
+                        Export Decisions CSV
+                      </button>
+                    </div>
+
+                    {runtimeError && <p className="error-text">{runtimeError}</p>}
+
+                    {runtimeSnapshot && (
+                      <div className="runtime-stack">
+                        <p>Startup status: {runtimeSnapshot.startup_status}</p>
+                        <p>Requests: {runtimeSnapshot.audit_summary?.requests ?? 0}</p>
+                        <p>Daily cost (USD): {runtimeSnapshot.daily_cost_usd}</p>
+                        {runtimeLastLoadedAt && <p>Last refresh: {runtimeLastLoadedAt}</p>}
+                        <p>
+                          Visible: alerts {runtimeView.alerts.length}/{runtimeView.baseAlerts.length} | events{" "}
+                          {runtimeView.events.length}/{runtimeView.baseEvents.length} | decisions{" "}
+                          {runtimeView.decisions.length}/{runtimeView.baseDecisions.length}
+                        </p>
+
+                        <h5>Alerts</h5>
+                        {runtimeView.alerts.length ? (
+                          <div className="runtime-alert-grid">
+                            {runtimeView.alerts.map((alert, index) => (
+                              <article key={`${alert.code}-${index}`} className="runtime-alert-item">
+                                <div className="runtime-alert-head">
+                                  <span className={severityBadgeClass(alert.severity)}>
+                                    {String(alert.severity || "info").toUpperCase()}
+                                  </span>
+                                  <strong>{alert.code}</strong>
+                                </div>
+                                <p>{alert.message}</p>
+                                <p>
+                                  value: {alert.value ?? "-"} | threshold: {alert.threshold ?? "-"}
+                                </p>
+                              </article>
+                            ))}
+                          </div>
+                        ) : (
+                          <p>No matched alerts</p>
+                        )}
+
+                        <h5>Recent Service Events</h5>
+                        {runtimeView.events.length ? (
+                          <div className="runtime-table-wrap">
+                            <table className="runtime-table">
+                              <thead>
+                                <tr>
+                                  <th>Time</th>
+                                  <th>Level</th>
+                                  <th>Component</th>
+                                  <th>Message</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {runtimeView.events.map((event, index) => (
+                                  <tr key={`${event.id}-${index}`}>
+                                    <td>{formatRuntimeTime(event.created_at)}</td>
+                                    <td>
+                                      <span className={levelBadgeClass(event.level)}>
+                                        {String(event.level || "INFO").toUpperCase()}
+                                      </span>
+                                    </td>
+                                    <td className="runtime-mono">{event.component}</td>
+                                    <td>{event.message}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p>No matched service events</p>
+                        )}
+
+                        <h5>Recent Control Tower Decisions</h5>
+                        {runtimeView.decisions.length ? (
+                          <div className="runtime-table-wrap">
+                            <table className="runtime-table">
+                              <thead>
+                                <tr>
+                                  <th>Time</th>
+                                  <th>Risk</th>
+                                  <th>Score</th>
+                                  <th>Scenario</th>
+                                  <th>Decision ID</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {runtimeView.decisions.map((decision, index) => (
+                                  <tr key={`${decision.decision_id}-${index}`}>
+                                    <td>{formatRuntimeTime(decision.created_at)}</td>
+                                    <td>
+                                      <span className={severityBadgeClass(decision.risk_level)}>
+                                        {String(decision.risk_level || "").toUpperCase()}
+                                      </span>
+                                    </td>
+                                    <td>{decision.risk_score}</td>
+                                    <td>{decision.scenario_id}</td>
+                                    <td className="runtime-mono">{decision.decision_id}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p>No matched decisions</p>
+                        )}
                       </div>
                     )}
                   </div>

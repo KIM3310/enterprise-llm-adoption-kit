@@ -176,3 +176,75 @@ class OpsAlertsResponse(BaseModel):
     alerts: List[OpsAlert]
     webhook_sent: int = 0
     webhook_failed: int = 0
+
+
+class OpsServiceEvent(BaseModel):
+    id: int
+    created_at: str
+    level: str
+    component: str
+    message: str
+    context: Dict = Field(default_factory=dict)
+
+
+class OpsRecentDecision(BaseModel):
+    decision_id: str
+    created_at: str
+    scenario_id: str
+    user_id: str
+    role: str
+    risk_score: float
+    risk_level: str
+    spec_version: str
+    refusal: bool
+
+
+class OpsRuntimeResponse(BaseModel):
+    startup_status: str
+    startup_report: Dict
+    audit_summary: Dict
+    daily_cost_usd: float
+    alerts: List[OpsAlert]
+    service_events: List[OpsServiceEvent]
+    recent_decisions: List[OpsRecentDecision]
+
+
+class OpsDiagnosticsRefreshResponse(BaseModel):
+    startup_status: str
+    startup_report: Dict
+
+
+class AdminLLMRuntimeView(BaseModel):
+    provider: str
+    model: str
+    temperature: float
+    max_tokens: int
+    timeout_sec: float
+    openai_base_url: str
+    openai_org: str
+    openai_api_key_configured: bool
+
+
+class AdminLLMRuntimeUpdate(BaseModel):
+    provider: Optional[str] = Field(default=None, pattern="^(stub|openai|openai_compatible)$")
+    model: Optional[str] = None
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
+    max_tokens: Optional[int] = Field(default=None, ge=1, le=8192)
+    timeout_sec: Optional[float] = Field(default=None, ge=1.0, le=600.0)
+    openai_base_url: Optional[str] = None
+    openai_org: Optional[str] = None
+    openai_api_key: Optional[str] = None
+    reset_to_env: bool = False
+
+
+class ArchitectureImportRequest(BaseModel):
+    jsonl: str = Field(min_length=2)
+
+
+class ArchitectureCatalogResponse(BaseModel):
+    source_path: str
+    doc_count: int
+    chunk_count: int
+    systems: List[str]
+    envs: List[str]
+    access_groups: List[str]
