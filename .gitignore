@@ -13,6 +13,7 @@ __pycache__/
 
 # Node
 node_modules/
+app/frontend/dist/
 
 # macOS
 .DS_Store
