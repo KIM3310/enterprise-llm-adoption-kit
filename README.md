@@ -4,6 +4,12 @@ Note: This is a personal portfolio project. No real customers or production depl
 
 Korean version: `README.ko.md`
 
+## Demo video
+- YouTube: https://youtu.be/yMq03b0js0E
+
+## Snapshot
+![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
+
 ## Project summary (entry-level, hands-on focus)
 - Built an end-to-end adoption kit to show how enterprise LLM discovery turns into a secure, testable, and observable PoC.
 - Implemented a working backend + frontend demo so reviewers can run it locally and verify behavior.
