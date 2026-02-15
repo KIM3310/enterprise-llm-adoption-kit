@@ -371,13 +371,25 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 @app.get("/health")
-def health() -> Dict[str, str]:
+def health() -> Dict[str, object]:
     startup_report = getattr(app.state, "startup_report", None)
-    if not startup_report:
-        return {"status": "ok"}
+    status = "ok"
+    startup_status = ""
+    if isinstance(startup_report, dict):
+        status = "ok" if startup_report.get("startup_ready", False) else "degraded"
+        startup_status = str(startup_report.get("overall_status", "unknown"))
+
+    # Non-sensitive runtime metadata to make preflight/debugging easier in demos.
+    runtime = get_llm_runtime_settings()
     return {
-        "status": "ok" if startup_report.get("startup_ready", False) else "degraded",
-        "startup_status": startup_report.get("overall_status", "unknown"),
+        "status": status,
+        "startup_status": startup_status,
+        "auth_mode": settings.auth_mode,
+        "data_handling_mode": settings.data_handling_mode,
+        "storage_backend": settings.event_storage_backend,
+        "llm_provider": runtime.get("provider", "stub"),
+        "llm_model": runtime.get("model", "stub-llm"),
+        "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
     }
 
 
