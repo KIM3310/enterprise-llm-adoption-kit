@@ -1,102 +1,91 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import heroTower from "./assets/hero-tower.svg";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
-const IMG_HERO =
-  "https://upload.wikimedia.org/wikipedia/commons/9/9f/Blacksmith%27s_workshop_2.jpg";
-const IMG_ARCHITECTURE =
-  "https://upload.wikimedia.org/wikipedia/commons/c/c6/The_Blacksmith%27s_Studio.jpg";
-const IMG_OPERATIONS =
-  "https://upload.wikimedia.org/wikipedia/commons/e/e9/Blacksmith_S_Workshop_%2860845456%29.jpeg";
-const IMG_GOVERNANCE =
-  "https://upload.wikimedia.org/wikipedia/commons/f/f0/Charlemont%E2%80%93A_Blacksmith_in_his_Workshop%2C_1882.jpg";
-const IMG_VALIDATION =
-  "https://upload.wikimedia.org/wikipedia/commons/2/28/A_Blacksmith%27s_Shop_%28by_Joseph_Wright_of_Derby%29.jpg";
-const IMG_SCENARIO =
-  "https://upload.wikimedia.org/wikipedia/commons/1/16/The_Blacksmith_%28Interior_of_a_Workshop_with_Figures%29.jpg";
-const IMG_SIGNAL =
-  "https://upload.wikimedia.org/wikipedia/commons/3/3e/Blacksmith_at_work.jpg";
+const APP_NAME = "LLM Adoption Atelier";
+const APP_TAGLINE = "Enterprise LLM Readiness Control Tower";
 
 const roles = ["Employee", "Ops", "Admin"];
 const pages = ["home", "capabilities", "validation", "scenario", "console"];
 
 const navItems = [
-  { key: "home", label: "Home" },
+  { key: "home", label: "Overview" },
   { key: "capabilities", label: "Capabilities" },
-  { key: "validation", label: "Validation" },
-  { key: "scenario", label: "Scenarios" },
-  { key: "console", label: "Live Console" }
+  { key: "validation", label: "Readiness" },
+  { key: "scenario", label: "Scenario Runner" },
+  { key: "console", label: "Console" }
 ];
 
 const capabilityCards = [
   {
     title: "Role-Based Access Control",
-    body: "직무별(Employee/Ops/Admin)로 볼 수 있는 문서 범위를 분리해 권한 누수를 방지합니다."
+    body: "Enforce least-privilege access by filtering retrieval to each role (Employee/Ops/Admin)."
   },
   {
     title: "RAG Retrieval with Citations",
-    body: "질문에 맞는 문서를 검색하고, 답변 근거 문서 ID와 필드를 함께 제시합니다."
+    body: "Return grounded answers with field-level citations so reviewers can verify provenance fast."
   },
   {
     title: "Architecture Risk Diagnosis",
-    body: "아키텍처 질문을 기반으로 보안/운영 리스크를 진단하고 근거 소스를 함께 제시합니다."
+    body: "Diagnose security and reliability risks from architecture prompts, then justify with evidence."
   },
   {
     title: "Operations Log Risk Analysis",
-    body: "장애 로그를 요약하고 원인 가설, 우선 대응 런북 단계를 정리합니다."
+    body: "Turn noisy incident logs into a structured summary, hypotheses, and actionable runbook steps."
   },
   {
     title: "Safety Guardrails",
-    body: "Prompt injection 탐지와 안전 거절 규칙으로 위험한 요청을 차단합니다."
+    body: "Detect prompt injection patterns and apply refusal policies before model calls."
   },
   {
     title: "PII Redaction and Audit",
-    body: "민감정보를 자동 마스킹하고 모든 요청/응답 이벤트를 감사 로그로 기록합니다."
+    body: "Mask sensitive content and emit audit events for accountability and compliance reviews."
   },
   {
     title: "Governance Summary",
-    body: "요청 수, 정책 이벤트, 툴 사용, 비용 지표를 하나의 요약 리포트로 확인합니다."
+    body: "Review requests, policy events, tool usage, and daily cost in a single decision-ready view."
   },
   {
     title: "Metrics and Eval Readiness",
-    body: "latency/token/cost/policy 이벤트 지표와 평가 흐름을 묶어 운영 준비 상태를 점검합니다."
+    body: "Expose latency/token/cost/policy metrics and keep the system eval-ready for regression checks."
   }
 ];
 
 const validationActs = [
   {
     title: "Act 1 - Discovery to Scope",
-    text: "업무 목표, 사용자 역할, 데이터 민감도를 정리해 도입 범위를 확정합니다."
+    text: "Define outcomes, roles, and data sensitivity to lock the real adoption scope."
   },
   {
     title: "Act 2 - Security and Evals",
-    text: "RBAC, redaction, injection 방어, 평가 기준을 검증해 안전성과 품질 기준을 맞춥니다."
+    text: "Validate RBAC, redaction, injection defenses, and measurable eval criteria."
   },
   {
     title: "Act 3 - Operations Proof",
-    text: "기능 실행 결과를 audit/metrics로 확인해 운영 가시성과 확장성을 점검합니다."
+    text: "Verify audit and metrics end-to-end so operations can trust what ships to production."
   }
 ];
 
 const scenarioSteps = [
   {
     title: "Identity and Role Check",
-    text: "JWT 발급 후 역할별 접근 범위를 점검합니다.",
+    text: "Issue a JWT and confirm least-privilege access behavior.",
     endpoint: "/auth/login"
   },
   {
     title: "Architecture Risk Diagnosis",
-    text: "아키텍처 리스크 진단 결과와 근거(citation) 일관성을 검증합니다.",
+    text: "Run the architecture advisor and verify citations are consistent and relevant.",
     endpoint: "/uc1/architecture"
   },
   {
     title: "Operations Log Risk Analysis",
-    text: "로그 요약, 원인 가설, 런북 단계를 점검합니다.",
+    text: "Generate incident hypotheses and runbook steps from raw operational logs.",
     endpoint: "/uc2/log-intel"
   },
   {
     title: "Governance and Observability",
-    text: "정책 이벤트, 비용, 요청량 지표를 확인해 운영 준비도를 판단합니다.",
+    text: "Review audit + cost metrics to decide if the system is production-ready.",
     endpoint: "/audit/summary · /metrics"
   }
 ];
@@ -198,6 +187,18 @@ function exportCsvFile(filename, columns, rows, metadata = []) {
   URL.revokeObjectURL(url);
 }
 
+function exportTextFile(filename, content, mime = "text/plain;charset=utf-8") {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 const SEVERITY_ORDER = {
   critical: 3,
   warning: 2,
@@ -269,17 +270,89 @@ function Reveal({ children, className = "", delay = 0 }) {
   );
 }
 
+function Icon({ name = "default" }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg"
+  };
+
+  const stroke = {
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  };
+
+  if (name === "architecture") {
+    return (
+      <svg {...common}>
+        <path {...stroke} d="M12 7V5" />
+        <path {...stroke} d="M12 19v-2" />
+        <path {...stroke} d="M7.2 9.2L5.8 7.8" />
+        <path {...stroke} d="M18.2 16.2l-1.4-1.4" />
+        <path {...stroke} d="M16.8 9.2l1.4-1.4" />
+        <path {...stroke} d="M5.8 16.2l1.4-1.4" />
+        <circle cx="12" cy="12" r="2.5" {...stroke} />
+        <circle cx="12" cy="5" r="1.6" {...stroke} />
+        <circle cx="12" cy="19" r="1.6" {...stroke} />
+        <circle cx="5" cy="12" r="1.6" {...stroke} />
+        <circle cx="19" cy="12" r="1.6" {...stroke} />
+        <path {...stroke} d="M9.7 10.7L6.6 11.6" />
+        <path {...stroke} d="M14.3 10.7l3.1.9" />
+        <path {...stroke} d="M9.7 13.3L6.6 12.4" />
+        <path {...stroke} d="M14.3 13.3l3.1-.9" />
+      </svg>
+    );
+  }
+
+  if (name === "ops") {
+    return (
+      <svg {...common}>
+        <path {...stroke} d="M3 12h4l2-6 4 14 2-6h6" />
+        <path {...stroke} d="M4 19h16" opacity="0.35" />
+        <path {...stroke} d="M4 5h16" opacity="0.35" />
+      </svg>
+    );
+  }
+
+  if (name === "governance") {
+    return (
+      <svg {...common}>
+        <path
+          {...stroke}
+          d="M12 3l7 4v6c0 5-3.2 8.2-7 9-3.8-.8-7-4-7-9V7l7-4z"
+        />
+        <path {...stroke} d="M8.5 12.5l2.2 2.2L15.8 9.6" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...common}>
+      <path {...stroke} d="M12 2v20" opacity="0.15" />
+      <path {...stroke} d="M2 12h20" opacity="0.15" />
+      <circle cx="12" cy="12" r="5" {...stroke} />
+    </svg>
+  );
+}
+
 export default function App() {
   const [page, setPage] = useState(() => getPageFromHash());
-  const [userId, setUserId] = useState("aeak-demo");
+  const [userId, setUserId] = useState("acme-demo");
   const [role, setRole] = useState("Employee");
   const [token, setToken] = useState("");
   const [activeTab, setActiveTab] = useState("architecture");
-  const [status, setStatus] = useState("Atelier console ready");
+  const [status, setStatus] = useState("Ready");
   const [lastRequestId, setLastRequestId] = useState("");
+  const [health, setHealth] = useState({ status: "unknown", startup_status: "" });
+  const [healthCheckedAt, setHealthCheckedAt] = useState("");
+  const [scenarioRun, setScenarioRun] = useState(null);
 
   const [diagnosisQuery, setDiagnosisQuery] = useState(
-    "우리 조직의 LLM 도입 아키텍처에서 보안/운영 리스크를 우선순위로 정리해줘"
+    "Prioritize the top security and reliability risks in our LLM adoption architecture. Provide evidence-backed mitigation steps."
   );
   const [diagnosisCitationOnly, setDiagnosisCitationOnly] = useState(false);
   const [targetSystem, setTargetSystem] = useState("");
@@ -336,6 +409,41 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/health`, { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(parseApiError(data, "Health check failed"));
+        }
+        if (cancelled) {
+          return;
+        }
+        setHealth({
+          status: String(data.status || "ok"),
+          startup_status: String(data.startup_status || "")
+        });
+        setHealthCheckedAt(new Date().toLocaleTimeString());
+      } catch (_error) {
+        if (cancelled) {
+          return;
+        }
+        setHealth({ status: "offline", startup_status: "" });
+        setHealthCheckedAt(new Date().toLocaleTimeString());
+      }
+    }
+
+    void loadHealth();
+    const timerId = window.setInterval(() => void loadHealth(), 12000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timerId);
+    };
+  }, []);
+
   function navigate(nextPage) {
     window.location.hash = nextPage;
     setPage(nextPage);
@@ -358,8 +466,11 @@ export default function App() {
     return { data, requestId };
   }
 
-  async function login() {
-    setStatus("Authenticating...");
+  async function login(options = {}) {
+    const { silent = false, throwOnError = false } = options;
+    if (!silent) {
+      setStatus("Authenticating...");
+    }
     try {
       const { data, requestId } = await fetchJson("/auth/login", {
         method: "POST",
@@ -368,14 +479,26 @@ export default function App() {
         errorMessage: "Login failed"
       });
       setToken(data.access_token);
-      setStatus(withRequestId("Authentication complete", requestId));
+      if (!silent) {
+        setStatus(withRequestId("Authentication complete", requestId));
+      }
+      return { data, requestId };
     } catch (error) {
-      setStatus(withRequestId(error.message || "Login failed", error.requestId));
+      if (!silent) {
+        setStatus(withRequestId(error.message || "Login failed", error.requestId));
+      }
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
     }
   }
 
-  async function runArchitectureDiagnosis() {
-    setStatus("Running architecture diagnosis...");
+  async function runArchitectureDiagnosis(options = {}) {
+    const { silent = false, throwOnError = false } = options;
+    if (!silent) {
+      setStatus("Running architecture diagnosis...");
+    }
     try {
       const body = JSON.stringify({
         query: diagnosisQuery,
@@ -407,14 +530,26 @@ export default function App() {
       }
 
       setDiagnosisResponse(result.data);
-      setStatus(withRequestId("Architecture diagnosis complete", result.requestId));
+      if (!silent) {
+        setStatus(withRequestId("Architecture diagnosis complete", result.requestId));
+      }
+      return result;
     } catch (error) {
-      setStatus(withRequestId(error.message || "Architecture diagnosis failed", error.requestId));
+      if (!silent) {
+        setStatus(withRequestId(error.message || "Architecture diagnosis failed", error.requestId));
+      }
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
     }
   }
 
-  async function runOpsRiskAnalysis() {
-    setStatus("Running operations risk analysis...");
+  async function runOpsRiskAnalysis(options = {}) {
+    const { silent = false, throwOnError = false } = options;
+    if (!silent) {
+      setStatus("Running operations risk analysis...");
+    }
     try {
       const { data, requestId } = await fetchJson("/uc2/log-intel", {
         method: "POST",
@@ -427,14 +562,26 @@ export default function App() {
       });
 
       setOpsResponse(data);
-      setStatus(withRequestId("Operations risk analysis complete", requestId));
+      if (!silent) {
+        setStatus(withRequestId("Operations risk analysis complete", requestId));
+      }
+      return { data, requestId };
     } catch (error) {
-      setStatus(withRequestId(error.message || "Operations risk analysis failed", error.requestId));
+      if (!silent) {
+        setStatus(withRequestId(error.message || "Operations risk analysis failed", error.requestId));
+      }
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
     }
   }
 
-  async function loadGovernanceSummary() {
-    setStatus("Loading governance summary...");
+  async function loadGovernanceSummary(options = {}) {
+    const { silent = false, throwOnError = false } = options;
+    if (!silent) {
+      setStatus("Loading governance summary...");
+    }
     setGovernanceError("");
 
     try {
@@ -442,10 +589,19 @@ export default function App() {
         errorMessage: "Governance summary failed"
       });
       setGovernanceSummary(data);
-      setStatus(withRequestId("Governance summary loaded", requestId));
+      if (!silent) {
+        setStatus(withRequestId("Governance summary loaded", requestId));
+      }
+      return { data, requestId };
     } catch (error) {
       setGovernanceError(error.message || "Governance summary failed");
-      setStatus(withRequestId("Governance summary error", error.requestId));
+      if (!silent) {
+        setStatus(withRequestId("Governance summary error", error.requestId));
+      }
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
     }
   }
 
@@ -468,7 +624,7 @@ export default function App() {
   async function loadAdminLlmRuntime(options = {}) {
     const { silent = false } = options;
     if (!token) {
-      setLlmRuntimeError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      setLlmRuntimeError("JWT required. Issue an Admin token first.");
       return;
     }
     if (!silent) {
@@ -497,7 +653,7 @@ export default function App() {
 
   async function saveAdminLlmRuntime(resetToEnv = false) {
     if (!token) {
-      setLlmRuntimeError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      setLlmRuntimeError("JWT required. Issue an Admin token first.");
       return;
     }
     setIsSavingLlmRuntime(true);
@@ -553,7 +709,7 @@ export default function App() {
       setArchitectureJsonl(String(reader.result || ""));
     };
     reader.onerror = () => {
-      setArchitectureError("파일을 읽지 못했습니다.");
+      setArchitectureError("Could not read the file.");
     };
     reader.readAsText(file, "utf-8");
   }
@@ -561,7 +717,7 @@ export default function App() {
   async function loadArchitectureCatalog(options = {}) {
     const { silent = false } = options;
     if (!token) {
-      setArchitectureError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      setArchitectureError("JWT required. Issue an Admin token first.");
       return;
     }
     if (!silent) {
@@ -590,11 +746,11 @@ export default function App() {
 
   async function importArchitectureDataset() {
     if (!token) {
-      setArchitectureError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      setArchitectureError("JWT required. Issue an Admin token first.");
       return;
     }
     if (!architectureJsonl.trim()) {
-      setArchitectureError("JSONL 데이터를 입력하거나 파일을 선택하세요.");
+      setArchitectureError("Provide a JSONL payload or select a file.");
       return;
     }
     setIsImportingArchitecture(true);
@@ -624,7 +780,7 @@ export default function App() {
 
   async function reindexArchitectureDataset() {
     if (!token) {
-      setArchitectureError("JWT가 필요합니다. Admin 토큰을 먼저 발급하세요.");
+      setArchitectureError("JWT required. Issue an Admin token first.");
       return;
     }
     setIsReindexingArchitecture(true);
@@ -680,10 +836,14 @@ export default function App() {
   }
 
   async function loadRuntimeSnapshot(options = {}) {
-    const { silent = false } = options;
+    const { silent = false, throwOnError = false } = options;
     if (!token) {
-      setRuntimeError("JWT가 필요합니다. 먼저 Access Control에서 토큰을 발급하세요.");
-      return;
+      const error = new Error("JWT required. Issue a token in Access Control first.");
+      setRuntimeError(error.message);
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
     }
     if (!silent) {
       setStatus("Loading runtime debug snapshot...");
@@ -703,17 +863,22 @@ export default function App() {
       if (!silent) {
         setStatus(withRequestId("Runtime snapshot loaded", requestId));
       }
+      return { data, requestId };
     } catch (error) {
       setRuntimeError(error.message || "Runtime snapshot failed");
       if (!silent) {
         setStatus(withRequestId("Runtime snapshot error", error.requestId));
       }
+      if (throwOnError) {
+        throw error;
+      }
+      return null;
     }
   }
 
   async function refreshDiagnostics() {
     if (!token) {
-      setRuntimeError("JWT가 필요합니다. 먼저 Access Control에서 토큰을 발급하세요.");
+      setRuntimeError("JWT required. Issue a token in Access Control first.");
       return;
     }
     setIsRefreshingDiagnostics(true);
@@ -957,7 +1122,7 @@ export default function App() {
   function exportRuntimeSnapshotCsv(type = "all") {
     const rows = runtimeCsvRows(type);
     if (rows.length === 0) {
-      setRuntimeError("CSV로 내보낼 데이터가 없습니다.");
+      setRuntimeError("No data available to export.");
       return;
     }
 
@@ -984,15 +1149,265 @@ export default function App() {
     );
   }
 
+  function buildDefaultScenarioSteps() {
+    const isOpsEligible = role === "Ops" || role === "Admin";
+    const base = [
+      {
+        key: "auth",
+        title: "Identity and Role Check",
+        text: "Issue a JWT and confirm least-privilege access behavior.",
+        endpoint: "/auth/login",
+        status: "idle"
+      },
+      {
+        key: "architecture",
+        title: "Architecture Risk Diagnosis",
+        text: "Run the architecture advisor and verify citations are consistent and relevant.",
+        endpoint: "/uc1/architecture",
+        status: "idle"
+      },
+      {
+        key: "ops",
+        title: "Operations Log Risk Analysis",
+        text: "Generate incident hypotheses and runbook steps from raw operational logs.",
+        endpoint: "/uc2/log-intel",
+        status: "idle"
+      },
+      {
+        key: "governance",
+        title: "Governance and Observability",
+        text: "Review audit + cost signals to decide if the system is production-ready.",
+        endpoint: "/audit/summary",
+        status: "idle"
+      },
+      {
+        key: "runtime",
+        title: "Ops Control Tower Snapshot (Optional)",
+        text: "Load /ops/runtime for alerts, recent events, and recent control tower decisions (Ops/Admin only).",
+        endpoint: "/ops/runtime",
+        status: isOpsEligible ? "idle" : "skipped",
+        skippedReason: isOpsEligible ? "" : "Requires Ops/Admin role."
+      }
+    ];
+    return base.map((step) => ({
+      ...step,
+      requestId: "",
+      error: "",
+      startedAt: "",
+      finishedAt: ""
+    }));
+  }
+
+  function updateScenarioStep(stepKey, patch) {
+    setScenarioRun((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      const steps = prev.steps.map((step) =>
+        step.key === stepKey ? { ...step, ...patch } : step
+      );
+      return { ...prev, steps };
+    });
+  }
+
+  function scenarioPillClass(statusValue) {
+    const status = String(statusValue || "idle").toLowerCase();
+    if (status === "running") {
+      return "pill pill-warning";
+    }
+    if (status === "error") {
+      return "pill pill-critical";
+    }
+    if (status === "skipped") {
+      return "pill pill-warning";
+    }
+    if (status === "ok") {
+      return "pill pill-info";
+    }
+    return "pill pill-info";
+  }
+
+  async function runScenarioRunner() {
+    const steps = buildDefaultScenarioSteps();
+    const startedAt = new Date().toISOString();
+
+    setScenarioRun({ running: true, startedAt, finishedAt: "", steps });
+    setDiagnosisResponse(null);
+    setOpsResponse(null);
+    setGovernanceSummary(null);
+    setGovernanceError("");
+    setRuntimeSnapshot(null);
+    setRuntimeError("");
+    setStatus("Running end-to-end scenario...");
+
+    const runStep = async (stepKey, runner) => {
+      updateScenarioStep(stepKey, { status: "running", startedAt: new Date().toISOString(), error: "" });
+      const result = await runner();
+      const requestId = result?.requestId || "";
+      updateScenarioStep(stepKey, {
+        status: "ok",
+        requestId,
+        finishedAt: new Date().toISOString()
+      });
+      return result;
+    };
+
+    try {
+      await runStep("auth", async () => login({ silent: true, throwOnError: true }));
+      await runStep("architecture", async () =>
+        runArchitectureDiagnosis({ silent: true, throwOnError: true })
+      );
+      await runStep("ops", async () => runOpsRiskAnalysis({ silent: true, throwOnError: true }));
+      await runStep("governance", async () =>
+        loadGovernanceSummary({ silent: true, throwOnError: true })
+      );
+
+      const isOpsEligible = role === "Ops" || role === "Admin";
+      if (isOpsEligible) {
+        await runStep("runtime", async () =>
+          loadRuntimeSnapshot({ silent: true, throwOnError: true })
+        );
+      }
+
+      setScenarioRun((prev) =>
+        prev ? { ...prev, running: false, finishedAt: new Date().toISOString() } : prev
+      );
+      setStatus("Scenario complete");
+    } catch (error) {
+      const message = error?.message || "Scenario failed";
+      setScenarioRun((prev) =>
+        prev ? { ...prev, running: false, finishedAt: new Date().toISOString() } : prev
+      );
+      setStatus(message);
+
+      // Mark the first running step as failed if any.
+      setScenarioRun((prev) => {
+        if (!prev) {
+          return prev;
+        }
+        const idx = prev.steps.findIndex((step) => step.status === "running");
+        if (idx === -1) {
+          return prev;
+        }
+        const stepsNext = prev.steps.slice();
+        stepsNext[idx] = {
+          ...stepsNext[idx],
+          status: "error",
+          error: message,
+          finishedAt: new Date().toISOString()
+        };
+        return { ...prev, steps: stepsNext };
+      });
+    }
+  }
+
+  function exportScenarioReport() {
+    if (!scenarioRun || scenarioRun.running) {
+      return;
+    }
+
+    const stamp = new Date().toISOString();
+    const lines = [];
+    lines.push(`# ${APP_NAME} - End-to-End Validation Report`);
+    lines.push("");
+    lines.push(`- generated_at_utc: ${stamp}`);
+    lines.push(`- api_base: ${API_BASE}`);
+    lines.push(`- user_id: ${userId}`);
+    lines.push(`- role: ${role}`);
+    if (scenarioRun.startedAt) {
+      lines.push(`- started_at_utc: ${scenarioRun.startedAt}`);
+    }
+    if (scenarioRun.finishedAt) {
+      lines.push(`- finished_at_utc: ${scenarioRun.finishedAt}`);
+    }
+    lines.push("");
+
+    lines.push("## Execution Timeline");
+    lines.push("| Step | Status | Request ID | Endpoint |");
+    lines.push("| --- | --- | --- | --- |");
+    scenarioRun.steps.forEach((step) => {
+      const status = String(step.status || "idle").toUpperCase();
+      const requestId = step.requestId ? `\`${step.requestId}\`` : "-";
+      const endpoint = step.endpoint ? `\`${step.endpoint}\`` : "-";
+      lines.push(`| ${step.title} | ${status} | ${requestId} | ${endpoint} |`);
+    });
+    lines.push("");
+
+    lines.push("## UC1 - Architecture Risk Diagnosis");
+    lines.push("### Prompt");
+    lines.push("```");
+    lines.push(String(diagnosisQuery || "").trim());
+    lines.push("```");
+    lines.push("");
+    lines.push("### Answer");
+    lines.push(diagnosisResponse?.answer ? String(diagnosisResponse.answer) : "_Not available_");
+    lines.push("");
+    if (Array.isArray(diagnosisResponse?.citations) && diagnosisResponse.citations.length > 0) {
+      lines.push("### Citations");
+      diagnosisResponse.citations.forEach((citation) => {
+        lines.push(`- ${citation.doc_id} :: ${citation.field_path}`);
+      });
+      lines.push("");
+    }
+
+    lines.push("## UC2 - Operations Log Risk Analysis");
+    lines.push("### Input logs");
+    lines.push("```");
+    lines.push(String(opsLogs || "").trim());
+    lines.push("```");
+    lines.push("");
+    lines.push("### Summary");
+    lines.push(opsResponse?.summary ? String(opsResponse.summary) : "_Not available_");
+    lines.push("");
+    if (Array.isArray(opsResponse?.root_causes) && opsResponse.root_causes.length > 0) {
+      lines.push("### Root Causes");
+      opsResponse.root_causes.forEach((cause) => lines.push(`- ${cause}`));
+      lines.push("");
+    }
+    if (Array.isArray(opsResponse?.runbook_steps) && opsResponse.runbook_steps.length > 0) {
+      lines.push("### Runbook Steps");
+      opsResponse.runbook_steps.forEach((step) => lines.push(`- ${step}`));
+      lines.push("");
+    }
+
+    lines.push("## Governance Summary");
+    if (governanceSummary) {
+      lines.push(`- requests: ${governanceSummary.requests ?? "-"}`);
+      lines.push(`- total_cost_usd: ${governanceSummary.total_cost ?? "-"}`);
+      lines.push(`- policy_events: ${Array.isArray(governanceSummary.policy_events) ? governanceSummary.policy_events.length : 0}`);
+      lines.push(`- tools_used: ${Array.isArray(governanceSummary.tools_used) ? governanceSummary.tools_used.length : 0}`);
+    } else {
+      lines.push("_Not available_");
+    }
+    lines.push("");
+
+    lines.push("## Ops Control Tower Snapshot");
+    if (runtimeSnapshot) {
+      lines.push(`- startup_status: ${runtimeSnapshot.startup_status ?? "-"}`);
+      lines.push(`- requests: ${runtimeSnapshot.audit_summary?.requests ?? "-"}`);
+      lines.push(`- daily_cost_usd: ${runtimeSnapshot.daily_cost_usd ?? "-"}`);
+      lines.push(`- alerts: ${Array.isArray(runtimeSnapshot.alerts) ? runtimeSnapshot.alerts.length : 0}`);
+      lines.push(`- service_events: ${Array.isArray(runtimeSnapshot.service_events) ? runtimeSnapshot.service_events.length : 0}`);
+      lines.push(`- recent_decisions: ${Array.isArray(runtimeSnapshot.recent_decisions) ? runtimeSnapshot.recent_decisions.length : 0}`);
+    } else {
+      lines.push("_Not available (requires Ops/Admin role)_");
+    }
+    lines.push("");
+
+    const safeStamp = stamp.replace(/[:.]/g, "-");
+    exportTextFile(`atelier-validation-report-${safeStamp}.md`, lines.join("\n"), "text/markdown;charset=utf-8");
+    setStatus("Scenario report exported");
+  }
+
   return (
     <div className="site-shell">
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
-
       <header className="top-nav">
         <button className="brand" onClick={() => navigate("home")}>
           <span className="brand-mark">A</span>
-          <span className="brand-text">LLM Adoption Atelier</span>
+          <span className="brand-text">
+            <strong>{APP_NAME}</strong>
+            <span>{APP_TAGLINE}</span>
+          </span>
         </button>
 
         <nav className="nav-links">
@@ -1007,9 +1422,45 @@ export default function App() {
           ))}
         </nav>
 
-        <button className="cta-light" onClick={() => navigate("console")}>
-          Open Console
-        </button>
+        <div className="nav-right">
+          <span
+            className="chip"
+            title={[
+              `API_BASE: ${API_BASE}`,
+              health.startup_status ? `startup_status: ${health.startup_status}` : "",
+              healthCheckedAt ? `checked: ${healthCheckedAt}` : ""
+            ]
+              .filter(Boolean)
+              .join("\n")}
+          >
+            <span
+              className={
+                String(health.status || "")
+                  .toLowerCase()
+                  .trim() === "ok"
+                  ? "dot ok"
+                  : String(health.status || "")
+                        .toLowerCase()
+                        .trim() === "degraded"
+                    ? "dot degraded"
+                    : "dot offline"
+              }
+            />
+            Backend:{" "}
+            {String(health.status || "")
+              .toLowerCase()
+              .trim() === "ok"
+              ? "OK"
+              : String(health.status || "")
+                    .toLowerCase()
+                    .trim() === "degraded"
+                ? "Degraded"
+                : "Offline"}
+          </span>
+          <button className="cta-light" onClick={() => navigate("console")}>
+            Open Console
+          </button>
+        </div>
       </header>
 
       <main className="main-content">
@@ -1017,71 +1468,101 @@ export default function App() {
           <div className="page-view">
             <section className="hero-grid">
               <Reveal className="hero-copy">
-                <p className="eyebrow">Medieval Craft x Modern AI</p>
-                <h1>LLM Adoption Atelier</h1>
+                <p className="eyebrow">Enterprise Adoption Sandbox</p>
+                <h1>{APP_NAME}</h1>
                 <p className="lead">
-                  중세 공방의 정교함과 현대 AI 운영 원칙을 결합해, 엔터프라이즈 LLM 도입 전에 필요한 검증을
-                  실제 콘솔 흐름으로 제공합니다.
+                  A production-minded validation kit for enterprise LLM adoption. Use it to test governance,
+                  grounded answers, and operational signals before you ship into sensitive environments.
                 </p>
                 <div className="hero-actions">
                   <button className="cta-primary" onClick={() => navigate("capabilities")}>
                     Explore Capabilities
                   </button>
-                  <button className="cta-ghost" onClick={() => navigate("console")}>
-                    Run Live Validation
+                  <button className="cta-ghost" onClick={() => navigate("scenario")}>
+                    Run End-to-End Scenario
                   </button>
                 </div>
                 <div className="kpi-grid">
                   <article className="kpi-item">
-                    <p>08</p>
-                    <span>Core Features</span>
+                    <p>03</p>
+                    <span>Roles (Employee/Ops/Admin)</span>
                   </article>
                   <article className="kpi-item">
-                    <p>99.9%</p>
-                    <span>Observability Coverage-Oriented</span>
+                    <p>02</p>
+                    <span>Use Cases (UC1/UC2)</span>
                   </article>
                   <article className="kpi-item">
-                    <p>05</p>
-                    <span>Scenario Pages</span>
+                    <p>01</p>
+                    <span>Control Tower Snapshot</span>
                   </article>
                 </div>
               </Reveal>
 
               <Reveal className="hero-media" delay={120}>
                 <div className="media-frame">
-                  <img src={IMG_HERO} alt="European medieval artisan workshop" />
-                  <div className="media-tag">Atelier Motion</div>
+                  <img src={heroTower} alt="Control tower visualization" />
+                  <div className="media-tag">CONTROL TOWER</div>
                 </div>
               </Reveal>
             </section>
 
             <section className="section-block">
               <Reveal className="section-head">
-                <p className="eyebrow">Core Service Surfaces</p>
-                <h2>Service-Aligned Validation Scenes</h2>
+                <p className="eyebrow">What You Can Validate</p>
+                <h2>Service-aligned validation surfaces</h2>
                 <p>
-                  홈 카드 3개를 실제 코어 기능과 직접 연결했습니다. 아키텍처 리스크 진단, 운영 로그 분석,
-                  거버넌스 점검 흐름을 한 번에 이해할 수 있도록 구성했습니다.
+                  This UI maps directly to the platform's core endpoints: architecture diagnosis, incident log
+                  analysis, and governance/ops signals.
                 </p>
               </Reveal>
 
               <div className="gallery-grid">
                 <Reveal className="gallery-card" delay={60}>
-                  <img src={IMG_ARCHITECTURE} alt="Architecture risk diagnosis scene" />
+                  <div className="icon-badge">
+                    <Icon name="architecture" />
+                  </div>
                   <h3>Architecture Risk Diagnosis</h3>
-                  <p>도입 아키텍처 질문을 기준으로 보안/운영 리스크를 진단하는 핵심 기능입니다.</p>
+                  <p>Turn architecture questions into prioritized risks with evidence-linked citations.</p>
+                  <div className="card-meta">
+                    <span className="tag">
+                      <strong>RAG</strong> citations
+                    </span>
+                    <span className="tag">
+                      <strong>RBAC</strong> enforced
+                    </span>
+                  </div>
                 </Reveal>
 
                 <Reveal className="gallery-card" delay={120}>
-                  <img src={IMG_OPERATIONS} alt="Operations log analysis scene" />
+                  <div className="icon-badge">
+                    <Icon name="ops" />
+                  </div>
                   <h3>Operations Log Risk Analysis</h3>
-                  <p>장애 로그를 요약하고 원인 가설과 실행 가능한 런북 단계를 제공하는 기능입니다.</p>
+                  <p>Summarize noisy logs into hypotheses and runbook steps you can execute immediately.</p>
+                  <div className="card-meta">
+                    <span className="tag">
+                      <strong>RCA</strong> hypotheses
+                    </span>
+                    <span className="tag">
+                      <strong>MTTR</strong> focus
+                    </span>
+                  </div>
                 </Reveal>
 
                 <Reveal className="gallery-card" delay={180}>
-                  <img src={IMG_GOVERNANCE} alt="Governance and audit review scene" />
+                  <div className="icon-badge">
+                    <Icon name="governance" />
+                  </div>
                   <h3>Governance and Audit Flow</h3>
-                  <p>요청량, 정책 이벤트, 비용 지표를 모아 도입 의사결정 품질을 높이는 기능입니다.</p>
+                  <p>Review policy events, tool usage, and daily cost to make adoption decisions defensible.</p>
+                  <div className="card-meta">
+                    <span className="tag">
+                      <strong>AUDIT</strong> events
+                    </span>
+                    <span className="tag">
+                      <strong>COST</strong> control
+                    </span>
+                  </div>
                 </Reveal>
               </div>
             </section>
@@ -1093,10 +1574,10 @@ export default function App() {
             <section className="section-block">
               <Reveal className="section-head">
                 <p className="eyebrow">Core Capabilities</p>
-                <h2>코어 서비스와 정확히 맞물린 검증 기능</h2>
+                <h2>Capabilities aligned to real adoption decisions</h2>
                 <p>
-                  이 플랫폼은 아키텍처 진단, 운영 로그 분석, 거버넌스 요약을 중심으로 엔터프라이즈 LLM 도입의
-                  핵심 의사결정 질문에 답하도록 설계되었습니다.
+                  This platform focuses on the questions that matter before rollout: access control, grounded
+                  answers, incident readiness, and governance signals.
                 </p>
               </Reveal>
 
@@ -1109,17 +1590,6 @@ export default function App() {
                   </Reveal>
                 ))}
               </div>
-
-              <div className="gif-ribbon">
-                <Reveal className="ribbon-item" delay={80}>
-                  <img src={IMG_ARCHITECTURE} alt="Architecture risk ribbon" />
-                  <span>Architecture Discipline</span>
-                </Reveal>
-                <Reveal className="ribbon-item" delay={130}>
-                  <img src={IMG_OPERATIONS} alt="Operations risk ribbon" />
-                  <span>Operations Discipline</span>
-                </Reveal>
-              </div>
             </section>
           </div>
         )}
@@ -1128,8 +1598,8 @@ export default function App() {
           <div className="page-view">
             <section className="section-block">
               <Reveal className="section-head">
-                <p className="eyebrow">Validation Flow</p>
-                <h2>도입 전 검증 순서를 명확히 고정한 흐름</h2>
+                <p className="eyebrow">Readiness Flow</p>
+                <h2>A structured validation order (before you deploy)</h2>
               </Reveal>
 
               <div className="validation-layout">
@@ -1144,14 +1614,18 @@ export default function App() {
                 </div>
 
                 <Reveal className="validation-visual" delay={120}>
-                  <img src={IMG_VALIDATION} alt="Validation workshop checklist visual" />
-                  <h3>Validation Checklist</h3>
+                  <h3>Readiness Checklist</h3>
                   <ul>
                     <li>RBAC and policy event consistency</li>
                     <li>Citation reliability for architecture diagnosis</li>
                     <li>Operations risk output actionability</li>
                     <li>Governance metrics traceability</li>
+                    <li>Cost and latency boundaries (pre-budget)</li>
                   </ul>
+                  <p className="lead" style={{ marginTop: 0 }}>
+                    The goal is not a pretty demo, but a repeatable validation loop that produces evidence you can
+                    share with reviewers.
+                  </p>
                 </Reveal>
               </div>
             </section>
@@ -1162,42 +1636,118 @@ export default function App() {
           <div className="page-view">
             <section className="section-block">
               <Reveal className="section-head">
-                <p className="eyebrow">Scenario Viewer</p>
-                <h2>서비스 검증 시나리오를 화면 단위로 재현</h2>
+                <p className="eyebrow">Scenario Runner</p>
+                <h2>Run a repeatable end-to-end validation</h2>
+                <p>
+                  Issue a token, execute UC1/UC2, review governance signals, and export a report you can share with
+                  reviewers.
+                </p>
               </Reveal>
 
               <div className="scenario-layout">
                 <Reveal className="scenario-window" delay={70}>
                   <div className="window-bar">
-                    <span className="window-dot red" />
-                    <span className="window-dot amber" />
-                    <span className="window-dot green" />
-                    <p>Scenario Runtime Window</p>
+                    <p>End-to-End Runbook</p>
+                    <div className="window-actions">
+                      <button className="cta-ghost" onClick={() => navigate("console")}>
+                        Open Console
+                      </button>
+                      <button
+                        className="cta-ghost"
+                        onClick={exportScenarioReport}
+                        disabled={!scenarioRun || scenarioRun.running}
+                      >
+                        Download Report
+                      </button>
+                      <button className="cta-primary" onClick={runScenarioRunner} disabled={scenarioRun?.running}>
+                        {scenarioRun?.running ? "Running..." : "Run Scenario"}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="window-body">
-                    {scenarioSteps.map((step) => (
-                      <article key={step.title} className="scenario-step">
-                        <h3>{step.title}</h3>
+                    {(scenarioRun?.steps || buildDefaultScenarioSteps()).map((step) => (
+                      <article key={step.key} className="scenario-step">
+                        <div className="step-head">
+                          <h3>{step.title}</h3>
+                          <span className={scenarioPillClass(step.status)}>
+                            {String(step.status || "idle").toUpperCase()}
+                          </span>
+                        </div>
                         <p>{step.text}</p>
                         <code>{step.endpoint}</code>
+                        {step.requestId && (
+                          <code className="mono-inline">request_id: {step.requestId}</code>
+                        )}
+                        {step.status === "skipped" && step.skippedReason && (
+                          <p className="error-text">{step.skippedReason}</p>
+                        )}
+                        {step.status === "error" && step.error && <p className="error-text">{step.error}</p>}
                       </article>
                     ))}
                   </div>
                 </Reveal>
 
-                <Reveal className="scenario-visual" delay={130}>
-                  <img src={IMG_SCENARIO} alt="Scenario execution workshop visual" />
-                  <h3>Scenario Alignment</h3>
+                <Reveal className="validation-visual" delay={130}>
+                  <h3>Preflight</h3>
                   <ul>
-                    <li>도입 아키텍처 질문 중심</li>
-                    <li>운영 로그 기반 리스크 분석</li>
-                    <li>거버넌스 지표 기반 판단</li>
-                    <li>실행 가능한 콘솔 검증 흐름</li>
+                    <li>
+                      API base: <code className="mono-inline">{API_BASE}</code>
+                    </li>
+                    <li>
+                      Health:{" "}
+                      <code className="mono-inline">
+                        {String(health.status || "unknown")}
+                        {health.startup_status ? ` / ${health.startup_status}` : ""}
+                      </code>
+                    </li>
+                    <li>Ops snapshot requires Ops/Admin role.</li>
                   </ul>
-                  <button className="cta-primary" onClick={() => navigate("console")}>
-                    Move To Live Console
-                  </button>
+
+                  <div className="panel" style={{ padding: 0, background: "transparent", boxShadow: "none" }}>
+                    <h4 style={{ margin: "0 0 10px" }}>Identity</h4>
+                    <div className="form-grid">
+                      <label>
+                        User ID
+                        <input value={userId} onChange={(event) => setUserId(event.target.value)} />
+                      </label>
+                      <label>
+                        Role
+                        <select value={role} onChange={(event) => setRole(event.target.value)}>
+                          {roles.map((item) => (
+                            <option key={item} value={item}>
+                              {item}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <button className="cta-primary" onClick={() => login()} disabled={scenarioRun?.running}>
+                        Issue JWT
+                      </button>
+                    </div>
+                    <div className="token-row">
+                      <span>Token</span>
+                      <code>{token ? `${token.slice(0, 72)}...` : "Not issued"}</code>
+                    </div>
+                  </div>
+
+                  <div className="result-card" style={{ minHeight: 0 }}>
+                    <h4>Latest Outputs (Preview)</h4>
+                    <p>
+                      <strong>UC1:</strong>{" "}
+                      {diagnosisResponse?.answer ? `${String(diagnosisResponse.answer).slice(0, 140)}...` : "—"}
+                    </p>
+                    <p>
+                      <strong>UC2:</strong>{" "}
+                      {opsResponse?.summary ? `${String(opsResponse.summary).slice(0, 140)}...` : "—"}
+                    </p>
+                    <p>
+                      <strong>Governance:</strong>{" "}
+                      {governanceSummary
+                        ? `requests=${governanceSummary.requests}, cost=$${governanceSummary.total_cost}`
+                        : "—"}
+                    </p>
+                  </div>
                 </Reveal>
               </div>
             </section>
@@ -1208,19 +1758,78 @@ export default function App() {
           <div className="page-view console-view">
             <section className="section-block console-header">
               <Reveal className="section-head">
-                <p className="eyebrow">Live Console</p>
-                <h2>코어 서비스 검증을 실행하는 메인 워크벤치</h2>
+                <p className="eyebrow">Console</p>
+                <h2>Run live validation against the backend</h2>
                 <p>
-                  이 콘솔은 아키텍처 리스크 진단, 운영 로그 분석, 거버넌스 요약을 실제 API 호출로 검증하도록
-                  구성되어 있습니다.
+                  Issue JWTs, execute UC1/UC2, and inspect governance + ops signals. Use Admin panels only when
+                  required (role-gated).
                 </p>
               </Reveal>
 
               <Reveal className="signal-card" delay={120}>
-                <img src={IMG_SIGNAL} alt="Live validation signal visual" />
-                <span>System Status</span>
-                <strong>{status || "Ready"}</strong>
-                {lastRequestId && <code className="signal-request-id">request_id: {lastRequestId}</code>}
+                <p className="signal-title">System Status</p>
+                <div className="signal-main">
+                  <span
+                    className="chip"
+                    title={[
+                      `API_BASE: ${API_BASE}`,
+                      health.startup_status ? `startup_status: ${health.startup_status}` : "",
+                      healthCheckedAt ? `checked: ${healthCheckedAt}` : ""
+                    ]
+                      .filter(Boolean)
+                      .join("\n")}
+                  >
+                    <span
+                      className={
+                        String(health.status || "")
+                          .toLowerCase()
+                          .trim() === "ok"
+                          ? "dot ok"
+                          : String(health.status || "")
+                                .toLowerCase()
+                                .trim() === "degraded"
+                            ? "dot degraded"
+                            : "dot offline"
+                      }
+                    />
+                    {String(health.status || "")
+                      .toLowerCase()
+                      .trim() === "ok"
+                      ? "Healthy"
+                      : String(health.status || "")
+                            .toLowerCase()
+                            .trim() === "degraded"
+                        ? "Degraded"
+                        : "Offline"}
+                  </span>
+                  <strong>{status || "Ready"}</strong>
+                  {lastRequestId && <code className="signal-request-id">request_id: {lastRequestId}</code>}
+                </div>
+
+                <div className="signal-grid">
+                  <div className="signal-metric">
+                    <span>Role</span>
+                    <strong>{role}</strong>
+                  </div>
+                  <div className="signal-metric">
+                    <span>Token</span>
+                    <strong>{token ? "Issued" : "None"}</strong>
+                  </div>
+                  <div className="signal-metric">
+                    <span>Requests</span>
+                    <strong>{runtimeSnapshot?.audit_summary?.requests ?? governanceSummary?.requests ?? "-"}</strong>
+                  </div>
+                  <div className="signal-metric">
+                    <span>Daily Cost</span>
+                    <strong>
+                      {runtimeSnapshot?.daily_cost_usd != null
+                        ? `$${runtimeSnapshot.daily_cost_usd}`
+                        : governanceSummary?.total_cost != null
+                          ? `$${governanceSummary.total_cost}`
+                          : "-"}
+                    </strong>
+                  </div>
+                </div>
               </Reveal>
             </section>
 
@@ -1369,7 +1978,7 @@ export default function App() {
                 <div className="tab-content tab-governance">
                   <div className="result-card">
                     <h4>Discovery Wizard (CLI)</h4>
-                    <p>도입 브리프, 리스크 노트, 평가 계획을 자동 생성합니다.</p>
+                    <p>Generate an adoption brief, risk notes, and an eval plan as a repeatable artifact.</p>
                     <code className="mono-inline">
                       python3 app/backend/scripts/discovery_wizard.py --company "ACME Korea"
                     </code>
@@ -1378,7 +1987,7 @@ export default function App() {
 
                   <div className="result-card">
                     <h4>Governance Summary</h4>
-                    <p>요청량, 정책 이벤트, 툴 사용, 비용 지표를 통합 요약합니다.</p>
+                    <p>Aggregate requests, policy events, tool usage, and cost signals into one summary.</p>
                     <button className="cta-primary" onClick={loadGovernanceSummary}>
                       Load Governance Summary
                     </button>
@@ -1418,11 +2027,11 @@ export default function App() {
                   <div className="result-card admin-card">
                     <h4>Admin Runtime LLM Settings</h4>
                     <p>
-                      브라우저에서 LLM provider/model/runtime 파라미터를 변경할 수 있습니다. 실제 운영에서는
-                      Secret Manager 연동이 필요합니다.
+                      Update provider/model/runtime parameters from the browser. In production, wire secrets through
+                      a Secret Manager instead of pasting keys into the UI.
                     </p>
                     <p className="admin-note">
-                      현재 선택 Role: <strong>{role}</strong> (Admin 권한 필요)
+                      Current role: <strong>{role}</strong> (Admin required)
                     </p>
                     <div className="admin-grid">
                       <label>
@@ -1549,8 +2158,9 @@ export default function App() {
                   <div className="result-card admin-card">
                     <h4>Architecture Dataset Manager</h4>
                     <p>
-                      운영 중에도 아키텍처 JSONL 데이터를 교체하고 즉시 재인덱싱할 수 있습니다. `system/env/access_group`
-                      필드는 필수입니다.
+                      Hot-swap the architecture JSONL dataset and reindex without redeploy. The fields{" "}
+                      <code className="mono-inline">system</code>, <code className="mono-inline">env</code>, and{" "}
+                      <code className="mono-inline">access_group</code> are required.
                     </p>
                     <div className="action-row">
                       <button className="cta-ghost" onClick={loadSampleArchitectureDataset}>
@@ -1605,8 +2215,8 @@ export default function App() {
                   <div className="result-card runtime-card">
                     <h4>Runtime Debug Snapshot</h4>
                     <p>
-                      운영 디버깅용 스냅샷입니다. 최근 서비스 이벤트, 최근 Control Tower 결정, 현재 경보 상태를
-                      한 번에 확인할 수 있습니다.
+                      Ops debugging snapshot. Inspect alerts, recent service events, and recent Control Tower decisions
+                      in one view.
                     </p>
                     <div className="runtime-filters">
                       <label>
@@ -1875,7 +2485,7 @@ export default function App() {
 
       <footer className="site-footer">
         <p>Observability: /metrics</p>
-        <p>Audit logs: data/audit.log</p>
+        <p>Audit logs: app/backend/data/audit.log (runtime)</p>
       </footer>
     </div>
   );
