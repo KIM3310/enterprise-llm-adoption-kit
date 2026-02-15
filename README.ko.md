@@ -13,6 +13,7 @@ Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 �
 - 백엔드 API, 프론트엔드 UI, eval harness, 프리세일즈 산출물을 단독 구현했습니다.
 - 주장보다 재현을 우선했습니다: 모든 항목은 문서, 테스트, 또는 스크립트로 검증 가능합니다.
 - 신입 온보딩 관점으로 설계했습니다: 역할 분리, 간단한 실행 절차, 안전한 기본값을 유지했습니다.
+- GitHub Actions로 CI 체크(backend quality gate, frontend build, eval gate)를 추가했습니다.
 
 ## 핵심 기능 (실제로 동작 확인 가능한 항목)
 - RBAC 기반 접근 제어 (retrieval 단계에서 적용)
@@ -21,6 +22,8 @@ Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 �
 - RAG-style retrieval (Chroma + deterministic hash embeddings)
 - Evals 리포트 + baseline diff
 - LLMOps 지표 (latency, token, cost, policy events)
+- 통합 패턴: Slack/Jira 스타일 ingestion 엔드포인트(UI에서 시뮬레이션 가능)
+- Scenario Runner가 Markdown 리포트를 export하고, 로컬 run history(브라우저 localStorage)를 유지합니다
 - 프리세일즈 아티팩트: discovery wizard, ROI 계산기, 데모 스크립트, exec deck
 
 ## 아키텍처 요약 (로컬 데모)
