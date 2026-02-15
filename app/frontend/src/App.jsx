@@ -134,6 +134,81 @@ function getPageFromHash() {
   return pages.includes(hash) ? hash : "home";
 }
 
+const STORAGE_KEYS = {
+  userId: "atelier.user_id",
+  role: "atelier.role",
+  scenarioHistory: "atelier.scenario_history.v1"
+};
+
+function safeStorageGet(key, fallback = "") {
+  try {
+    const value = window.localStorage.getItem(key);
+    return value == null ? fallback : value;
+  } catch (_err) {
+    return fallback;
+  }
+}
+
+function safeStorageSet(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch (_err) {
+    // ignore
+  }
+}
+
+function safeJsonParse(raw, fallback) {
+  if (!raw) {
+    return fallback;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (_err) {
+    return fallback;
+  }
+}
+
+function safeJsonStringify(value, fallback = "") {
+  try {
+    return JSON.stringify(value);
+  } catch (_err) {
+    return fallback;
+  }
+}
+
+function readJsonStorage(key, fallback) {
+  return safeJsonParse(safeStorageGet(key, ""), fallback);
+}
+
+function writeJsonStorage(key, value) {
+  safeStorageSet(key, safeJsonStringify(value, ""));
+}
+
+async function copyTextToClipboard(text) {
+  const payload = String(text ?? "");
+  try {
+    await navigator.clipboard.writeText(payload);
+    return true;
+  } catch (_err) {
+    // Fallback for older browsers / permissions.
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = payload;
+      textarea.style.position = "fixed";
+      textarea.style.top = "-1000px";
+      textarea.style.left = "-1000px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const ok = document.execCommand("copy");
+      textarea.remove();
+      return ok;
+    } catch (_err2) {
+      return false;
+    }
+  }
+}
+
 function parseApiError(payload, fallback) {
   const detail = payload?.detail;
   if (typeof detail === "string" && detail.trim()) {
@@ -341,15 +416,43 @@ function Icon({ name = "default" }) {
 
 export default function App() {
   const [page, setPage] = useState(() => getPageFromHash());
-  const [userId, setUserId] = useState("acme-demo");
-  const [role, setRole] = useState("Employee");
+  const [userId, setUserId] = useState(() => safeStorageGet(STORAGE_KEYS.userId, "acme-demo"));
+  const [role, setRole] = useState(() => {
+    const stored = safeStorageGet(STORAGE_KEYS.role, "Employee");
+    return roles.includes(stored) ? stored : "Employee";
+  });
   const [token, setToken] = useState("");
   const [activeTab, setActiveTab] = useState("architecture");
   const [status, setStatus] = useState("Ready");
   const [lastRequestId, setLastRequestId] = useState("");
-  const [health, setHealth] = useState({ status: "unknown", startup_status: "" });
+  const [health, setHealth] = useState({
+    status: "unknown",
+    startup_status: "",
+    auth_mode: "",
+    data_handling_mode: "",
+    storage_backend: "",
+    llm_provider: "",
+    llm_model: "",
+    openai_api_key_configured: false
+  });
   const [healthCheckedAt, setHealthCheckedAt] = useState("");
   const [scenarioRun, setScenarioRun] = useState(null);
+  const [scenarioHistory, setScenarioHistory] = useState(() => {
+    const stored = readJsonStorage(STORAGE_KEYS.scenarioHistory, []);
+    return Array.isArray(stored) ? stored : [];
+  });
+
+  useEffect(() => {
+    safeStorageSet(STORAGE_KEYS.userId, userId);
+  }, [userId]);
+
+  useEffect(() => {
+    safeStorageSet(STORAGE_KEYS.role, role);
+  }, [role]);
+
+  useEffect(() => {
+    writeJsonStorage(STORAGE_KEYS.scenarioHistory, scenarioHistory);
+  }, [scenarioHistory]);
 
   const [diagnosisQuery, setDiagnosisQuery] = useState(
     "Prioritize the top security and reliability risks in our LLM adoption architecture. Provide evidence-backed mitigation steps."
@@ -398,6 +501,16 @@ export default function App() {
   const [architectureError, setArchitectureError] = useState("");
   const [isImportingArchitecture, setIsImportingArchitecture] = useState(false);
   const [isReindexingArchitecture, setIsReindexingArchitecture] = useState(false);
+  const [slackText, setSlackText] = useState("/uc2 ERROR Timeout while calling payments API");
+  const [slackChannel, setSlackChannel] = useState("ops-incidents");
+  const [slackResponse, setSlackResponse] = useState(null);
+  const [slackError, setSlackError] = useState("");
+  const [jiraTicketId, setJiraTicketId] = useState("INC-1001");
+  const [jiraTitle, setJiraTitle] = useState("Payments API timeout spikes");
+  const [jiraDescription, setJiraDescription] = useState("ERROR Timeout while calling payments API");
+  const [jiraPriority, setJiraPriority] = useState("High");
+  const [jiraResponse, setJiraResponse] = useState(null);
+  const [jiraError, setJiraError] = useState("");
 
   useEffect(() => {
     const onHashChange = () => setPage(getPageFromHash());
@@ -424,14 +537,29 @@ export default function App() {
         }
         setHealth({
           status: String(data.status || "ok"),
-          startup_status: String(data.startup_status || "")
+          startup_status: String(data.startup_status || ""),
+          auth_mode: String(data.auth_mode || ""),
+          data_handling_mode: String(data.data_handling_mode || ""),
+          storage_backend: String(data.storage_backend || ""),
+          llm_provider: String(data.llm_provider || ""),
+          llm_model: String(data.llm_model || ""),
+          openai_api_key_configured: Boolean(data.openai_api_key_configured)
         });
         setHealthCheckedAt(new Date().toLocaleTimeString());
       } catch (_error) {
         if (cancelled) {
           return;
         }
-        setHealth({ status: "offline", startup_status: "" });
+        setHealth({
+          status: "offline",
+          startup_status: "",
+          auth_mode: "",
+          data_handling_mode: "",
+          storage_backend: "",
+          llm_provider: "",
+          llm_model: "",
+          openai_api_key_configured: false
+        });
         setHealthCheckedAt(new Date().toLocaleTimeString());
       }
     }
@@ -616,6 +744,98 @@ export default function App() {
       }
       if (throwOnError) {
         throw error;
+      }
+      return null;
+    }
+  }
+
+  async function sendSlackEvent(options = {}) {
+    const { silent = false } = options;
+    setSlackError("");
+    setSlackResponse(null);
+    if (!silent) {
+      setStatus("Sending Slack event...");
+    }
+
+    const text = String(slackText || "").trim();
+    if (!text) {
+      const msg = "Slack message cannot be empty";
+      setSlackError(msg);
+      if (!silent) {
+        setStatus(msg);
+      }
+      return null;
+    }
+
+    try {
+      const { data, requestId } = await fetchJson("/integrations/slack/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: userId || "slack-user",
+          role,
+          channel: slackChannel || null,
+          text
+        }),
+        errorMessage: "Slack integration failed"
+      });
+      setSlackResponse(data);
+      if (!silent) {
+        setStatus(withRequestId("Slack reply generated", requestId));
+      }
+      return { data, requestId };
+    } catch (error) {
+      setSlackError(error.message || "Slack integration failed");
+      if (!silent) {
+        setStatus(withRequestId("Slack integration error", error.requestId));
+      }
+      return null;
+    }
+  }
+
+  async function generateJiraComment(options = {}) {
+    const { silent = false } = options;
+    setJiraError("");
+    setJiraResponse(null);
+    if (!silent) {
+      setStatus("Generating Jira comment...");
+    }
+
+    const ticketId = String(jiraTicketId || "").trim();
+    const title = String(jiraTitle || "").trim();
+    const description = String(jiraDescription || "").trim();
+    if (!ticketId || !title || !description) {
+      const msg = "Jira ticket_id/title/description are required";
+      setJiraError(msg);
+      if (!silent) {
+        setStatus(msg);
+      }
+      return null;
+    }
+
+    try {
+      const { data, requestId } = await fetchJson("/integrations/jira/ticket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticket_id: ticketId,
+          title,
+          description,
+          priority: String(jiraPriority || "Medium"),
+          reporter: userId || null,
+          role
+        }),
+        errorMessage: "Jira integration failed"
+      });
+      setJiraResponse(data);
+      if (!silent) {
+        setStatus(withRequestId("Jira comment generated", requestId));
+      }
+      return { data, requestId };
+    } catch (error) {
+      setJiraError(error.message || "Jira integration failed");
+      if (!silent) {
+        setStatus(withRequestId("Jira integration error", error.requestId));
       }
       return null;
     }
@@ -1244,11 +1464,199 @@ export default function App() {
     return "pill pill-info";
   }
 
+  function addScenarioHistoryEntry(entry) {
+    const next = {
+      id: String(entry?.id || `run-${Date.now()}`),
+      generated_at_utc: String(entry?.generated_at_utc || new Date().toISOString()),
+      status: String(entry?.status || "ok"),
+      api_base: String(entry?.api_base || API_BASE),
+      user_id: String(entry?.user_id || userId),
+      role: String(entry?.role || role),
+      report_md: String(entry?.report_md || "")
+    };
+
+    setScenarioHistory((prev) => {
+      const existing = Array.isArray(prev) ? prev : [];
+      const deduped = existing.filter((item) => item?.id !== next.id);
+      return [next, ...deduped].slice(0, 12);
+    });
+  }
+
+  function clearScenarioHistory() {
+    setScenarioHistory([]);
+    setStatus("Scenario history cleared");
+  }
+
+  function downloadScenarioHistoryEntry(entry) {
+    const stamp = String(entry?.generated_at_utc || new Date().toISOString());
+    const report = String(entry?.report_md || "");
+    if (!report.trim()) {
+      setStatus("No report content available");
+      return;
+    }
+    const safeStamp = stamp.replace(/[:.]/g, "-");
+    exportTextFile(`atelier-validation-report-${safeStamp}.md`, report, "text/markdown;charset=utf-8");
+    setStatus("Scenario report exported");
+  }
+
+  async function copyScenarioHistoryEntry(entry) {
+    const report = String(entry?.report_md || "");
+    if (!report.trim()) {
+      setStatus("No report content available");
+      return;
+    }
+    const ok = await copyTextToClipboard(report);
+    setStatus(ok ? "Scenario report copied" : "Failed to copy scenario report");
+  }
+
+  function buildScenarioReportMarkdown(options = {}) {
+    const stamp = String(options.stamp || new Date().toISOString());
+    const scenario = options.scenario || scenarioRun;
+    const reportUserId = String(options.userId ?? userId);
+    const reportRole = String(options.role ?? role);
+    const reportApiBase = String(options.apiBase ?? API_BASE);
+
+    const diagnosisPrompt = String(options.diagnosisQuery ?? diagnosisQuery);
+    const opsInputLogs = String(options.opsLogs ?? opsLogs);
+    const diagnosisData = options.diagnosisData ?? diagnosisResponse;
+    const opsData = options.opsData ?? opsResponse;
+    const governanceData = options.governanceData ?? governanceSummary;
+    const runtimeData = options.runtimeData ?? runtimeSnapshot;
+
+    const steps = Array.isArray(scenario?.steps) ? scenario.steps : [];
+
+    const lines = [];
+    lines.push(`# ${APP_NAME} - End-to-End Validation Report`);
+    lines.push("");
+    lines.push(`- generated_at_utc: ${stamp}`);
+    lines.push(`- api_base: ${reportApiBase}`);
+    lines.push(`- user_id: ${reportUserId}`);
+    lines.push(`- role: ${reportRole}`);
+    if (scenario?.startedAt) {
+      lines.push(`- started_at_utc: ${scenario.startedAt}`);
+    }
+    if (scenario?.finishedAt) {
+      lines.push(`- finished_at_utc: ${scenario.finishedAt}`);
+    }
+    lines.push("");
+
+    lines.push("## Execution Timeline");
+    lines.push("| Step | Status | Request ID | Endpoint |");
+    lines.push("| --- | --- | --- | --- |");
+    steps.forEach((step) => {
+      const status = String(step.status || "idle").toUpperCase();
+      const requestId = step.requestId ? `\`${step.requestId}\`` : "-";
+      const endpoint = step.endpoint ? `\`${step.endpoint}\`` : "-";
+      lines.push(`| ${step.title} | ${status} | ${requestId} | ${endpoint} |`);
+    });
+    lines.push("");
+
+    lines.push("## UC1 - Architecture Risk Diagnosis");
+    lines.push("### Prompt");
+    lines.push("```");
+    lines.push(String(diagnosisPrompt || "").trim());
+    lines.push("```");
+    lines.push("");
+    lines.push("### Answer");
+    lines.push(diagnosisData?.answer ? String(diagnosisData.answer) : "_Not available_");
+    lines.push("");
+    if (Array.isArray(diagnosisData?.citations) && diagnosisData.citations.length > 0) {
+      lines.push("### Citations");
+      diagnosisData.citations.forEach((citation) => {
+        lines.push(`- ${citation.doc_id} :: ${citation.field_path}`);
+      });
+      lines.push("");
+    }
+
+    lines.push("## UC2 - Operations Log Risk Analysis");
+    lines.push("### Input logs");
+    lines.push("```");
+    lines.push(String(opsInputLogs || "").trim());
+    lines.push("```");
+    lines.push("");
+    lines.push("### Summary");
+    lines.push(opsData?.summary ? String(opsData.summary) : "_Not available_");
+    lines.push("");
+    if (Array.isArray(opsData?.root_causes) && opsData.root_causes.length > 0) {
+      lines.push("### Root Causes");
+      opsData.root_causes.forEach((cause) => lines.push(`- ${cause}`));
+      lines.push("");
+    }
+    if (Array.isArray(opsData?.runbook_steps) && opsData.runbook_steps.length > 0) {
+      lines.push("### Runbook Steps");
+      opsData.runbook_steps.forEach((step) => lines.push(`- ${step}`));
+      lines.push("");
+    }
+
+    lines.push("## Governance Summary");
+    if (governanceData) {
+      lines.push(`- requests: ${governanceData.requests ?? "-"}`);
+      lines.push(`- total_cost_usd: ${governanceData.total_cost ?? "-"}`);
+      lines.push(
+        `- policy_events: ${
+          Array.isArray(governanceData.policy_events) ? governanceData.policy_events.length : 0
+        }`
+      );
+      lines.push(
+        `- tools_used: ${
+          Array.isArray(governanceData.tools_used) ? governanceData.tools_used.length : 0
+        }`
+      );
+    } else {
+      lines.push("_Not available_");
+    }
+    lines.push("");
+
+    lines.push("## Ops Control Tower Snapshot");
+    if (runtimeData) {
+      lines.push(`- startup_status: ${runtimeData.startup_status ?? "-"}`);
+      lines.push(`- requests: ${runtimeData.audit_summary?.requests ?? "-"}`);
+      lines.push(`- daily_cost_usd: ${runtimeData.daily_cost_usd ?? "-"}`);
+      lines.push(`- alerts: ${Array.isArray(runtimeData.alerts) ? runtimeData.alerts.length : 0}`);
+      lines.push(
+        `- service_events: ${
+          Array.isArray(runtimeData.service_events) ? runtimeData.service_events.length : 0
+        }`
+      );
+      lines.push(
+        `- recent_decisions: ${
+          Array.isArray(runtimeData.recent_decisions) ? runtimeData.recent_decisions.length : 0
+        }`
+      );
+    } else {
+      lines.push("_Not available (requires Ops/Admin role)_");
+    }
+    lines.push("");
+
+    lines.push("## Runtime Metadata");
+    lines.push(`- auth_mode: ${String(health.auth_mode || "-")}`);
+    lines.push(`- data_handling_mode: ${String(health.data_handling_mode || "-")}`);
+    lines.push(`- storage_backend: ${String(health.storage_backend || "-")}`);
+    lines.push(
+      `- llm_provider: ${String(health.llm_provider || "-")} (${String(health.llm_model || "-")})`
+    );
+    lines.push(`- openai_api_key_configured: ${health.openai_api_key_configured ? "true" : "false"}`);
+    lines.push("");
+
+    return lines.join("\n");
+  }
+
+  async function copyScenarioReportToClipboard() {
+    if (!scenarioRun || scenarioRun.running) {
+      return;
+    }
+    const stamp = new Date().toISOString();
+    const report = buildScenarioReportMarkdown({ stamp });
+    const ok = await copyTextToClipboard(report);
+    setStatus(ok ? "Scenario report copied" : "Failed to copy scenario report");
+  }
+
   async function runScenarioRunner() {
     const steps = buildDefaultScenarioSteps();
+    const runId = `run-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
     const startedAt = new Date().toISOString();
 
-    setScenarioRun({ running: true, startedAt, finishedAt: "", steps });
+    setScenarioRun({ id: runId, running: true, startedAt, finishedAt: "", steps });
     setDiagnosisResponse(null);
     setOpsResponse(null);
     setGovernanceSummary(null);
@@ -1257,11 +1665,19 @@ export default function App() {
     setRuntimeError("");
     setStatus("Running end-to-end scenario...");
 
+    const updateLocalStep = (stepKey, patch) => {
+      const idx = steps.findIndex((item) => item.key === stepKey);
+      if (idx >= 0) {
+        steps[idx] = { ...steps[idx], ...patch };
+      }
+      updateScenarioStep(stepKey, patch);
+    };
+
     const runStep = async (stepKey, runner) => {
-      updateScenarioStep(stepKey, { status: "running", startedAt: new Date().toISOString(), error: "" });
+      updateLocalStep(stepKey, { status: "running", startedAt: new Date().toISOString(), error: "" });
       const result = await runner();
       const requestId = result?.requestId || "";
-      updateScenarioStep(stepKey, {
+      updateLocalStep(stepKey, {
         status: "ok",
         requestId,
         finishedAt: new Date().toISOString()
@@ -1270,31 +1686,54 @@ export default function App() {
     };
 
     try {
-      await runStep("auth", async () => login({ silent: true, throwOnError: true }));
-      await runStep("architecture", async () =>
+      const authResult = await runStep("auth", async () => login({ silent: true, throwOnError: true }));
+      const uc1Result = await runStep("architecture", async () =>
         runArchitectureDiagnosis({ silent: true, throwOnError: true })
       );
-      await runStep("ops", async () => runOpsRiskAnalysis({ silent: true, throwOnError: true }));
-      await runStep("governance", async () =>
+      const uc2Result = await runStep("ops", async () =>
+        runOpsRiskAnalysis({ silent: true, throwOnError: true })
+      );
+      const governanceResult = await runStep("governance", async () =>
         loadGovernanceSummary({ silent: true, throwOnError: true })
       );
 
       const isOpsEligible = role === "Ops" || role === "Admin";
+      let runtimeResult = null;
       if (isOpsEligible) {
-        await runStep("runtime", async () =>
+        runtimeResult = await runStep("runtime", async () =>
           loadRuntimeSnapshot({ silent: true, throwOnError: true })
         );
       }
 
-      setScenarioRun((prev) =>
-        prev ? { ...prev, running: false, finishedAt: new Date().toISOString() } : prev
-      );
+      const finishedAt = new Date().toISOString();
+      setScenarioRun((prev) => (prev ? { ...prev, running: false, finishedAt } : prev));
       setStatus("Scenario complete");
+
+      addScenarioHistoryEntry({
+        id: runId,
+        generated_at_utc: finishedAt,
+        status: "ok",
+        api_base: API_BASE,
+        user_id: userId,
+        role,
+        report_md: buildScenarioReportMarkdown({
+          stamp: finishedAt,
+          scenario: { id: runId, startedAt, finishedAt, steps },
+          userId,
+          role,
+          apiBase: API_BASE,
+          diagnosisData: uc1Result?.data,
+          opsData: uc2Result?.data,
+          governanceData: governanceResult?.data,
+          runtimeData: runtimeResult?.data
+        })
+      });
+
+      void authResult;
     } catch (error) {
       const message = error?.message || "Scenario failed";
-      setScenarioRun((prev) =>
-        prev ? { ...prev, running: false, finishedAt: new Date().toISOString() } : prev
-      );
+      const finishedAt = new Date().toISOString();
+      setScenarioRun((prev) => (prev ? { ...prev, running: false, finishedAt } : prev));
       setStatus(message);
 
       // Mark the first running step as failed if any.
@@ -1311,9 +1750,31 @@ export default function App() {
           ...stepsNext[idx],
           status: "error",
           error: message,
-          finishedAt: new Date().toISOString()
+          finishedAt
         };
         return { ...prev, steps: stepsNext };
+      });
+
+      // Keep local copy consistent for report/history.
+      const idx = steps.findIndex((step) => step.status === "running");
+      if (idx >= 0) {
+        steps[idx] = { ...steps[idx], status: "error", error: message, finishedAt };
+      }
+
+      addScenarioHistoryEntry({
+        id: runId,
+        generated_at_utc: finishedAt,
+        status: "error",
+        api_base: API_BASE,
+        user_id: userId,
+        role,
+        report_md: buildScenarioReportMarkdown({
+          stamp: finishedAt,
+          scenario: { id: runId, startedAt, finishedAt, steps },
+          userId,
+          role,
+          apiBase: API_BASE
+        })
       });
     }
   }
@@ -1324,95 +1785,9 @@ export default function App() {
     }
 
     const stamp = new Date().toISOString();
-    const lines = [];
-    lines.push(`# ${APP_NAME} - End-to-End Validation Report`);
-    lines.push("");
-    lines.push(`- generated_at_utc: ${stamp}`);
-    lines.push(`- api_base: ${API_BASE}`);
-    lines.push(`- user_id: ${userId}`);
-    lines.push(`- role: ${role}`);
-    if (scenarioRun.startedAt) {
-      lines.push(`- started_at_utc: ${scenarioRun.startedAt}`);
-    }
-    if (scenarioRun.finishedAt) {
-      lines.push(`- finished_at_utc: ${scenarioRun.finishedAt}`);
-    }
-    lines.push("");
-
-    lines.push("## Execution Timeline");
-    lines.push("| Step | Status | Request ID | Endpoint |");
-    lines.push("| --- | --- | --- | --- |");
-    scenarioRun.steps.forEach((step) => {
-      const status = String(step.status || "idle").toUpperCase();
-      const requestId = step.requestId ? `\`${step.requestId}\`` : "-";
-      const endpoint = step.endpoint ? `\`${step.endpoint}\`` : "-";
-      lines.push(`| ${step.title} | ${status} | ${requestId} | ${endpoint} |`);
-    });
-    lines.push("");
-
-    lines.push("## UC1 - Architecture Risk Diagnosis");
-    lines.push("### Prompt");
-    lines.push("```");
-    lines.push(String(diagnosisQuery || "").trim());
-    lines.push("```");
-    lines.push("");
-    lines.push("### Answer");
-    lines.push(diagnosisResponse?.answer ? String(diagnosisResponse.answer) : "_Not available_");
-    lines.push("");
-    if (Array.isArray(diagnosisResponse?.citations) && diagnosisResponse.citations.length > 0) {
-      lines.push("### Citations");
-      diagnosisResponse.citations.forEach((citation) => {
-        lines.push(`- ${citation.doc_id} :: ${citation.field_path}`);
-      });
-      lines.push("");
-    }
-
-    lines.push("## UC2 - Operations Log Risk Analysis");
-    lines.push("### Input logs");
-    lines.push("```");
-    lines.push(String(opsLogs || "").trim());
-    lines.push("```");
-    lines.push("");
-    lines.push("### Summary");
-    lines.push(opsResponse?.summary ? String(opsResponse.summary) : "_Not available_");
-    lines.push("");
-    if (Array.isArray(opsResponse?.root_causes) && opsResponse.root_causes.length > 0) {
-      lines.push("### Root Causes");
-      opsResponse.root_causes.forEach((cause) => lines.push(`- ${cause}`));
-      lines.push("");
-    }
-    if (Array.isArray(opsResponse?.runbook_steps) && opsResponse.runbook_steps.length > 0) {
-      lines.push("### Runbook Steps");
-      opsResponse.runbook_steps.forEach((step) => lines.push(`- ${step}`));
-      lines.push("");
-    }
-
-    lines.push("## Governance Summary");
-    if (governanceSummary) {
-      lines.push(`- requests: ${governanceSummary.requests ?? "-"}`);
-      lines.push(`- total_cost_usd: ${governanceSummary.total_cost ?? "-"}`);
-      lines.push(`- policy_events: ${Array.isArray(governanceSummary.policy_events) ? governanceSummary.policy_events.length : 0}`);
-      lines.push(`- tools_used: ${Array.isArray(governanceSummary.tools_used) ? governanceSummary.tools_used.length : 0}`);
-    } else {
-      lines.push("_Not available_");
-    }
-    lines.push("");
-
-    lines.push("## Ops Control Tower Snapshot");
-    if (runtimeSnapshot) {
-      lines.push(`- startup_status: ${runtimeSnapshot.startup_status ?? "-"}`);
-      lines.push(`- requests: ${runtimeSnapshot.audit_summary?.requests ?? "-"}`);
-      lines.push(`- daily_cost_usd: ${runtimeSnapshot.daily_cost_usd ?? "-"}`);
-      lines.push(`- alerts: ${Array.isArray(runtimeSnapshot.alerts) ? runtimeSnapshot.alerts.length : 0}`);
-      lines.push(`- service_events: ${Array.isArray(runtimeSnapshot.service_events) ? runtimeSnapshot.service_events.length : 0}`);
-      lines.push(`- recent_decisions: ${Array.isArray(runtimeSnapshot.recent_decisions) ? runtimeSnapshot.recent_decisions.length : 0}`);
-    } else {
-      lines.push("_Not available (requires Ops/Admin role)_");
-    }
-    lines.push("");
-
+    const report = buildScenarioReportMarkdown({ stamp });
     const safeStamp = stamp.replace(/[:.]/g, "-");
-    exportTextFile(`atelier-validation-report-${safeStamp}.md`, lines.join("\n"), "text/markdown;charset=utf-8");
+    exportTextFile(`atelier-validation-report-${safeStamp}.md`, report, "text/markdown;charset=utf-8");
     setStatus("Scenario report exported");
   }
 
@@ -1677,6 +2052,13 @@ export default function App() {
                         Download Report
                       </button>
                       <button
+                        className="cta-ghost"
+                        onClick={copyScenarioReportToClipboard}
+                        disabled={!scenarioRun || scenarioRun.running}
+                      >
+                        Copy Report
+                      </button>
+                      <button
                         className="cta-primary"
                         onClick={runScenarioRunner}
                         disabled={scenarioRun?.running || !backendOnline}
@@ -1726,6 +2108,21 @@ export default function App() {
                         {String(health.status || "unknown")}
                         {health.startup_status ? ` / ${health.startup_status}` : ""}
                       </code>
+                    </li>
+                    <li>
+                      LLM:{" "}
+                      <code className="mono-inline">
+                        {health.llm_provider || "-"} / {health.llm_model || "-"}
+                      </code>{" "}
+                      <code className="mono-inline">
+                        api_key={health.openai_api_key_configured ? "set" : "unset"}
+                      </code>
+                    </li>
+                    <li>
+                      Modes:{" "}
+                      <code className="mono-inline">{health.auth_mode || "-"}</code>{" "}
+                      <code className="mono-inline">{health.data_handling_mode || "-"}</code>{" "}
+                      <code className="mono-inline">{health.storage_backend || "-"}</code>
                     </li>
                     {String(health.status || "")
                       .toLowerCase()
@@ -1782,6 +2179,53 @@ export default function App() {
                         : "—"}
                     </p>
                   </div>
+
+                  {Array.isArray(scenarioHistory) && scenarioHistory.length > 0 && (
+                    <div className="result-card" style={{ minHeight: 0 }}>
+                      <div className="card-head">
+                        <h4>Run History (local)</h4>
+                        <button className="cta-ghost" onClick={clearScenarioHistory}>
+                          Clear
+                        </button>
+                      </div>
+                      <p className="admin-note" style={{ marginTop: 0 }}>
+                        Stored in browser localStorage. Avoid real secrets or proprietary data.
+                      </p>
+                      <ul className="history-list">
+                        {scenarioHistory.map((entry) => (
+                          <li key={entry.id} className="history-item">
+                            <div className="history-row">
+                              <div className="history-meta">
+                                <strong>{String(entry.status || "ok").toUpperCase()}</strong>
+                                <span>
+                                  {entry.generated_at_utc
+                                    ? new Date(entry.generated_at_utc).toLocaleString()
+                                    : "-"}{" "}
+                                  · {entry.role || "-"}
+                                </span>
+                              </div>
+                              <div className="history-actions">
+                                <button
+                                  className="cta-ghost"
+                                  onClick={() => downloadScenarioHistoryEntry(entry)}
+                                  disabled={!entry.report_md}
+                                >
+                                  Download
+                                </button>
+                                <button
+                                  className="cta-ghost"
+                                  onClick={() => void copyScenarioHistoryEntry(entry)}
+                                  disabled={!entry.report_md}
+                                >
+                                  Copy
+                                </button>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </Reveal>
               </div>
             </section>
@@ -1913,6 +2357,12 @@ export default function App() {
                   onClick={() => setActiveTab("governance")}
                 >
                   Adoption Design and Governance
+                </button>
+                <button
+                  className={activeTab === "integrations" ? "tab-btn active" : "tab-btn"}
+                  onClick={() => setActiveTab("integrations")}
+                >
+                  Integrations Simulator
                 </button>
               </div>
 
@@ -2539,6 +2989,103 @@ export default function App() {
                           <p>No matched decisions</p>
                         )}
                       </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "integrations" && (
+                <div className="tab-content tab-integrations">
+                  <div className="result-card">
+                    <h4>Slack Event Simulator</h4>
+                    <p>
+                      Simulate a Slack command payload. Use <code className="mono-inline">/uc1</code> or{" "}
+                      <code className="mono-inline">/uc2</code> prefixes to trigger the corresponding workflow.
+                    </p>
+                    <div className="inline-grid">
+                      <label>
+                        Channel
+                        <input
+                          value={slackChannel}
+                          onChange={(event) => setSlackChannel(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Role (payload)
+                        <input value={role} readOnly />
+                      </label>
+                      <label>
+                        User ID (payload)
+                        <input value={userId} readOnly />
+                      </label>
+                    </div>
+                    <label>
+                      Slack Message
+                      <textarea value={slackText} onChange={(event) => setSlackText(event.target.value)} />
+                    </label>
+                    <button className="cta-primary" onClick={sendSlackEvent}>
+                      Send Slack Event
+                    </button>
+                    {slackError && <p className="error-text">{slackError}</p>}
+                    {slackResponse?.text && (
+                      <label>
+                        Bot Reply
+                        <textarea value={String(slackResponse.text)} readOnly />
+                      </label>
+                    )}
+                  </div>
+
+                  <div className="result-card">
+                    <h4>Jira Ticket Simulator</h4>
+                    <p>
+                      Simulate generating an incident triage comment for a Jira ticket using the UC2 log analysis
+                      workflow.
+                    </p>
+                    <div className="inline-grid">
+                      <label>
+                        Ticket ID
+                        <input
+                          value={jiraTicketId}
+                          onChange={(event) => setJiraTicketId(event.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Priority
+                        <select
+                          value={jiraPriority}
+                          onChange={(event) => setJiraPriority(event.target.value)}
+                        >
+                          <option value="Low">Low</option>
+                          <option value="Medium">Medium</option>
+                          <option value="High">High</option>
+                          <option value="Critical">Critical</option>
+                        </select>
+                      </label>
+                      <label>
+                        Role (payload)
+                        <input value={role} readOnly />
+                      </label>
+                    </div>
+                    <label>
+                      Title
+                      <input value={jiraTitle} onChange={(event) => setJiraTitle(event.target.value)} />
+                    </label>
+                    <label>
+                      Description
+                      <textarea
+                        value={jiraDescription}
+                        onChange={(event) => setJiraDescription(event.target.value)}
+                      />
+                    </label>
+                    <button className="cta-primary" onClick={generateJiraComment}>
+                      Generate Jira Comment
+                    </button>
+                    {jiraError && <p className="error-text">{jiraError}</p>}
+                    {jiraResponse?.comment && (
+                      <label>
+                        Generated Comment
+                        <textarea value={String(jiraResponse.comment)} readOnly />
+                      </label>
                     )}
                   </div>
                 </div>

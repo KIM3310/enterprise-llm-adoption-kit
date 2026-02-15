@@ -1028,6 +1028,11 @@ textarea {
   align-items: stretch;
 }
 
+.tab-integrations {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
 .runtime-card {
   grid-column: 1 / -1;
 }
@@ -1039,6 +1044,54 @@ textarea {
 .admin-note {
   font-size: 0.86rem;
   color: var(--muted) !important;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.history-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.86);
+  padding: 10px 12px;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.history-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.history-meta span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.history-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .admin-grid {
@@ -1334,6 +1387,10 @@ textarea {
   }
 
   .tab-governance {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-integrations {
     grid-template-columns: 1fr;
   }
 
