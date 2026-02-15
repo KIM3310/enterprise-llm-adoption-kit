@@ -1,19 +1,23 @@
-# Environment
-.env
-.env.*
-
-# Python
 __pycache__/
 *.pyc
 .pytest_cache/
+
 .venv/
-*.db-shm
-*.db-wal
-.coverage
+venv/
 
-# Node
 node_modules/
-app/frontend/dist/
+dist/
 
-# macOS
+.env
+.env.*
+!.env.example
+
 .DS_Store
+
+# Generated runtime data (never commit)
+app/backend/data/audit.log
+app/backend/data/app.db
+app/backend/data/app.db-*
+app/backend/data/app.db-shm
+app/backend/data/app.db-wal
+app/backend/data/chroma/
