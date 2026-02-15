@@ -447,6 +447,8 @@ export default function App() {
   const healthStatus = String(health.status || "").toLowerCase().trim();
   // "unknown" is treated as online so the UI isn't blocked before the first health poll finishes.
   const backendOnline = healthStatus !== "offline";
+  const isAdmin = role === "Admin";
+  const isOpsEligible = role === "Ops" || role === "Admin";
 
   function navigate(nextPage) {
     window.location.hash = nextPage;
@@ -917,7 +919,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (!(page === "console" && activeTab === "governance" && runtimeAutoRefresh && token)) {
+    if (!(page === "console" && activeTab === "governance" && runtimeAutoRefresh && token && isOpsEligible)) {
       return undefined;
     }
     const intervalSec = Math.max(5, Number(runtimeAutoRefreshSec) || 15);
@@ -930,6 +932,7 @@ export default function App() {
     activeTab,
     runtimeAutoRefresh,
     runtimeAutoRefreshSec,
+    role,
     token,
     runtimeEventsLimit,
     runtimeDecisionsLimit,
@@ -941,12 +944,12 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    if (!(page === "console" && activeTab === "governance" && token)) {
+    if (!(page === "console" && activeTab === "governance" && token && isAdmin)) {
       return;
     }
     void loadAdminLlmRuntime({ silent: true });
     void loadArchitectureCatalog({ silent: true });
-  }, [page, activeTab, token]);
+  }, [page, activeTab, token, role]);
 
   const runtimeView = useMemo(() => {
     const snapshot = runtimeSnapshot || {};
@@ -2072,6 +2075,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, provider: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         >
                           <option value="stub">stub</option>
                           <option value="openai">openai</option>
@@ -2085,6 +2089,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, model: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                       <label>
@@ -2098,6 +2103,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, temperature: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                       <label>
@@ -2110,6 +2116,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, max_tokens: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                       <label>
@@ -2122,6 +2129,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, timeout_sec: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                       <label>
@@ -2131,6 +2139,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, openai_base_url: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                       <label>
@@ -2140,6 +2149,7 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, openai_org: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                       <label>
@@ -2151,24 +2161,25 @@ export default function App() {
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, openai_api_key: event.target.value }))
                           }
+                          disabled={!isAdmin}
                         />
                       </label>
                     </div>
                     <div className="action-row">
-                      <button className="cta-ghost" onClick={() => loadAdminLlmRuntime()} disabled={!token}>
+                      <button className="cta-ghost" onClick={() => loadAdminLlmRuntime()} disabled={!token || !isAdmin}>
                         Reload Runtime
                       </button>
                       <button
                         className="cta-primary"
                         onClick={() => saveAdminLlmRuntime(false)}
-                        disabled={!token || isSavingLlmRuntime}
+                        disabled={!token || !isAdmin || isSavingLlmRuntime}
                       >
                         {isSavingLlmRuntime ? "Saving..." : "Save Runtime Settings"}
                       </button>
                       <button
                         className="cta-ghost"
                         onClick={() => saveAdminLlmRuntime(true)}
-                        disabled={!token || isSavingLlmRuntime}
+                        disabled={!token || !isAdmin || isSavingLlmRuntime}
                       >
                         Reset To Env Defaults
                       </button>
@@ -2193,13 +2204,21 @@ export default function App() {
                       <code className="mono-inline">system</code>, <code className="mono-inline">env</code>, and{" "}
                       <code className="mono-inline">access_group</code> are required.
                     </p>
+                    <p className="admin-note">
+                      Current role: <strong>{role}</strong> (Admin required)
+                    </p>
                     <div className="action-row">
-                      <button className="cta-ghost" onClick={loadSampleArchitectureDataset}>
+                      <button className="cta-ghost" onClick={loadSampleArchitectureDataset} disabled={!isAdmin}>
                         Load Sample JSONL
                       </button>
-                      <label className="file-btn">
+                      <label className={isAdmin ? "file-btn" : "file-btn disabled"} aria-disabled={!isAdmin}>
                         Choose JSONL File
-                        <input type="file" accept=".jsonl,.txt,application/json" onChange={onArchitectureFileSelected} />
+                        <input
+                          type="file"
+                          accept=".jsonl,.txt,application/json"
+                          onChange={onArchitectureFileSelected}
+                          disabled={!isAdmin}
+                        />
                       </label>
                     </div>
                     <label>
@@ -2209,24 +2228,29 @@ export default function App() {
                         placeholder='{"doc_id":"ACME-0001","system":"payments","env":"prod","access_group":"ops",...}'
                         value={architectureJsonl}
                         onChange={(event) => setArchitectureJsonl(event.target.value)}
+                        disabled={!isAdmin}
                       />
                     </label>
                     <div className="action-row">
                       <button
                         className="cta-primary"
                         onClick={importArchitectureDataset}
-                        disabled={!token || isImportingArchitecture}
+                        disabled={!token || !isAdmin || isImportingArchitecture}
                       >
                         {isImportingArchitecture ? "Importing..." : "Import + Reindex"}
                       </button>
                       <button
                         className="cta-ghost"
                         onClick={reindexArchitectureDataset}
-                        disabled={!token || isReindexingArchitecture}
+                        disabled={!token || !isAdmin || isReindexingArchitecture}
                       >
                         {isReindexingArchitecture ? "Reindexing..." : "Reindex Existing Dataset"}
                       </button>
-                      <button className="cta-ghost" onClick={() => loadArchitectureCatalog()} disabled={!token}>
+                      <button
+                        className="cta-ghost"
+                        onClick={() => loadArchitectureCatalog()}
+                        disabled={!token || !isAdmin}
+                      >
                         Reload Catalog
                       </button>
                     </div>
@@ -2248,6 +2272,9 @@ export default function App() {
                     <p>
                       Ops debugging snapshot. Inspect alerts, recent service events, and recent Control Tower decisions
                       in one view.
+                    </p>
+                    <p className="admin-note">
+                      Current role: <strong>{role}</strong> (Ops/Admin required)
                     </p>
                     <div className="runtime-filters">
                       <label>
@@ -2305,6 +2332,7 @@ export default function App() {
                           type="checkbox"
                           checked={runtimeAutoRefresh}
                           onChange={(event) => setRuntimeAutoRefresh(event.target.checked)}
+                          disabled={!token || !isOpsEligible}
                         />
                         Auto Refresh
                       </label>
@@ -2358,13 +2386,19 @@ export default function App() {
                       </label>
                     </div>
                     <div className="action-row">
-                      <button className="cta-primary" onClick={loadRuntimeSnapshot} disabled={!token}>
+                      <button
+                        className="cta-primary"
+                        onClick={loadRuntimeSnapshot}
+                        disabled={!token || !isOpsEligible}
+                        title={isOpsEligible ? "" : "Requires Ops/Admin role"}
+                      >
                         Load Runtime Snapshot
                       </button>
                       <button
                         className="cta-ghost"
                         onClick={refreshDiagnostics}
-                        disabled={!token || isRefreshingDiagnostics}
+                        disabled={!token || !isOpsEligible || isRefreshingDiagnostics}
+                        title={isOpsEligible ? "" : "Requires Ops/Admin role"}
                       >
                         {isRefreshingDiagnostics ? "Refreshing..." : "Refresh Diagnostics"}
                       </button>
