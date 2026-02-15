@@ -109,6 +109,21 @@ Docker가 없다면 로컬 러너 스크립트를 사용하세요:
 make demo-local
 ```
 
+## Scenario Runner (CLI)
+실행 결과를 공유 가능한 리포트(Markdown) + 증빙 패키지(zip)로 내보냅니다.
+
+백엔드가 이미 실행 중일 때:
+```bash
+make scenario-run
+```
+
+원커맨드(로컬 stub 백엔드를 띄우고 시나리오 실행 후 종료):
+```bash
+make scenario-demo-local
+```
+
+출력은 `dist/scenario_runs/` 아래에 저장됩니다(gitignore).
+
 ## 원커맨드 데모 (Docker)
 ```
 make demo

@@ -109,6 +109,21 @@ If you don't have Docker installed, use the local runner script:
 make demo-local
 ```
 
+## Scenario Runner (CLI)
+Generate a shareable validation report (Markdown) + evidence pack (zip).
+
+Against an already-running backend:
+```bash
+make scenario-run
+```
+
+One command (starts a local stub backend, runs the scenario, then stops):
+```bash
+make scenario-demo-local
+```
+
+Output is written under `dist/scenario_runs/` (gitignored).
+
 ## One-command demo (docker)
 ```
 make demo
