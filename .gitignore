@@ -21,3 +21,8 @@ app/backend/data/app.db-*
 app/backend/data/app.db-shm
 app/backend/data/app.db-wal
 app/backend/data/chroma/
+
+# Terraform (never commit state)
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
