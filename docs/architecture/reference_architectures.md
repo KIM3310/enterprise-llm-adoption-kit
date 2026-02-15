@@ -6,6 +6,10 @@ See `docs/architecture/integration_patterns.md` for common enterprise patterns.
 - Local dev: FastAPI + Vite + Chroma + SQLite
 - Mock JWT RBAC, audit logs, redaction, eval runner
 
+## AWS + OpenAI (Conceptual + IaC Draft)
+- Production reference architecture (conceptual): `docs/architecture/aws_openai_reference_architecture.md`
+- Terraform draft (infrastructure as code): `infra/aws/terraform/`
+
 ## SaaS (Conceptual)
 - Managed LLM API via adapter
 - Managed vector DB + object storage
