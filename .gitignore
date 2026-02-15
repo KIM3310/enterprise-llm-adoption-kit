@@ -1,0 +1,41 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.venv/
+.venv*/
+venv/
+
+node_modules/
+dist/
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+
+# Generated runtime data (never commit)
+app/backend/data/audit.log
+app/backend/data/app.db
+app/backend/data/app.db-*
+app/backend/data/app.db-shm
+app/backend/data/app.db-wal
+app/backend/data/chroma/
+
+# Terraform (never commit state)
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+.codex_runs/
+
+# Review/export bundles
+app/data/app.db
+app/data/app.db-*
+app/data/app.db-shm
+app/data/app.db-wal
+dist/application_bundle_*/
+
+# Orchestration and test artifacts
+.omc/
+.coverage
