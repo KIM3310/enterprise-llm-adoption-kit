@@ -1,12 +1,12 @@
 # Pre-Sales UI Tab
 
-## Discovery & Audit
-The UI includes a new tab that surfaces:
-- Discovery Wizard command and output location
-- Audit Viewer summary (requests, tools, policy events, cost)
+## Scenario Runner + Console
+The UI provides two reviewer-friendly surfaces:
+- **Scenario Runner**: runs an end-to-end validation flow (JWT -> UC1 -> UC2 -> governance/ops checks) and exports a Markdown report.
+- **Console**: interactively calls UC1/UC2, loads `/audit/summary` and `/ops/runtime` (role-gated), and surfaces governance signals.
 
 ## Usage
 1) Open UI: http://localhost:5173
-2) Click "Discovery & Audit"
-3) Click "Load Audit Summary" to fetch `/audit/summary`
-
+2) Run the "Scenario Runner" flow to generate outputs and export a report (optional)
+3) Open "Console" -> "Adoption Design and Governance"
+4) Click "Load Governance Summary" to fetch `/audit/summary`

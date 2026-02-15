@@ -128,7 +128,7 @@ make quality-backend
 - OIDC token exchange:
   - `POST /auth/oidc/exchange` with `{ "id_token": "..." }`
 - LLM provider:
-  - `LLM_PROVIDER=openai`
+  - `LLM_PROVIDER=stub` (default, offline) or `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
   - `LLM_OPENAI_API_KEY` (or `LLM_OPENAI_API_KEY_FILE`)
   - optional `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
 - Ops policy and alerts:
@@ -156,15 +156,26 @@ make quality-backend
 - PoC Success Generator: `python3 app/backend/scripts/poc_success_generator.py`
 - BYO Dataset Ingest: `python3 evals/runner/dataset_ingest.py --input evals/datasets/sample_dataset.csv`
 - Eval Gate: `make eval-gate`
-- Audit Viewer: `python3 app/backend/scripts/audit_viewer.py --log app/backend/data/audit.log`
+- Audit Viewer: `python3 app/backend/scripts/audit_viewer.py --log app/backend/data/audit.log` (generated at runtime)
 - Exec Deck: `python3 app/backend/scripts/generate_exec_deck.py`
 - Modules index: `docs/modules/README.md`
- - Integration demo checklist: `docs/sales/integration_demo_checklist.md`
- - Red-team summary: `docs/evals/redteam_summary.md`
- - Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
+- Integration demo checklist: `docs/sales/integration_demo_checklist.md`
+- Red-team summary: `docs/evals/redteam_summary.md`
+- Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
 These proof artifacts and demo scripts are designed to support discovery and PoC alignment in pre-sales conversations.
 
-## Pre-Sales UI + KR Evals
-- UI tab: "Discovery & Audit" (loads `/audit/summary`)
+## UI walkthrough (local)
+- Tabs: Overview / Capabilities / Readiness / Scenario Runner / Console
+- Scenario Runner: runs JWT -> UC1 -> UC2 -> governance/ops checks and exports a Markdown report
+- Console: lets reviewers call UC1/UC2 and load `/audit/summary` and `/ops/runtime` (role-gated)
+
+## Publishing safety (before you push)
+This repo is safe to publish: runtime data (SQLite DB, audit log, Chroma persistence) is generated locally and ignored by git.
+
+```bash
+make sanitize
+```
+
+## KR evals
 - KR dataset: `evals/datasets/kr_enterprise_30.jsonl`
 - KR eval run: `python3 evals/runner/run_eval.py --dataset evals/datasets/kr_enterprise_30.jsonl`

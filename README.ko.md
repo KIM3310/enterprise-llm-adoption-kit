@@ -128,7 +128,7 @@ make quality-backend
 - OIDC 토큰 교환:
   - `POST /auth/oidc/exchange` with `{ "id_token": "..." }`
 - LLM provider:
-  - `LLM_PROVIDER=openai`
+  - `LLM_PROVIDER=stub` (기본, 오프라인) 또는 `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
   - `LLM_OPENAI_API_KEY` (또는 `LLM_OPENAI_API_KEY_FILE`)
   - 선택 `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
 - 운영 정책/알림:
@@ -156,15 +156,26 @@ make quality-backend
 - PoC Success Generator: `python3 app/backend/scripts/poc_success_generator.py`
 - BYO Dataset Ingest: `python3 evals/runner/dataset_ingest.py --input evals/datasets/sample_dataset.csv`
 - Eval Gate: `make eval-gate`
-- Audit Viewer: `python3 app/backend/scripts/audit_viewer.py --log app/backend/data/audit.log`
+- Audit Viewer: `python3 app/backend/scripts/audit_viewer.py --log app/backend/data/audit.log` (런타임 생성)
 - Exec Deck: `python3 app/backend/scripts/generate_exec_deck.py`
 - Modules index: `docs/modules/README.md`
- - Integration demo checklist: `docs/sales/integration_demo_checklist.md`
- - Red-team summary: `docs/evals/redteam_summary.md`
- - Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
+- Integration demo checklist: `docs/sales/integration_demo_checklist.md`
+- Red-team summary: `docs/evals/redteam_summary.md`
+- Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
 이 증빙/데모 스크립트는 discovery 및 PoC 정렬 대화에서 재현 가능한 근거로 사용하도록 설계되었습니다.
 
-## Pre-Sales UI + KR Evals
-- UI tab: "Discovery & Audit" (loads `/audit/summary`)
+## UI 둘러보기 (로컬)
+- 탭: Overview / Capabilities / Readiness / Scenario Runner / Console
+- Scenario Runner: JWT -> UC1 -> UC2 -> governance/ops 체크를 한 번에 실행하고 Markdown 리포트를 내보냅니다.
+- Console: UC1/UC2를 직접 호출하고 `/audit/summary`, `/ops/runtime`를 로드해 검증합니다(권한 필요).
+
+## 공개 전 정리 (푸시 전에)
+이 레포는 공개 가능한 형태로 설계했습니다: 런타임 데이터(SQLite DB, audit log, Chroma persistence)는 로컬에서 생성되며 git에서 무시됩니다.
+
+```bash
+make sanitize
+```
+
+## KR evals
 - KR dataset: `evals/datasets/kr_enterprise_30.jsonl`
 - KR eval run: `python3 evals/runner/run_eval.py --dataset evals/datasets/kr_enterprise_30.jsonl`

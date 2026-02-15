@@ -1,5 +1,7 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo quality-backend
+.PHONY: eval-gate demo quality-backend sanitize
+
+COMPOSE := docker compose -f infra/docker-compose.yml
 
 eval-gate:
 	python3 evals/runner/eval_gate.py
@@ -7,7 +9,7 @@ eval-gate:
 demo:
 	@echo "[1/6] starting services..."
 	@docker info >/dev/null 2>&1 || { echo "Docker not running. Start Docker Desktop."; exit 1; }
-	@docker compose -f infra/docker-compose.yml up -d --build
+	@$(COMPOSE) up -d --build
 	@echo "OK"
 	@echo "[2/6] health check..."
 	@for i in 1 2 3 4 5 6 7 8 9 10; do \
@@ -25,11 +27,16 @@ demo:
 	@curl -fsS http://localhost:8000/metrics | head -n 20
 	@echo "OK"
 	@echo "[5/6] eval runner..."
-	@python3 evals/runner/run_eval.py --dataset evals/datasets/initial_20.jsonl
+	@$(COMPOSE) run --rm tools python3 evals/runner/run_eval.py \
+		--dataset evals/datasets/initial_20.jsonl \
+		--base-url http://backend:8000
 	@echo "OK"
 	@echo "[6/6] tests..."
-	@python3 -m pytest -q
+	@$(COMPOSE) run --rm tools python3 -m pytest -q
 	@echo "DEMO OK"
 
 quality-backend:
 	@cd app/backend && ./scripts/quality_gate.sh
+
+sanitize:
+	@./scripts/sanitize_repo.sh
