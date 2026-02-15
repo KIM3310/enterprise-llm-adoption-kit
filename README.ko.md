@@ -94,7 +94,13 @@ cd infra
 docker-compose up --build
 ```
 
-## 원커맨드 데모
+## 원커맨드 데모 (Docker 없이)
+Docker가 없다면 로컬 러너 스크립트를 사용하세요:
+```bash
+make demo-local
+```
+
+## 원커맨드 데모 (Docker)
 ```
 make demo
 ```

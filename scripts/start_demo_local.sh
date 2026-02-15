@@ -72,13 +72,22 @@ echo "Starting backend on :8000"
 BACK_PID=$!
 
 echo "Waiting for backend health..."
+backend_ready="false"
 for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
   if curl -fsS "http://localhost:8000/health" >/dev/null 2>&1; then
     echo "Backend ready."
+    backend_ready="true"
     break
   fi
   sleep 0.5
 done
+
+if [[ "$backend_ready" != "true" ]]; then
+  echo "Backend failed to become healthy on :8000." >&2
+  echo "Try running the backend directly to see logs:" >&2
+  echo "  cd \"$BACKEND_DIR\" && LLM_PROVIDER=stub .venv/bin/python -m app" >&2
+  exit 1
+fi
 
 echo "Starting frontend on :5173"
 (
