@@ -13,6 +13,7 @@ Korean version: `README.ko.md`
 - Solo implementation of backend API, frontend UI, eval harness, and pre-sales artifacts.
 - Focused on reproducibility: every claim is backed by a doc, a test, or a runnable script.
 - Designed with "new hire readiness" in mind: clear separation of concerns, simple setup, and safe defaults.
+- Added CI checks via GitHub Actions (backend quality gate, frontend build, eval gate).
 
 ## Core capabilities (what you can see working)
 - Role-based access (RBAC) enforced at retrieval time
@@ -21,6 +22,8 @@ Korean version: `README.ko.md`
 - RAG-style retrieval (Chroma + deterministic hash embeddings)
 - Evals with reports + baseline diffs
 - LLMOps-ready metrics (latency, tokens, cost, policy events)
+- Integration patterns: Slack/Jira-style ingestion endpoints (simulatable from the UI)
+- Scenario Runner exports a shareable Markdown report and keeps a local run history (browser localStorage)
 - Pre-sales artifacts: discovery wizard, ROI calculator, demo scripts, exec deck
 
 ## Architecture at a glance (local demo)
