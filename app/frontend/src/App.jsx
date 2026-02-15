@@ -451,7 +451,17 @@ export default function App() {
 
   async function fetchJson(path, options = {}) {
     const { errorMessage = "Request failed", ...fetchOptions } = options;
-    const res = await fetch(`${API_BASE}${path}`, fetchOptions);
+    let res;
+    try {
+      res = await fetch(`${API_BASE}${path}`, fetchOptions);
+    } catch (_error) {
+      const offline = new Error(
+        `Backend offline at ${API_BASE}. Start the backend on :8000 and retry.`
+      );
+      offline.status = 0;
+      offline.requestId = "";
+      throw offline;
+    }
     const data = await res.json().catch(() => ({}));
     const requestId = res.headers.get("x-request-id") || data.request_id || "";
     if (requestId) {
@@ -1701,6 +1711,14 @@ export default function App() {
                         {health.startup_status ? ` / ${health.startup_status}` : ""}
                       </code>
                     </li>
+                    {String(health.status || "")
+                      .toLowerCase()
+                      .trim() === "offline" && (
+                      <li>
+                        Start local demo:{" "}
+                        <code className="mono-inline">bash scripts/start_demo_local.sh</code>
+                      </li>
+                    )}
                     <li>Ops snapshot requires Ops/Admin role.</li>
                   </ul>
 

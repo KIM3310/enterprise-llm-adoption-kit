@@ -1,5 +1,5 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo quality-backend sanitize
+.PHONY: eval-gate demo demo-local quality-backend sanitize
 
 COMPOSE := docker compose -f infra/docker-compose.yml
 
@@ -34,6 +34,9 @@ demo:
 	@echo "[6/6] tests..."
 	@$(COMPOSE) run --rm tools python3 -m pytest -q
 	@echo "DEMO OK"
+
+demo-local:
+	@bash scripts/start_demo_local.sh
 
 quality-backend:
 	@cd app/backend && ./scripts/quality_gate.sh
