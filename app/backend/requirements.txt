@@ -8,3 +8,4 @@ prometheus_client==0.20.0
 requests==2.31.0
 httpx==0.27.2
 pytest==8.0.0
+urllib3<2
