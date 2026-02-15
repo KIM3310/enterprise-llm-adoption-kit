@@ -1,5 +1,5 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo demo-local quality-backend sanitize
+.PHONY: eval-gate demo demo-local scenario-run scenario-demo-local quality-backend sanitize
 
 COMPOSE := docker compose -f infra/docker-compose.yml
 
@@ -37,6 +37,12 @@ demo:
 
 demo-local:
 	@bash scripts/start_demo_local.sh
+
+scenario-run:
+	@cd app/backend && .venv/bin/python scripts/scenario_runner_cli.py --base-url http://localhost:8000
+
+scenario-demo-local:
+	@bash scripts/run_scenario_local.sh
 
 quality-backend:
 	@cd app/backend && ./scripts/quality_gate.sh
