@@ -4,6 +4,12 @@ Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 �
 
 영문 버전: `README.md`
 
+## 데모 영상
+- YouTube: https://youtu.be/yMq03b0js0E
+
+## 스냅샷
+![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
+
 ## 프로젝트 요약 (신입/핸즈온 관점)
 - 엔터프라이즈 LLM 도입의 Discovery 결과가 어떻게 안전하고 검증 가능한 PoC로 이어지는지 end-to-end로 보여주기 위해 만들었습니다.
 - 백엔드 + 프론트엔드 데모를 직접 구성해 로컬에서 재현 가능한 형태로 제공합니다.
