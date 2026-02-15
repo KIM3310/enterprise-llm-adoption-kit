@@ -3,6 +3,7 @@ from threading import Lock
 from typing import Dict, List, Optional
 
 import requests
+import re
 
 from .config import settings
 
@@ -194,18 +195,120 @@ class OpenAICompatibleAdapter(LLMAdapter):
 
 class StubLLMAdapter(LLMAdapter):
     def generate(self, messages: List[Dict[str, str]], use_case: str) -> LLMResult:
-        # Deterministic stub output based on last user message
-        _ = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
+        # Offline-first deterministic "good enough" responses.
+        user_text = next(
+            (m.get("content", "") for m in reversed(messages) if m.get("role") == "user"),
+            "",
+        )
+        context_text = next(
+            (
+                m.get("content", "")
+                for m in reversed(messages)
+                if m.get("role") == "assistant" and "CONTEXT:" in str(m.get("content", ""))
+            ),
+            "",
+        )
+
+        def extract_citations(text: str) -> List[str]:
+            hits = re.findall(r"\\[([^\\]:\\n]+):([^\\]\\n]+)\\]", text or "")
+            items = [f"{doc_id.strip()}::{field.strip()}" for doc_id, field in hits]
+            seen = set()
+            unique = []
+            for item in items:
+                if item in seen:
+                    continue
+                seen.add(item)
+                unique.append(item)
+            return unique[:6]
+
+        def pick_keywords(text: str) -> List[str]:
+            lower = str(text or "").lower()
+            candidates = [
+                "rbac",
+                "audit",
+                "pii",
+                "injection",
+                "egress",
+                "kms",
+                "breakglass",
+                "timeout",
+                "retry",
+                "circuit",
+                "drift",
+                "latency",
+                "cost",
+            ]
+            return [c for c in candidates if c in lower][:6]
+
+        citations = extract_citations(context_text)
+        keywords = pick_keywords(f"{user_text}\n{context_text}")
+
         if use_case == "uc1":
-            response = (
-                "Architecture validation summary based on retrieved governance context. "
-                "Priority risks and next actions are listed."
-            )
+            lines = []
+            lines.append("Adoption risk review (offline stub mode).")
+            lines.append("")
+            lines.append("Top risks:")
+            # Keep the list stable but slightly contextual.
+            if any(k in keywords for k in ["rbac", "audit", "pii"]):
+                lines.append("- Data access leakage if retrieval is not strictly role-filtered (RBAC at retrieval + post-check).")
+                lines.append("- Audit/PII handling risk if raw prompts/responses are persisted without hashing/redaction.")
+            if any(k in keywords for k in ["injection"]):
+                lines.append("- Prompt injection can bypass intended tool/use-case boundaries without explicit safety policies.")
+            if any(k in keywords for k in ["egress", "kms", "breakglass"]):
+                lines.append("- Privileged egress and key-management paths need breakglass controls and change auditing.")
+            if any(k in keywords for k in ["timeout", "retry", "circuit", "latency"]):
+                lines.append("- Reliability risk: upstream timeouts can cascade without timeouts/retries/circuit breakers.")
+            if any(k in keywords for k in ["drift"]):
+                lines.append("- Quality risk: retrieval/answer quality drifts as documents and query patterns evolve.")
+            if "cost" in keywords:
+                lines.append("- Budget risk: uncontrolled context size and retries can inflate token spend.")
+            if len(lines) == 3:
+                lines.append("- Validate least-privilege, grounding, and operational readiness before rollout.")
+
+            lines.append("")
+            lines.append("Recommended next actions:")
+            lines.append("- Run the Scenario Runner and export a validation report for reviewers.")
+            lines.append("- Verify citations are relevant and stable across roles (Employee vs Ops/Admin).")
+            lines.append("- Set explicit cost/latency guardrails and monitor via /metrics.")
+            if citations:
+                lines.append("")
+                lines.append("Context references (parsed):")
+                for item in citations:
+                    lines.append(f"- {item}")
+            response = "\n".join(lines)
         else:
-            response = (
-                "Log summary: errors detected with likely root causes. "
-                "Runbook steps recommended."
-            )
+            # UC2 log intelligence
+            logs_preview = str(context_text or "")
+            # Try to extract the first line after "LOGS:" if present.
+            extracted_logs = ""
+            if "LOGS:" in logs_preview:
+                after = logs_preview.split("LOGS:", 1)[1]
+                extracted_logs = after.strip().splitlines()[0:3]
+                extracted_logs = "\n".join(extracted_logs).strip()
+            if not extracted_logs:
+                extracted_logs = str(user_text or "").strip()
+
+            lines = []
+            lines.append("Incident log summary (offline stub mode).")
+            if extracted_logs:
+                lines.append("")
+                lines.append("Observed signal:")
+                lines.append("```")
+                lines.append(extracted_logs[:500])
+                lines.append("```")
+            lines.append("")
+            lines.append("Likely causes (heuristic):")
+            if "timeout" in str(extracted_logs).lower():
+                lines.append("- Upstream timeout / dependency saturation (check retries, pool limits, and p95 latency).")
+            if "5xx" in str(extracted_logs).lower() or "error" in str(extracted_logs).lower():
+                lines.append("- Recent deploy regression or failing dependency (validate diffs and health checks).")
+            lines.append("- If no clear signature: investigate the last change window and correlate with metrics.")
+            lines.append("")
+            lines.append("Next steps:")
+            lines.append("- Use the provided runbook steps and confirm via dashboards.")
+            lines.append("- Capture a postmortem note: timeline, hypothesis, decision path, and prevention.")
+            response = "\n".join(lines)
+
         tokens_in = _estimate_tokens(" ".join([m["content"] for m in messages]))
         tokens_out = _estimate_tokens(response)
         cost = _estimate_cost(tokens_in, tokens_out)
