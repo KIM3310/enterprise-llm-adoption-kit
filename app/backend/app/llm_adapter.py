@@ -210,7 +210,9 @@ class StubLLMAdapter(LLMAdapter):
         )
 
         def extract_citations(text: str) -> List[str]:
-            hits = re.findall(r"\\[([^\\]:\\n]+):([^\\]\\n]+)\\]", text or "")
+            # Context lines are formatted like: "[DOC_ID:field_path] content..."
+            # Keep the regex intentionally conservative (no newlines, no closing bracket).
+            hits = re.findall(r"\[([^\]:\n]+):([^\]\n]+)\]", text or "")
             items = [f"{doc_id.strip()}::{field.strip()}" for doc_id, field in hits]
             seen = set()
             unique = []
