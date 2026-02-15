@@ -94,7 +94,13 @@ cd infra
 docker-compose up --build
 ```
 
-## One-command demo
+## One-command demo (no docker)
+If you don't have Docker installed, use the local runner script:
+```bash
+make demo-local
+```
+
+## One-command demo (docker)
 ```
 make demo
 ```
