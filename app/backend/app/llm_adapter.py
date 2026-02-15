@@ -3,7 +3,6 @@ from threading import Lock
 from typing import Dict, List, Optional
 
 import requests
-import re
 
 from .config import settings
 
@@ -211,9 +210,28 @@ class StubLLMAdapter(LLMAdapter):
 
         def extract_citations(text: str) -> List[str]:
             # Context lines are formatted like: "[DOC_ID:field_path] content..."
-            # Keep the regex intentionally conservative (no newlines, no closing bracket).
-            hits = re.findall(r"\[([^\]:\n]+):([^\]\n]+)\]", text or "")
-            items = [f"{doc_id.strip()}::{field.strip()}" for doc_id, field in hits]
+            # `field_path` can include bracket characters (e.g., `runbook_steps[0]`), so avoid regexes
+            # that treat `]` as a terminator. Instead, parse the first marker per line.
+            items: List[str] = []
+            for raw_line in str(text or "").splitlines():
+                line = raw_line.strip()
+                if not line.startswith("[") or ":" not in line:
+                    continue
+                start = 1
+                colon = line.find(":", start)
+                if colon == -1:
+                    continue
+                # Prefer the marker terminator `] ` (end bracket followed by a space),
+                # otherwise fall back to the last `]` in the line.
+                end = line.find("] ", colon + 1)
+                if end == -1:
+                    end = line.rfind("]")
+                if end == -1 or end <= colon:
+                    continue
+                doc_id = line[start:colon].strip()
+                field = line[colon + 1:end].strip()
+                if doc_id and field:
+                    items.append(f"{doc_id}::{field}")
             seen = set()
             unique = []
             for item in items:
