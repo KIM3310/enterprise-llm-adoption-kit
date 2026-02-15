@@ -72,9 +72,9 @@ def _active_runtime_config() -> Dict[str, object]:
     )
     max_tokens = int(settings.llm_max_tokens if max_tokens_raw is None else max_tokens_raw)
     timeout_sec = float(settings.llm_timeout_sec if timeout_raw is None else timeout_raw)
-    base_url = str(base_url_raw or settings.llm_openai_base_url).strip()
-    org = str(org_raw or settings.llm_openai_org).strip()
-    api_key = str(api_key_raw or settings.llm_openai_api_key).strip()
+    base_url = str(settings.llm_openai_base_url if base_url_raw is None else base_url_raw).strip()
+    org = str(settings.llm_openai_org if org_raw is None else org_raw).strip()
+    api_key = str(settings.llm_openai_api_key if api_key_raw is None else api_key_raw).strip()
 
     return {
         "provider": provider,
