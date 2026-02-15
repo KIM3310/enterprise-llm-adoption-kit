@@ -444,6 +444,10 @@ export default function App() {
     };
   }, []);
 
+  const healthStatus = String(health.status || "").toLowerCase().trim();
+  // "unknown" is treated as online so the UI isn't blocked before the first health poll finishes.
+  const backendOnline = healthStatus !== "offline";
+
   function navigate(nextPage) {
     window.location.hash = nextPage;
     setPage(nextPage);
@@ -1669,7 +1673,16 @@ export default function App() {
                       >
                         Download Report
                       </button>
-                      <button className="cta-primary" onClick={runScenarioRunner} disabled={scenarioRun?.running}>
+                      <button
+                        className="cta-primary"
+                        onClick={runScenarioRunner}
+                        disabled={scenarioRun?.running || !backendOnline}
+                        title={
+                          backendOnline
+                            ? ""
+                            : `Backend offline. Start it first (e.g., make demo-local). API_BASE=${API_BASE}`
+                        }
+                      >
                         {scenarioRun?.running ? "Running..." : "Run Scenario"}
                       </button>
                     </div>
