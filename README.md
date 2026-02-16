@@ -209,3 +209,11 @@ make sanitize
 ## KR evals
 - KR dataset: `evals/datasets/kr_enterprise_30.jsonl`
 - KR eval run: `python3 evals/runner/run_eval.py --dataset evals/datasets/kr_enterprise_30.jsonl`
+
+## Glossary (first-time readers)
+- PoC: Proof of Concept
+- RBAC: Role-Based Access Control
+- PII: Personally Identifiable Information
+- RAG: Retrieval-Augmented Generation
+- OIDC: OpenID Connect
+- IaC: Infrastructure as Code (e.g., Terraform)
