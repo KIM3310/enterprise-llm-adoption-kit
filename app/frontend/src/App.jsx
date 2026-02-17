@@ -285,6 +285,22 @@ function parseIsoTime(value) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+async function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
+  const safeTimeoutMs = Math.max(1000, Math.min(120000, Number(timeoutMs) || 20000));
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), safeTimeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(`Request timed out after ${Math.round(safeTimeoutMs / 1000)}s`);
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 function formatRuntimeTime(value) {
   const parsed = parseIsoTime(value);
   return parsed ? new Date(parsed).toLocaleString() : String(value || "-");
@@ -527,7 +543,7 @@ export default function App() {
 
     async function loadHealth() {
       try {
-        const res = await fetch(`${API_BASE}/health`, { cache: "no-store" });
+        const res = await fetchWithTimeout(`${API_BASE}/health`, { cache: "no-store" }, 8000);
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           throw new Error(parseApiError(data, "Health check failed"));
@@ -584,13 +600,17 @@ export default function App() {
   }
 
   async function fetchJson(path, options = {}) {
-    const { errorMessage = "Request failed", ...fetchOptions } = options;
+    const { errorMessage = "Request failed", timeoutMs = 20000, ...fetchOptions } = options;
     let res;
     try {
-      res = await fetch(`${API_BASE}${path}`, fetchOptions);
-    } catch (_error) {
+      res = await fetchWithTimeout(`${API_BASE}${path}`, fetchOptions, timeoutMs);
+    } catch (rawError) {
+      const reason =
+        rawError instanceof Error && rawError.message.includes("timed out")
+          ? rawError.message
+          : `Backend offline at ${API_BASE}. Start the backend on :8000 and retry.`;
       const offline = new Error(
-        `Backend offline at ${API_BASE}. Start the backend on :8000 and retry.`
+        reason
       );
       offline.status = 0;
       offline.requestId = "";
