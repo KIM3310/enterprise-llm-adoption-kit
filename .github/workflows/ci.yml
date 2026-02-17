@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Dependency audit (high+)
+        run: npm audit --audit-level=high
+
       - name: Build
         run: npm run build
 
@@ -42,4 +45,3 @@ jobs:
 
       - name: Eval gate
         run: python3 evals/runner/eval_gate.py
-
