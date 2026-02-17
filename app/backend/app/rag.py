@@ -163,10 +163,45 @@ def load_raw_docs() -> List[Dict]:
         return []
     docs = []
     with open(RAW_DOCS_PATH, "r", encoding="utf-8") as f:
-        for line in f:
-            if line.strip():
-                docs.append(json.loads(line))
+        for index, line in enumerate(f, start=1):
+            stripped = line.strip()
+            if not stripped:
+                continue
+            try:
+                payload = json.loads(stripped)
+            except json.JSONDecodeError:
+                logging.warning("Skipping invalid JSON in %s line %s", RAW_DOCS_PATH, index)
+                continue
+            if not isinstance(payload, dict):
+                logging.warning("Skipping non-object JSON in %s line %s", RAW_DOCS_PATH, index)
+                continue
+            docs.append(payload)
     return docs
+
+
+def _normalize_text_list(value: object) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    normalized: List[str] = []
+    for item in value:
+        if item is None:
+            continue
+        text = str(item).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
+def _normalize_owner(value: object) -> Dict[str, str]:
+    if not isinstance(value, dict):
+        return {"name": "", "team": "", "contact": ""}
+    def _safe(value: object) -> str:
+        return "" if value is None else str(value).strip()
+    return {
+        "name": _safe(value.get("name", "")),
+        "team": _safe(value.get("team", "")),
+        "contact": _safe(value.get("contact", "")),
+    }
 
 
 def normalize_doc(raw: Dict) -> Dict:
@@ -183,14 +218,10 @@ def normalize_doc(raw: Dict) -> Dict:
     doc["handover_notes"] = str(doc.get("handover_notes", "")).strip()
     doc["last_updated"] = str(doc.get("last_updated", "")).strip()
 
-    if not isinstance(doc.get("runbook_steps"), list):
-        doc["runbook_steps"] = []
-    if not isinstance(doc.get("dependencies"), list):
-        doc["dependencies"] = []
-    if not isinstance(doc.get("risks"), list):
-        doc["risks"] = []
-    if not isinstance(doc.get("owner"), dict):
-        doc["owner"] = {"name": "", "team": "", "contact": ""}
+    doc["runbook_steps"] = _normalize_text_list(doc.get("runbook_steps"))
+    doc["dependencies"] = _normalize_text_list(doc.get("dependencies"))
+    doc["risks"] = _normalize_text_list(doc.get("risks"))
+    doc["owner"] = _normalize_owner(doc.get("owner"))
     return doc
 
 
@@ -211,6 +242,7 @@ def validate_normalized_doc(doc: Dict) -> None:
 
 def parse_jsonl_to_normalized_docs(jsonl_text: str) -> List[Dict]:
     docs: List[Dict] = []
+    seen_doc_ids = set()
     raw_lines = str(jsonl_text or "").splitlines()
     for index, raw_line in enumerate(raw_lines, start=1):
         line = raw_line.strip()
@@ -224,6 +256,10 @@ def parse_jsonl_to_normalized_docs(jsonl_text: str) -> List[Dict]:
             raise ValueError(f"line {index}: JSON object required")
         doc = normalize_doc(raw_doc)
         validate_normalized_doc(doc)
+        doc_id = str(doc.get("doc_id", ""))
+        if doc_id in seen_doc_ids:
+            raise ValueError(f"line {index}: duplicate doc_id '{doc_id}'")
+        seen_doc_ids.add(doc_id)
         docs.append(doc)
     if not docs:
         raise ValueError("no valid JSONL records found")
@@ -256,9 +292,19 @@ def load_normalized_docs() -> List[Dict]:
     if os.path.exists(NORM_DOCS_PATH):
         docs = []
         with open(NORM_DOCS_PATH, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.strip():
-                    docs.append(json.loads(line))
+            for index, line in enumerate(f, start=1):
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                try:
+                    payload = json.loads(stripped)
+                except json.JSONDecodeError:
+                    logging.warning("Skipping invalid JSON in %s line %s", NORM_DOCS_PATH, index)
+                    continue
+                if not isinstance(payload, dict):
+                    logging.warning("Skipping non-object JSON in %s line %s", NORM_DOCS_PATH, index)
+                    continue
+                docs.append(payload)
         return docs
 
     raw_docs = load_raw_docs()
