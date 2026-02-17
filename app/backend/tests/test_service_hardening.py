@@ -94,6 +94,27 @@ def test_storage_persists_service_events_and_decisions(tmp_path, monkeypatch) ->
     assert decisions[0]["risk_level"] == "high"
 
 
+def test_storage_operations_auto_initialize_schema(tmp_path, monkeypatch) -> None:
+    sqlite_path = tmp_path / "lazy-init.db"
+    monkeypatch.setattr(storage, "settings", SimpleNamespace(sqlite_path=str(sqlite_path)))
+
+    # Regression guard: these operations should work even when init_db() was not called.
+    storage.add_cost(0.75)
+    storage.record_service_event(
+        level="INFO",
+        component="lazy-init-test",
+        message="schema bootstrapped on demand",
+        context={"source": "regression"},
+    )
+
+    today_cost = storage.get_daily_cost()
+    events = storage.get_recent_service_events(limit=5)
+
+    assert today_cost >= 0.75
+    assert len(events) == 1
+    assert events[0]["component"] == "lazy-init-test"
+
+
 def test_startup_diagnostics_success(tmp_path, monkeypatch) -> None:
     runbook_path = tmp_path / "runbooks.json"
     runbook_path.write_text(
