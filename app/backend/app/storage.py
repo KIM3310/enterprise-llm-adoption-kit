@@ -188,6 +188,7 @@ def add_cost(amount: float) -> None:
         _save_cost_map(cost_map)
         return
 
+    init_db()
     conn = _connect()
     try:
         cur = conn.cursor()
@@ -209,6 +210,7 @@ def get_daily_cost(day: Optional[str] = None) -> float:
         cost_map = _load_cost_map()
         return float(cost_map.get(day, 0.0))
 
+    init_db()
     conn = _connect()
     try:
         cur = conn.cursor()
@@ -250,6 +252,7 @@ def record_control_tower_decision(
         )
         return
 
+    init_db()
     conn = _connect()
     try:
         cur = conn.cursor()
@@ -309,6 +312,7 @@ def get_recent_control_tower_decisions(limit: int = 20) -> List[Dict]:
             )
         return results
 
+    init_db()
     conn = _connect(row_factory=True)
     try:
         cur = conn.cursor()
@@ -374,6 +378,7 @@ def record_service_event(
         )
         return
 
+    init_db()
     conn = _connect()
     try:
         cur = conn.cursor()
@@ -419,6 +424,7 @@ def get_recent_service_events(limit: int = 50) -> List[Dict]:
             )
         return results
 
+    init_db()
     conn = _connect(row_factory=True)
     try:
         cur = conn.cursor()
