@@ -1089,6 +1089,9 @@ def handover(
 
         return HandoverResponse(answer=redacted_answer, citations=citations)
 
+    # Tests and local scripts may bypass FastAPI lifespan startup.
+    # Ensure the retrieval index exists before querying.
+    rag_store.ensure_index()
     groups = allowed_access_groups(user.roles)
     chunks = rag_store.query(redacted_query, groups, payload.system, payload.env, top_k=5)
     citations = _build_citations(chunks)
@@ -1219,6 +1222,9 @@ def log_intel(
             tool_calls=tool_calls,
         )
 
+    # Tests and local scripts may bypass FastAPI lifespan startup.
+    # Ensure the retrieval index exists before tool-based knowledge lookup.
+    rag_store.ensure_index()
     tool_router = ToolRouter(
         knowledge_search_fn=lambda query, role_name: {
             "results": [
