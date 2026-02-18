@@ -11,6 +11,10 @@ const GISCUS_CATEGORY = String(import.meta.env.VITE_GISCUS_CATEGORY || "").trim(
 const GISCUS_CATEGORY_ID = String(import.meta.env.VITE_GISCUS_CATEGORY_ID || "").trim();
 const ADSENSE_CLIENT = String(import.meta.env.VITE_ADSENSE_CLIENT || "").trim();
 const ADSENSE_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim();
+const VALID_ADSENSE_CLIENT =
+  /^ca-pub-\d{16}$/.test(ADSENSE_CLIENT) && ADSENSE_CLIENT !== "ca-pub-0000000000000000";
+const VALID_ADSENSE_SLOT = /^\d{8,20}$/.test(ADSENSE_SLOT) && ADSENSE_SLOT !== "1234567890";
+const ADS_READY = VALID_ADSENSE_CLIENT && VALID_ADSENSE_SLOT;
 
 const APP_NAME = "LLM Adoption Atelier";
 const APP_TAGLINE = "Enterprise LLM Readiness Control Tower";
@@ -106,7 +110,7 @@ const SAMPLE_ARCHITECTURE_JSONL = [
     system: "payments",
     env: "prod",
     access_group: "ops",
-    owner: { name: "Platform Owner", team: "Payments", contact: "owner@acme.local" },
+    owner: { name: "Platform Owner", team: "Payments", contact: "owner@acme-ops.ai" },
     summary: "Payments service architecture with external gateway dependency.",
     handover_notes: "Monitor timeout spikes and queue depth after deployment.",
     runbook_steps: [
@@ -124,7 +128,7 @@ const SAMPLE_ARCHITECTURE_JSONL = [
     system: "analytics",
     env: "staging",
     access_group: "admin",
-    owner: { name: "Data Lead", team: "Analytics", contact: "data@acme.local" },
+    owner: { name: "Data Lead", team: "Analytics", contact: "data@acme-ops.ai" },
     summary: "Analytics pipeline architecture for staged model validation.",
     handover_notes: "Validate schema drift alerts before production sync.",
     runbook_steps: [
@@ -142,7 +146,7 @@ function AdSenseSlot() {
   const pushedRef = useRef(false);
 
   useEffect(() => {
-    if (!ADSENSE_CLIENT || typeof document === "undefined") {
+    if (!ADS_READY || typeof document === "undefined") {
       return;
     }
     if (document.getElementById("atelier-adsbygoogle-script")) {
@@ -157,7 +161,7 @@ function AdSenseSlot() {
   }, []);
 
   useEffect(() => {
-    if (!ADSENSE_CLIENT || !ADSENSE_SLOT || pushedRef.current) {
+    if (!ADS_READY || pushedRef.current) {
       return;
     }
     try {
@@ -168,10 +172,11 @@ function AdSenseSlot() {
     }
   }, []);
 
-  if (!ADSENSE_CLIENT || !ADSENSE_SLOT) {
+  if (!ADS_READY) {
     return (
       <div className="adsense-placeholder">
-        Set <code>VITE_ADSENSE_CLIENT</code> and <code>VITE_ADSENSE_SLOT</code> to enable AdSense.
+        Sponsored slot is in standby mode. Set valid <code>VITE_ADSENSE_CLIENT</code> and{" "}
+        <code>VITE_ADSENSE_SLOT</code> to enable AdSense.
       </div>
     );
   }
@@ -3335,11 +3340,14 @@ export default function App() {
         <div className="footer-meta">
           <p>Observability: /metrics</p>
           <p>Audit logs: app/backend/data/audit.log (runtime)</p>
-          <p>Contact: llm-atelier@ops.local</p>
+          <p>
+            Contact:{" "}
+            <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/issues">GitHub Issues</a>
+          </p>
           <p>Privacy: only operational telemetry required for governance workflows.</p>
           <p>Terms: guidance output must be reviewed by human operators before production decisions.</p>
           <p>
-            Links: <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> ·{" "}
+            Links: <a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> ·{" "}
             <a href="/contact.html">Contact</a> · <a href="/compliance.html">Compliance</a>
           </p>
         </div>
