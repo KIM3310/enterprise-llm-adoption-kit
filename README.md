@@ -93,6 +93,14 @@ python3 -m app
 ```
 cd app/frontend
 npm install
+# optional community integrations
+# export VITE_FORMSPREE_ENDPOINT="https://formspree.io/f/xxxxxx"
+# export VITE_DISQUS_SHORTNAME="your-shortname"
+# export VITE_DISQUS_IDENTIFIER="atelier-home"
+# export VITE_GISCUS_REPO="owner/repo"
+# export VITE_GISCUS_REPO_ID="R_kgxxxx"
+# export VITE_GISCUS_CATEGORY="General"
+# export VITE_GISCUS_CATEGORY_ID="DIC_kwxxxx"
 npm run dev
 ```
 3) Visit `http://localhost:5173`
