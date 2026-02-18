@@ -95,6 +95,7 @@ rag_store = RAGStore()
 rate_limiter = RateLimiter(settings.rate_limit_capacity, settings.rate_limit_refill_per_sec)
 control_tower_service = ControlTowerService()
 LLM_MAX_RETRIES = 3
+APP_STARTED_AT = int(time.time())
 
 
 def _rate_limit_key(user_id: str, role: str, use_case: str) -> str:
@@ -314,6 +315,7 @@ async def request_context_middleware(request: Request, call_next):
     try:
         response = await call_next(request)
         response.headers["x-request-id"] = request_id
+        response.headers.setdefault("cache-control", "no-store")
         return response
     except Exception as exc:  # noqa: BLE001
         latency_ms = int((time.time() - started) * 1000)
@@ -344,6 +346,7 @@ async def request_context_middleware(request: Request, call_next):
             },
         )
         response.headers["x-request-id"] = request_id
+        response.headers["cache-control"] = "no-store"
         return response
 
 
@@ -367,11 +370,15 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "detail": exc.detail,
             "request_id": request_id,
         },
+        headers={
+            "x-request-id": request_id,
+            "cache-control": "no-store",
+        },
     )
 
 
 @app.get("/health")
-def health() -> Dict[str, object]:
+def health(request: Request) -> Dict[str, object]:
     startup_report = getattr(app.state, "startup_report", None)
     status = "ok"
     startup_status = ""
@@ -390,6 +397,8 @@ def health() -> Dict[str, object]:
         "llm_provider": runtime.get("provider", "stub"),
         "llm_model": runtime.get("model", "stub-llm"),
         "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
+        "uptime_seconds": max(0, int(time.time()) - APP_STARTED_AT),
+        "request_id": getattr(request.state, "request_id", ""),
     }
 
 
