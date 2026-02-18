@@ -2,6 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import heroTower from "./assets/hero-tower.svg";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const FORMSPREE_ENDPOINT = String(import.meta.env.VITE_FORMSPREE_ENDPOINT || "").trim();
+const DISQUS_SHORTNAME = String(import.meta.env.VITE_DISQUS_SHORTNAME || "").trim();
+const DISQUS_IDENTIFIER = String(import.meta.env.VITE_DISQUS_IDENTIFIER || "atelier-home").trim();
+const GISCUS_REPO = String(import.meta.env.VITE_GISCUS_REPO || "").trim();
+const GISCUS_REPO_ID = String(import.meta.env.VITE_GISCUS_REPO_ID || "").trim();
+const GISCUS_CATEGORY = String(import.meta.env.VITE_GISCUS_CATEGORY || "").trim();
+const GISCUS_CATEGORY_ID = String(import.meta.env.VITE_GISCUS_CATEGORY_ID || "").trim();
 
 const APP_NAME = "LLM Adoption Atelier";
 const APP_TAGLINE = "Enterprise LLM Readiness Control Tower";
@@ -527,6 +534,13 @@ export default function App() {
   const [jiraPriority, setJiraPriority] = useState("High");
   const [jiraResponse, setJiraResponse] = useState(null);
   const [jiraError, setJiraError] = useState("");
+  const [communityName, setCommunityName] = useState("");
+  const [communityEmail, setCommunityEmail] = useState("");
+  const [communityMessage, setCommunityMessage] = useState("");
+  const [communitySubmitStatus, setCommunitySubmitStatus] = useState("idle");
+  const [communityNotice, setCommunityNotice] = useState("");
+  const disqusLoadedRef = useRef(false);
+  const giscusContainerRef = useRef(null);
 
   useEffect(() => {
     const onHashChange = () => setPage(getPageFromHash());
@@ -537,6 +551,47 @@ export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
+
+  useEffect(() => {
+    if (!DISQUS_SHORTNAME || typeof document === "undefined" || disqusLoadedRef.current) {
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = "atelier-disqus-script";
+    script.src = `https://${DISQUS_SHORTNAME}.disqus.com/embed.js`;
+    script.async = true;
+    script.setAttribute("data-timestamp", String(Date.now()));
+    script.setAttribute("data-identifier", DISQUS_IDENTIFIER);
+    document.body.appendChild(script);
+    disqusLoadedRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    const node = giscusContainerRef.current;
+    if (!node || !GISCUS_REPO || !GISCUS_REPO_ID || !GISCUS_CATEGORY || !GISCUS_CATEGORY_ID) {
+      return;
+    }
+    if (node.querySelector("script[data-giscus]")) {
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.setAttribute("data-giscus", "1");
+    script.setAttribute("data-repo", GISCUS_REPO);
+    script.setAttribute("data-repo-id", GISCUS_REPO_ID);
+    script.setAttribute("data-category", GISCUS_CATEGORY);
+    script.setAttribute("data-category-id", GISCUS_CATEGORY_ID);
+    script.setAttribute("data-mapping", "pathname");
+    script.setAttribute("data-strict", "0");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-emit-metadata", "0");
+    script.setAttribute("data-input-position", "top");
+    script.setAttribute("data-theme", "light");
+    script.setAttribute("data-lang", "en");
+    script.crossOrigin = "anonymous";
+    node.appendChild(script);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -628,6 +683,49 @@ export default function App() {
       throw error;
     }
     return { data, requestId };
+  }
+
+  async function submitCommunityFeedback(event) {
+    event.preventDefault();
+    if (!FORMSPREE_ENDPOINT) {
+      setCommunitySubmitStatus("error");
+      setCommunityNotice("Set VITE_FORMSPREE_ENDPOINT to enable feedback submission.");
+      return;
+    }
+
+    setCommunitySubmitStatus("submitting");
+    setCommunityNotice("");
+    try {
+      const response = await fetchWithTimeout(
+        FORMSPREE_ENDPOINT,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+          },
+          body: JSON.stringify({
+            name: communityName.trim(),
+            email: communityEmail.trim(),
+            message: communityMessage.trim(),
+            source: "enterprise-llm-adoption-kit",
+            page_url: window.location.href
+          })
+        },
+        12000
+      );
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(parseApiError(payload, "Feedback request failed."));
+      }
+
+      setCommunitySubmitStatus("success");
+      setCommunityMessage("");
+      setCommunityNotice("Feedback submitted. We'll include it in the next validation cycle.");
+    } catch (error) {
+      setCommunitySubmitStatus("error");
+      setCommunityNotice(error instanceof Error ? error.message : "Feedback request failed.");
+    }
   }
 
   async function login(options = {}) {
@@ -1974,6 +2072,72 @@ export default function App() {
                     <span className="tag">
                       <strong>COST</strong> control
                     </span>
+                  </div>
+                </Reveal>
+              </div>
+            </section>
+
+            <section className="section-block">
+              <Reveal className="section-head">
+                <p className="eyebrow">Community Integrations</p>
+                <h2>Open-source feedback and discussion channels</h2>
+                <p>
+                  Formspree handles structured feedback intake, while Disqus/Giscus keep threaded discussions
+                  attached to each page revision.
+                </p>
+              </Reveal>
+
+              <div className="community-grid">
+                <Reveal className="result-card" delay={90}>
+                  <h4>Feedback Intake (Formspree)</h4>
+                  <form onSubmit={submitCommunityFeedback} className="community-form">
+                    <input
+                      required
+                      value={communityName}
+                      onChange={(event) => setCommunityName(event.target.value)}
+                      placeholder="Name"
+                    />
+                    <input
+                      required
+                      type="email"
+                      value={communityEmail}
+                      onChange={(event) => setCommunityEmail(event.target.value)}
+                      placeholder="Email"
+                    />
+                    <textarea
+                      required
+                      value={communityMessage}
+                      onChange={(event) => setCommunityMessage(event.target.value)}
+                      placeholder="What should this validation kit improve next?"
+                    />
+                    <button className="cta-primary" disabled={communitySubmitStatus === "submitting"}>
+                      {communitySubmitStatus === "submitting" ? "Sending..." : "Send Feedback"}
+                    </button>
+                  </form>
+                  {communityNotice && (
+                    <p className={communitySubmitStatus === "error" ? "feedback-status error" : "feedback-status"}>
+                      {communityNotice}
+                    </p>
+                  )}
+                </Reveal>
+
+                <Reveal className="result-card" delay={130}>
+                  <h4>Threaded Discussion (Disqus + Giscus)</h4>
+                  <div className="discussion-card">
+                    <p>Disqus</p>
+                    {DISQUS_SHORTNAME ? (
+                      <div id="disqus_thread" className="discussion-frame" />
+                    ) : (
+                      <p className="admin-note">Set VITE_DISQUS_SHORTNAME to enable Disqus thread.</p>
+                    )}
+                  </div>
+                  <div className="discussion-card">
+                    <p>Giscus (GitHub Discussions)</p>
+                    {GISCUS_REPO && GISCUS_REPO_ID && GISCUS_CATEGORY && GISCUS_CATEGORY_ID ? (
+                      <div ref={giscusContainerRef} className="discussion-frame" />
+                    ) : (
+                      <p className="admin-note">Set VITE_GISCUS_* variables to enable Giscus.</p>
+                    )}
                   </div>
                 </Reveal>
               </div>
