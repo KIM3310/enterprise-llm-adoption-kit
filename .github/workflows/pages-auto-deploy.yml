@@ -16,6 +16,9 @@ jobs:
     permissions:
       contents: read
       deployments: write
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,15 +30,24 @@ jobs:
           cache: npm
           cache-dependency-path: app/frontend/package-lock.json
 
-      - name: Build frontend
+      - name: Build
         run: |
           cd app/frontend
           npm ci
           npm run build
+          cd ../..
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy app/frontend/dist --project-name=enterprise-llm-kit --branch=main
+      - name: Deploy to Cloudflare Pages (retry)
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            echo "Deploy attempt $attempt/3"
+            if npx wrangler@4.66.0 pages deploy app/frontend/dist --project-name=enterprise-llm-kit --branch=main --commit-dirty=true; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep 15
+            fi
+          done
+          echo "Cloudflare deploy failed after retries"
+          exit 1
