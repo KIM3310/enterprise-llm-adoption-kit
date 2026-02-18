@@ -1332,6 +1332,61 @@ textarea {
   margin-bottom: 6px;
 }
 
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.community-form {
+  display: grid;
+  gap: 10px;
+}
+
+.community-form input,
+.community-form textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  color: rgba(11, 18, 32, 0.92);
+}
+
+.community-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.community-form button {
+  width: fit-content;
+}
+
+.feedback-status {
+  margin-top: 4px;
+  font-size: 0.86rem;
+  color: rgba(22, 163, 74, 0.95);
+}
+
+.feedback-status.error {
+  color: rgba(220, 38, 38, 0.95);
+}
+
+.discussion-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.discussion-card p {
+  margin: 0 0 8px;
+}
+
+.discussion-frame {
+  min-height: 110px;
+}
+
 .site-footer {
   margin-top: 22px;
   padding-top: 4px;
@@ -1371,6 +1426,10 @@ textarea {
   .validation-layout,
   .scenario-layout,
   .console-header {
+    grid-template-columns: 1fr;
+  }
+
+  .community-grid {
     grid-template-columns: 1fr;
   }
 
