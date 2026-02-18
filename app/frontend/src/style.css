@@ -1390,12 +1390,55 @@ textarea {
 .site-footer {
   margin-top: 22px;
   padding-top: 4px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
   gap: 14px;
+  align-items: start;
   color: var(--muted-2);
   font-size: 0.84rem;
+}
+
+.footer-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.footer-meta p {
+  margin: 0;
+}
+
+.footer-meta a {
+  color: var(--ink-strong);
+}
+
+.footer-ad {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.footer-ad p {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.adsense-box {
+  min-height: 96px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.adsense-placeholder {
+  min-height: 96px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
 }
 
 .reveal {
@@ -1462,6 +1505,10 @@ textarea {
   }
 
   .runtime-alert-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer {
     grid-template-columns: 1fr;
   }
 }

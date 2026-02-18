@@ -9,6 +9,8 @@ const GISCUS_REPO = String(import.meta.env.VITE_GISCUS_REPO || "").trim();
 const GISCUS_REPO_ID = String(import.meta.env.VITE_GISCUS_REPO_ID || "").trim();
 const GISCUS_CATEGORY = String(import.meta.env.VITE_GISCUS_CATEGORY || "").trim();
 const GISCUS_CATEGORY_ID = String(import.meta.env.VITE_GISCUS_CATEGORY_ID || "").trim();
+const ADSENSE_CLIENT = String(import.meta.env.VITE_ADSENSE_CLIENT || "").trim();
+const ADSENSE_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim();
 
 const APP_NAME = "LLM Adoption Atelier";
 const APP_TAGLINE = "Enterprise LLM Readiness Control Tower";
@@ -135,6 +137,56 @@ const SAMPLE_ARCHITECTURE_JSONL = [
     last_updated: "2026-02-12"
   })
 ].join("\n");
+
+function AdSenseSlot() {
+  const pushedRef = useRef(false);
+
+  useEffect(() => {
+    if (!ADSENSE_CLIENT || typeof document === "undefined") {
+      return;
+    }
+    if (document.getElementById("atelier-adsbygoogle-script")) {
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = "atelier-adsbygoogle-script";
+    script.async = true;
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!ADSENSE_CLIENT || !ADSENSE_SLOT || pushedRef.current) {
+      return;
+    }
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      pushedRef.current = true;
+    } catch (_err) {
+      // no-op
+    }
+  }, []);
+
+  if (!ADSENSE_CLIENT || !ADSENSE_SLOT) {
+    return (
+      <div className="adsense-placeholder">
+        Set <code>VITE_ADSENSE_CLIENT</code> and <code>VITE_ADSENSE_SLOT</code> to enable AdSense.
+      </div>
+    );
+  }
+
+  return (
+    <ins
+      className="adsbygoogle adsense-box"
+      style={{ display: "block" }}
+      data-ad-client={ADSENSE_CLIENT}
+      data-ad-slot={ADSENSE_SLOT}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+    />
+  );
+}
 
 function getPageFromHash() {
   const hash = window.location.hash.replace("#", "").trim().toLowerCase();
@@ -3280,8 +3332,20 @@ export default function App() {
       </main>
 
       <footer className="site-footer">
-        <p>Observability: /metrics</p>
-        <p>Audit logs: app/backend/data/audit.log (runtime)</p>
+        <div className="footer-meta">
+          <p>Observability: /metrics</p>
+          <p>Audit logs: app/backend/data/audit.log (runtime)</p>
+          <p>Contact: llm-atelier@ops.local</p>
+          <p>Privacy: only operational telemetry required for governance workflows.</p>
+          <p>Terms: guidance output must be reviewed by human operators before production decisions.</p>
+          <p>
+            Links: <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="/contact.html">Contact</a>
+          </p>
+        </div>
+        <div className="footer-ad">
+          <p>Sponsored</p>
+          <AdSenseSlot />
+        </div>
       </footer>
     </div>
   );

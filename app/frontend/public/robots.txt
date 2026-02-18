@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://llm-adoption-atelier.pages.dev/sitemap.xml
