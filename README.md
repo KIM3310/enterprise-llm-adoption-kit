@@ -108,7 +108,7 @@ npm run dev
 ```
 3) Visit `http://localhost:5173`
 
-AdSense review helpers are prepared in `app/frontend/public/ads.txt`, `app/frontend/public/robots.txt`, and `app/frontend/public/sitemap.xml`.
+AdSense review helpers are prepared in `app/frontend/public/ads.txt`, `app/frontend/public/robots.txt`, `app/frontend/public/sitemap.xml`, `app/frontend/public/compliance.html`, and `app/frontend/public/_headers`.
 
 ## How to run (docker)
 ```
