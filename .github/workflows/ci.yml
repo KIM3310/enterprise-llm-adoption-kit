@@ -45,3 +45,12 @@ jobs:
 
       - name: Eval gate
         run: python3 evals/runner/eval_gate.py
+
+  review-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: AdSense/Cloudflare review gate
+        run: bash tools/release_ops.sh check
