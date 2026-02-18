@@ -101,9 +101,14 @@ npm install
 # export VITE_GISCUS_REPO_ID="R_kgxxxx"
 # export VITE_GISCUS_CATEGORY="General"
 # export VITE_GISCUS_CATEGORY_ID="DIC_kwxxxx"
+# optional AdSense
+# export VITE_ADSENSE_CLIENT="ca-pub-xxxxxxxxxxxxxxxx"
+# export VITE_ADSENSE_SLOT="1234567890"
 npm run dev
 ```
 3) Visit `http://localhost:5173`
+
+AdSense review helpers are prepared in `app/frontend/public/ads.txt`, `app/frontend/public/robots.txt`, and `app/frontend/public/sitemap.xml`.
 
 ## How to run (docker)
 ```
