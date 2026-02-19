@@ -12,8 +12,8 @@
 
 ## Key Endpoints
 - `POST /auth/oidc/login` → JWT with mapped roles
-- `POST /integrations/slack/events` → UC1/UC2 routing
-- `POST /integrations/jira/ticket` → UC2 summary for ticket comments
+- `POST /integrations/slack/events` → UC1/UC2 routing (Bearer JWT required by default)
+- `POST /integrations/jira/ticket` → UC2 summary for ticket comments (Bearer JWT required by default)
 
 ## Data Contracts
 - OIDC claims: `sub`, `email`, `groups[]`, `roles[]`

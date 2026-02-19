@@ -26,5 +26,12 @@ async def test_health_includes_runtime_metadata() -> None:
     assert payload.get("auth_mode") in {"local_jwt", "oidc"}
     assert payload.get("data_handling_mode") in {"demo", "enterprise"}
     assert payload.get("storage_backend") in {"sqlite", "jsonl"}
+    assert payload.get("integrations_require_auth") in {True, False}
+    assert payload.get("llm_fallback_to_stub_on_error") in {True, False}
+    assert payload.get("llm_circuit_state") in {"open", "closed"}
+    assert isinstance(payload.get("llm_circuit_open_seconds_remaining"), int)
+    assert isinstance(payload.get("llm_circuit_consecutive_failures"), int)
+    assert isinstance(payload.get("request_max_body_bytes"), int)
+    assert payload.get("request_max_body_bytes", 0) >= 1024
 
     reset_llm_runtime_settings()

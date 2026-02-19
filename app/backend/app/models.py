@@ -1,10 +1,15 @@
 from typing import Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+USER_ID_PATTERN = r"^[A-Za-z0-9._:@-]+$"
+IDENTIFIER_PATTERN = r"^[A-Za-z0-9._:-]+$"
+REGION_PATTERN = r"^[A-Za-z0-9._-]+$"
 
 
 class AuthRequest(BaseModel):
-    user_id: str
+    user_id: str = Field(min_length=1, max_length=128, pattern=USER_ID_PATTERN)
     role: str = Field(pattern="^(Employee|Ops|Admin)$")
+    login_code: Optional[str] = Field(default=None, max_length=128)
 
 
 class AuthResponse(BaseModel):
@@ -18,10 +23,17 @@ class Citation(BaseModel):
 
 
 class HandoverRequest(BaseModel):
-    query: str
+    query: str = Field(min_length=1, max_length=12000)
     citation_only: bool = False
-    system: Optional[str] = None
-    env: Optional[str] = None
+    system: Optional[str] = Field(default=None, max_length=128)
+    env: Optional[str] = Field(default=None, max_length=128)
+
+    @field_validator("query")
+    @classmethod
+    def _query_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("query must not be blank")
+        return value
 
 
 class HandoverResponse(BaseModel):
@@ -30,9 +42,16 @@ class HandoverResponse(BaseModel):
 
 
 class LogIntelRequest(BaseModel):
-    logs: str
-    system: Optional[str] = None
-    env: Optional[str] = None
+    logs: str = Field(min_length=1, max_length=20000)
+    system: Optional[str] = Field(default=None, max_length=128)
+    env: Optional[str] = Field(default=None, max_length=128)
+
+    @field_validator("logs")
+    @classmethod
+    def _logs_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("logs must not be blank")
+        return value
 
 
 class ToolCall(BaseModel):
@@ -54,31 +73,52 @@ class UserContext(BaseModel):
 
 
 class OIDCLoginRequest(BaseModel):
-    sub: str
-    email: Optional[str] = None
+    sub: str = Field(min_length=1, max_length=256)
+    email: Optional[str] = Field(default=None, max_length=256)
     groups: List[str] = Field(default_factory=list)
     roles: List[str] = Field(default_factory=list)
-    issuer: Optional[str] = None
+    issuer: Optional[str] = Field(default=None, max_length=256)
+
+    @field_validator("sub")
+    @classmethod
+    def _sub_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("sub must not be blank")
+        return value
 
 
 class OIDCTokenExchangeRequest(BaseModel):
-    id_token: str
+    id_token: str = Field(min_length=20, max_length=8192)
 
 
 class SlackEvent(BaseModel):
-    user_id: str
-    text: str
-    channel: Optional[str] = None
+    user_id: str = Field(min_length=1, max_length=128, pattern=USER_ID_PATTERN)
+    text: str = Field(min_length=1, max_length=4000)
+    channel: Optional[str] = Field(default=None, max_length=128)
     role: str = Field(default="Employee", pattern="^(Employee|Ops|Admin)$")
+
+    @field_validator("text")
+    @classmethod
+    def _text_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("text must not be blank")
+        return value
 
 
 class JiraTicket(BaseModel):
-    ticket_id: str
-    title: str
-    description: str
-    priority: Optional[str] = "Medium"
-    reporter: Optional[str] = None
+    ticket_id: str = Field(min_length=1, max_length=64, pattern=IDENTIFIER_PATTERN)
+    title: str = Field(min_length=1, max_length=200)
+    description: str = Field(min_length=1, max_length=12000)
+    priority: Optional[str] = Field(default="Medium", max_length=32)
+    reporter: Optional[str] = Field(default=None, max_length=128, pattern=USER_ID_PATTERN)
     role: str = Field(default="Ops", pattern="^(Employee|Ops|Admin)$")
+
+    @field_validator("title", "description")
+    @classmethod
+    def _jira_fields_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("jira field must not be blank")
+        return value
 
 
 class PlatformTargets(BaseModel):
@@ -122,11 +162,11 @@ class ControlTowerSignals(BaseModel):
 
 
 class ControlTowerDecisionRequest(BaseModel):
-    scenario_id: str
-    region: str = "us-east-1"
-    notes: str = ""
-    system: Optional[str] = None
-    env: Optional[str] = None
+    scenario_id: str = Field(min_length=1, max_length=128, pattern=IDENTIFIER_PATTERN)
+    region: str = Field(default="us-east-1", min_length=1, max_length=64, pattern=REGION_PATTERN)
+    notes: str = Field(default="", max_length=8000)
+    system: Optional[str] = Field(default=None, max_length=128)
+    env: Optional[str] = Field(default=None, max_length=128)
     signals: ControlTowerSignals
     targets: PlatformTargets = Field(default_factory=PlatformTargets)
 

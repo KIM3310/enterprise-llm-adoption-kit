@@ -4,9 +4,11 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from threading import Lock
 from typing import Dict, List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -18,6 +20,7 @@ from .auth import (
     create_jwt_for_roles,
     decode_oidc_token,
     get_current_user,
+    get_optional_user,
 )
 from .audit import build_payload, log_audit
 from .audit_viewer import summarize_log
@@ -30,6 +33,7 @@ from .control_tower_service import (
 from .diagnostics import run_startup_diagnostics
 from .injection import detect_injection
 from .llm_adapter import (
+    StubLLMAdapter,
     get_llm_adapter,
     get_llm_runtime_settings,
     update_llm_runtime_settings,
@@ -37,6 +41,8 @@ from .llm_adapter import (
 from .metrics import (
     COST_COUNTER,
     LATENCY_HIST,
+    LLM_CIRCUIT_EVENT_COUNTER,
+    LLM_FAILURE_COUNTER,
     POLICY_EVENT_COUNTER,
     REQUEST_COUNTER,
     TOKENS_IN_COUNTER,
@@ -93,9 +99,34 @@ logger = logging.getLogger("service")
 
 rag_store = RAGStore()
 rate_limiter = RateLimiter(settings.rate_limit_capacity, settings.rate_limit_refill_per_sec)
+login_attempt_limiter = RateLimiter(settings.login_attempt_capacity, settings.login_attempt_refill_per_sec)
 control_tower_service = ControlTowerService()
 LLM_MAX_RETRIES = 3
 APP_STARTED_AT = int(time.time())
+ROLE_PRIORITY = {"Employee": 1, "Ops": 2, "Admin": 3}
+SECURITY_HEADERS = {
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "referrer-policy": "no-referrer",
+    "permissions-policy": "camera=(), microphone=(), geolocation=()",
+}
+SENSITIVE_CONTEXT_KEYS = {
+    "authorization",
+    "api_key",
+    "apikey",
+    "secret",
+    "password",
+    "token",
+    "access_token",
+    "id_token",
+    "refresh_token",
+    "cookie",
+    "set_cookie",
+}
+LLM_CIRCUIT_LOCK = Lock()
+LLM_CIRCUIT_CONSECUTIVE_FAILURES = 0
+LLM_CIRCUIT_OPEN_UNTIL = 0.0
+LLM_CIRCUIT_LAST_ERROR = ""
 
 
 def _rate_limit_key(user_id: str, role: str, use_case: str) -> str:
@@ -115,6 +146,167 @@ def _record_metrics(endpoint: str, use_case: str, role: str, status: str, latenc
 def _ensure_any_role(user_roles: List[str], allowed_roles: List[str]) -> None:
     if not set(user_roles).intersection(set(allowed_roles)):
         raise HTTPException(status_code=403, detail="Insufficient role")
+
+
+def _effective_role(user_roles: List[str], default: str = "Employee") -> str:
+    valid_roles = [role for role in user_roles if role in ROLE_PRIORITY]
+    if not valid_roles:
+        return default
+    return max(valid_roles, key=lambda role_name: ROLE_PRIORITY[role_name])
+
+
+def _apply_standard_headers(response, request_id: str) -> None:
+    response.headers["x-request-id"] = request_id
+    response.headers.setdefault("cache-control", "no-store")
+    for header_name, header_value in SECURITY_HEADERS.items():
+        response.headers.setdefault(header_name, header_value)
+
+
+def _error_response(status_code: int, detail: object, request_id: str) -> JSONResponse:
+    response = JSONResponse(
+        status_code=status_code,
+        content={
+            "detail": detail,
+            "request_id": request_id,
+        },
+    )
+    _apply_standard_headers(response, request_id)
+    return response
+
+
+def _looks_sensitive_key(key: object) -> bool:
+    normalized = str(key or "").strip().lower().replace("-", "_")
+    if not normalized:
+        return False
+    return any(token in normalized for token in SENSITIVE_CONTEXT_KEYS)
+
+
+def _sanitize_context_value(value: object, *, depth: int = 0) -> object:
+    if depth >= 6:
+        return "[TRUNCATED_DEPTH]"
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    if isinstance(value, str):
+        raw = value.strip()
+        if not raw:
+            return ""
+        if raw.lower().startswith("bearer "):
+            return "Bearer [REDACTED]"
+        if len(raw) > 512:
+            return f"{raw[:512]}...[TRUNCATED]"
+        return raw
+    if isinstance(value, dict):
+        sanitized: Dict[str, object] = {}
+        for key, item in value.items():
+            key_name = str(key)
+            if _looks_sensitive_key(key_name):
+                sanitized[key_name] = "[REDACTED]"
+                continue
+            sanitized[key_name] = _sanitize_context_value(item, depth=depth + 1)
+        return sanitized
+    if isinstance(value, list):
+        items = [_sanitize_context_value(item, depth=depth + 1) for item in value[:50]]
+        if len(value) > 50:
+            items.append(f"[TRUNCATED_ITEMS:{len(value) - 50}]")
+        return items
+    return _sanitize_context_value(str(value), depth=depth + 1)
+
+
+def _sanitize_event_context(context: Dict) -> Dict:
+    if not isinstance(context, dict):
+        return {"value": _sanitize_context_value(context)}
+    sanitized: Dict[str, object] = {}
+    for key, value in context.items():
+        key_name = str(key)
+        if _looks_sensitive_key(key_name):
+            sanitized[key_name] = "[REDACTED]"
+            continue
+        sanitized[key_name] = _sanitize_context_value(value)
+    return sanitized
+
+
+def _login_attempt_key(request: Request, user_id: str) -> str:
+    remote = getattr(getattr(request, "client", None), "host", "") or "unknown"
+    normalized_user = str(user_id or "").strip() or "unknown"
+    return f"{remote}:{normalized_user}"
+
+
+def _enforce_login_attempt_limit(request: Request, user_id: str) -> None:
+    key = _login_attempt_key(request, user_id)
+    if login_attempt_limiter.check(key):
+        return
+    _safe_record_service_event(
+        level="WARN",
+        component="auth",
+        message="login attempt rate limit exceeded",
+        context={
+            "user_id": str(user_id or "").strip(),
+            "remote": key.split(":", 1)[0],
+        },
+    )
+    raise HTTPException(status_code=429, detail="Too many login attempts. Retry later.")
+
+
+def _llm_circuit_config() -> Dict[str, int]:
+    return {
+        "threshold": max(1, int(getattr(settings, "llm_circuit_breaker_threshold", 3))),
+        "cooldown_sec": max(1, int(getattr(settings, "llm_circuit_breaker_cooldown_sec", 30))),
+    }
+
+
+def _llm_circuit_snapshot(*, now: Optional[float] = None) -> Dict[str, object]:
+    ts = float(time.time() if now is None else now)
+    with LLM_CIRCUIT_LOCK:
+        failures = int(LLM_CIRCUIT_CONSECUTIVE_FAILURES)
+        open_until = float(LLM_CIRCUIT_OPEN_UNTIL)
+    is_open = open_until > ts
+    return {
+        "state": "open" if is_open else "closed",
+        "consecutive_failures": failures,
+        "open_until_epoch": int(open_until) if is_open else 0,
+        "open_seconds_remaining": max(0, int(open_until - ts)) if is_open else 0,
+    }
+
+
+def _llm_circuit_record_success() -> bool:
+    global LLM_CIRCUIT_CONSECUTIVE_FAILURES
+    global LLM_CIRCUIT_OPEN_UNTIL
+    global LLM_CIRCUIT_LAST_ERROR
+
+    now = float(time.time())
+    with LLM_CIRCUIT_LOCK:
+        was_open = LLM_CIRCUIT_OPEN_UNTIL > now
+        had_failures = LLM_CIRCUIT_CONSECUTIVE_FAILURES > 0
+        if not was_open and not had_failures:
+            return False
+        LLM_CIRCUIT_CONSECUTIVE_FAILURES = 0
+        LLM_CIRCUIT_OPEN_UNTIL = 0.0
+        LLM_CIRCUIT_LAST_ERROR = ""
+        return True
+
+
+def _llm_circuit_record_failure(error_text: str) -> Dict[str, object]:
+    global LLM_CIRCUIT_CONSECUTIVE_FAILURES
+    global LLM_CIRCUIT_OPEN_UNTIL
+    global LLM_CIRCUIT_LAST_ERROR
+
+    conf = _llm_circuit_config()
+    now = float(time.time())
+    with LLM_CIRCUIT_LOCK:
+        LLM_CIRCUIT_CONSECUTIVE_FAILURES += 1
+        LLM_CIRCUIT_LAST_ERROR = str(error_text or "")
+        opened = False
+        if LLM_CIRCUIT_CONSECUTIVE_FAILURES >= conf["threshold"]:
+            if LLM_CIRCUIT_OPEN_UNTIL <= now:
+                opened = True
+            LLM_CIRCUIT_OPEN_UNTIL = now + conf["cooldown_sec"]
+        return {
+            "opened": opened,
+            "consecutive_failures": int(LLM_CIRCUIT_CONSECUTIVE_FAILURES),
+            "open_until_epoch": int(LLM_CIRCUIT_OPEN_UNTIL),
+            "threshold": conf["threshold"],
+            "cooldown_sec": conf["cooldown_sec"],
+        }
 
 
 def _policy_event(event: str, triggered: bool) -> None:
@@ -204,17 +396,133 @@ def _llm_model_config() -> Dict[str, object]:
 
 
 def _call_llm_with_retry(messages, use_case: str):
+    runtime = get_llm_runtime_settings()
+    provider = str(runtime.get("provider", "stub"))
+
+    if provider != "stub":
+        snapshot = _llm_circuit_snapshot()
+        if snapshot["state"] == "open":
+            if settings.llm_fallback_to_stub_on_error:
+                LLM_CIRCUIT_EVENT_COUNTER.labels(provider=provider, event="fallback_stub").inc()
+                _safe_record_service_event(
+                    level="WARN",
+                    component="llm_adapter",
+                    message="llm circuit open; using stub fallback",
+                    context={
+                        "provider": provider,
+                        "use_case": use_case,
+                        "open_seconds_remaining": snapshot["open_seconds_remaining"],
+                        "consecutive_failures": snapshot["consecutive_failures"],
+                    },
+                )
+                return StubLLMAdapter().generate(messages, use_case=use_case)
+            LLM_CIRCUIT_EVENT_COUNTER.labels(provider=provider, event="blocked").inc()
+            raise HTTPException(status_code=503, detail="LLM provider temporarily unavailable")
+
     backoff = 0.2
     last_exc = None
     for _ in range(LLM_MAX_RETRIES):
         try:
             adapter = get_llm_adapter()
-            return adapter.generate(messages, use_case=use_case)
+            result = adapter.generate(messages, use_case=use_case)
+            if provider != "stub":
+                recovered = _llm_circuit_record_success()
+                if recovered:
+                    LLM_CIRCUIT_EVENT_COUNTER.labels(provider=provider, event="recovered").inc()
+                    _safe_record_service_event(
+                        level="INFO",
+                        component="llm_adapter",
+                        message="llm provider recovered; circuit closed",
+                        context={"provider": provider, "use_case": use_case},
+                    )
+            return result
         except Exception as exc:  # noqa: BLE001
             last_exc = exc
             time.sleep(backoff)
             backoff *= 2
-    raise HTTPException(status_code=502, detail=f"LLM call failed: {last_exc}")
+
+    if provider != "stub":
+        LLM_FAILURE_COUNTER.labels(use_case=use_case, provider=provider).inc()
+        failure_state = _llm_circuit_record_failure(str(last_exc))
+        if failure_state["opened"]:
+            LLM_CIRCUIT_EVENT_COUNTER.labels(provider=provider, event="opened").inc()
+            _safe_record_service_event(
+                level="WARN",
+                component="llm_adapter",
+                message="llm circuit opened after repeated failures",
+                context={
+                    "provider": provider,
+                    "use_case": use_case,
+                    "consecutive_failures": failure_state["consecutive_failures"],
+                    "threshold": failure_state["threshold"],
+                    "cooldown_sec": failure_state["cooldown_sec"],
+                    "open_until_epoch": failure_state["open_until_epoch"],
+                },
+            )
+
+    if provider != "stub" and settings.llm_fallback_to_stub_on_error:
+        logger.warning(
+            "LLM provider=%s failed after retries; falling back to stub adapter. reason=%s",
+            provider,
+            last_exc,
+        )
+        _safe_record_service_event(
+            level="WARN",
+            component="llm_adapter",
+            message="provider failed after retries; fallback to stub",
+            context={
+                "provider": provider,
+                "use_case": use_case,
+                "error": str(last_exc),
+            },
+        )
+        return StubLLMAdapter().generate(messages, use_case=use_case)
+    raise HTTPException(status_code=502, detail="LLM call failed after retries")
+
+
+def _resolve_integration_user(
+    auth_user: Optional[UserContext],
+    *,
+    payload_user_id: str,
+    payload_role: str,
+    source: str,
+) -> UserContext:
+    if isinstance(auth_user, UserContext):
+        role = _effective_role(auth_user.roles, default="Employee")
+        payload_user = str(payload_user_id or "").strip()
+        if payload_user and payload_user != auth_user.user_id:
+            _safe_record_service_event(
+                level="INFO",
+                component="integrations",
+                message=f"{source} payload user_id overridden by bearer token user_id",
+                context={
+                    "token_user_id": auth_user.user_id,
+                    "payload_user_id": payload_user,
+                    "token_role": role,
+                },
+            )
+        if payload_role != role:
+            _safe_record_service_event(
+                level="INFO",
+                component="integrations",
+                message=f"{source} payload role overridden by bearer token role",
+                context={
+                    "token_user_id": auth_user.user_id,
+                    "token_role": role,
+                    "payload_role": payload_role,
+                },
+            )
+        return UserContext(user_id=auth_user.user_id, roles=[role])
+
+    if settings.integrations_require_auth:
+        raise HTTPException(status_code=401, detail=f"{source} integration requires bearer token")
+
+    fallback_user_id = str(payload_user_id or "").strip() or "integration-user"
+    fallback_role = str(payload_role or "").strip() or "Employee"
+    return UserContext(
+        user_id=fallback_user_id,
+        roles=[_effective_role([fallback_role], default="Employee")],
+    )
 
 
 def _architecture_catalog_payload() -> Dict[str, object]:
@@ -226,7 +534,12 @@ def _architecture_catalog_payload() -> Dict[str, object]:
 
 def _safe_record_service_event(level: str, component: str, message: str, context: Dict) -> None:
     try:
-        record_service_event(level=level, component=component, message=message, context=context)
+        record_service_event(
+            level=level,
+            component=component,
+            message=str(message)[:256],
+            context=_sanitize_event_context(context),
+        )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to persist service event")
 
@@ -243,6 +556,7 @@ def _safe_record_control_tower_decision(
     details: Dict,
 ) -> None:
     try:
+        safe_details = _sanitize_context_value(details)
         record_control_tower_decision(
             decision_id=decision_id,
             scenario_id=scenario_id,
@@ -252,7 +566,7 @@ def _safe_record_control_tower_decision(
             risk_level=risk_level,
             spec_version=spec_version,
             refusal=refusal,
-            details=details,
+            details=safe_details if isinstance(safe_details, dict) else {"value": safe_details},
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to persist control tower decision")
@@ -312,10 +626,24 @@ async def request_context_middleware(request: Request, call_next):
     request_id = request.headers.get("x-request-id") or f"req-{uuid.uuid4().hex[:12]}"
     request.state.request_id = request_id
     started = time.time()
+
+    raw_content_length = str(request.headers.get("content-length", "")).strip()
+    if raw_content_length:
+        try:
+            content_length = int(raw_content_length)
+        except ValueError:
+            return _error_response(400, "Invalid Content-Length header", request_id)
+        max_body_bytes = int(getattr(settings, "request_max_body_bytes", 262_144))
+        if content_length > max_body_bytes:
+            return _error_response(
+                413,
+                f"Request body too large (max {max_body_bytes} bytes)",
+                request_id,
+            )
+
     try:
         response = await call_next(request)
-        response.headers["x-request-id"] = request_id
-        response.headers.setdefault("cache-control", "no-store")
+        _apply_standard_headers(response, request_id)
         return response
     except Exception as exc:  # noqa: BLE001
         latency_ms = int((time.time() - started) * 1000)
@@ -338,16 +666,7 @@ async def request_context_middleware(request: Request, call_next):
                 "latency_ms": latency_ms,
             },
         )
-        response = JSONResponse(
-            status_code=500,
-            content={
-                "detail": "Internal server error",
-                "request_id": request_id,
-            },
-        )
-        response.headers["x-request-id"] = request_id
-        response.headers["cache-control"] = "no-store"
-        return response
+        return _error_response(500, "Internal server error", request_id)
 
 
 @app.exception_handler(HTTPException)
@@ -364,16 +683,49 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "status_code": exc.status_code,
         },
     )
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "detail": exc.detail,
+    return _error_response(exc.status_code, exc.detail, request_id)
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
+    request_id = getattr(request.state, "request_id", f"req-{uuid.uuid4().hex[:12]}")
+    raw_errors = exc.errors()
+    normalized_errors = []
+    for err in raw_errors[:20]:
+        normalized_errors.append(
+            {
+                "loc": [str(item) for item in err.get("loc", [])],
+                "msg": str(err.get("msg", "invalid input")),
+                "type": str(err.get("type", "value_error")),
+            }
+        )
+    if len(raw_errors) > 20:
+        normalized_errors.append(
+            {
+                "loc": [],
+                "msg": f"{len(raw_errors) - 20} additional validation errors truncated",
+                "type": "validation_truncated",
+            }
+        )
+
+    _safe_record_service_event(
+        level="WARN",
+        component="validation_error",
+        message="request validation failed",
+        context={
             "request_id": request_id,
+            "path": request.url.path,
+            "method": request.method,
+            "errors": normalized_errors,
         },
-        headers={
-            "x-request-id": request_id,
-            "cache-control": "no-store",
+    )
+    return _error_response(
+        422,
+        {
+            "message": "Request validation failed",
+            "errors": normalized_errors,
         },
+        request_id,
     )
 
 
@@ -388,12 +740,20 @@ def health(request: Request) -> Dict[str, object]:
 
     # Non-sensitive runtime metadata to make preflight/debugging easier in demos.
     runtime = get_llm_runtime_settings()
+    circuit = _llm_circuit_snapshot()
     return {
         "status": status,
         "startup_status": startup_status,
         "auth_mode": settings.auth_mode,
+        "login_code_required": bool(settings.demo_login_code),
         "data_handling_mode": settings.data_handling_mode,
         "storage_backend": settings.event_storage_backend,
+        "integrations_require_auth": settings.integrations_require_auth,
+        "llm_fallback_to_stub_on_error": settings.llm_fallback_to_stub_on_error,
+        "llm_circuit_state": circuit["state"],
+        "llm_circuit_open_seconds_remaining": circuit["open_seconds_remaining"],
+        "llm_circuit_consecutive_failures": circuit["consecutive_failures"],
+        "request_max_body_bytes": settings.request_max_body_bytes,
         "llm_provider": runtime.get("provider", "stub"),
         "llm_model": runtime.get("model", "stub-llm"),
         "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
@@ -426,12 +786,17 @@ def daily_cost() -> Dict[str, float]:
 @app.get("/ops/policy")
 def ops_policy(user=Depends(get_current_user)) -> Dict[str, object]:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     _ensure_rate_limit(user.user_id, role, "ops_policy")
 
     payload = {
         "auth_mode": settings.auth_mode,
+        "login_code_required": bool(settings.demo_login_code),
+        "login_attempt_limit": {
+            "capacity": settings.login_attempt_capacity,
+            "refill_per_sec": settings.login_attempt_refill_per_sec,
+        },
         "data_handling_mode": settings.data_handling_mode,
         "rate_limit": {
             "capacity": settings.rate_limit_capacity,
@@ -439,6 +804,14 @@ def ops_policy(user=Depends(get_current_user)) -> Dict[str, object]:
         },
         "allowed_tools": settings.allowed_tools,
         "storage_backend": settings.event_storage_backend,
+        "integrations_require_auth": settings.integrations_require_auth,
+        "llm_fallback_to_stub_on_error": settings.llm_fallback_to_stub_on_error,
+        "llm_circuit_breaker": {
+            "failure_threshold": settings.llm_circuit_breaker_threshold,
+            "cooldown_sec": settings.llm_circuit_breaker_cooldown_sec,
+        },
+        "llm_circuit_runtime": _llm_circuit_snapshot(),
+        "request_max_body_bytes": settings.request_max_body_bytes,
         "audit_summary_max_lines": settings.audit_summary_max_lines,
         "alert_thresholds": {
             "min_requests": settings.ops_alert_min_requests,
@@ -455,7 +828,7 @@ def ops_policy(user=Depends(get_current_user)) -> Dict[str, object]:
 @app.get("/ops/alerts", response_model=OpsAlertsResponse)
 def ops_alerts(deliver: bool = False, user=Depends(get_current_user)) -> OpsAlertsResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     _ensure_rate_limit(user.user_id, role, "ops_alerts")
 
@@ -505,7 +878,7 @@ def ops_runtime(
     user=Depends(get_current_user),
 ) -> OpsRuntimeResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     _ensure_rate_limit(user.user_id, role, "ops_runtime")
 
@@ -645,7 +1018,7 @@ def ops_runtime(
 @app.post("/ops/diagnostics/refresh", response_model=OpsDiagnosticsRefreshResponse)
 def ops_diagnostics_refresh(user=Depends(get_current_user)) -> OpsDiagnosticsRefreshResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     _ensure_rate_limit(user.user_id, role, "ops_diagnostics_refresh")
 
@@ -682,7 +1055,7 @@ def ops_diagnostics_refresh(user=Depends(get_current_user)) -> OpsDiagnosticsRef
 @app.get("/v1/control-tower/spec", response_model=ControlTowerSpecResponse)
 def control_tower_spec(user=Depends(get_current_user)) -> ControlTowerSpecResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_rate_limit(user.user_id, role, "control_tower_spec")
 
     spec, validation_ok, validation_error = get_control_tower_spec_snapshot()
@@ -703,7 +1076,7 @@ def control_tower_decision(
     user=Depends(get_current_user),
 ) -> ControlTowerDecisionResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     _ensure_rate_limit(user.user_id, role, "control_tower")
 
@@ -822,7 +1195,21 @@ def control_tower_decision(
 
 
 @app.post("/auth/login", response_model=AuthResponse)
-def login(payload: AuthRequest) -> AuthResponse:
+def login(payload: AuthRequest, request: Request) -> AuthResponse:
+    expected_code = str(settings.demo_login_code or "").strip()
+    if expected_code:
+        _enforce_login_attempt_limit(request, payload.user_id)
+        if str(payload.login_code or "").strip() != expected_code:
+            _safe_record_service_event(
+                level="WARN",
+                component="auth",
+                message="login denied: invalid demo login code",
+                context={
+                    "user_id": payload.user_id,
+                    "remote": getattr(getattr(request, "client", None), "host", "") or "unknown",
+                },
+            )
+            raise HTTPException(status_code=401, detail="Invalid login code")
     token = create_jwt(payload.user_id, payload.role)
     return AuthResponse(access_token=token)
 
@@ -850,7 +1237,7 @@ def auth_keys(user=Depends(get_current_user)) -> Dict[str, object]:
 @app.get("/admin/runtime/llm", response_model=AdminLLMRuntimeView)
 def admin_runtime_llm(user=Depends(get_current_user)) -> AdminLLMRuntimeView:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Admin"])
     _ensure_rate_limit(user.user_id, role, "admin_runtime_llm_get")
 
@@ -866,7 +1253,7 @@ def admin_runtime_llm_update(
     user=Depends(get_current_user),
 ) -> AdminLLMRuntimeView:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Admin"])
     _ensure_rate_limit(user.user_id, role, "admin_runtime_llm_update")
 
@@ -906,7 +1293,7 @@ def admin_runtime_llm_update(
 @app.get("/admin/architecture/catalog", response_model=ArchitectureCatalogResponse)
 def admin_architecture_catalog(user=Depends(get_current_user)) -> ArchitectureCatalogResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Admin"])
     _ensure_rate_limit(user.user_id, role, "admin_architecture_catalog")
 
@@ -922,7 +1309,7 @@ def admin_architecture_import(
     user=Depends(get_current_user),
 ) -> ArchitectureCatalogResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Admin"])
     _ensure_rate_limit(user.user_id, role, "admin_architecture_import")
 
@@ -959,7 +1346,7 @@ def admin_architecture_import(
 @app.post("/admin/architecture/reindex", response_model=ArchitectureCatalogResponse)
 def admin_architecture_reindex(user=Depends(get_current_user)) -> ArchitectureCatalogResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Admin"])
     _ensure_rate_limit(user.user_id, role, "admin_architecture_reindex")
 
@@ -988,10 +1375,19 @@ def admin_architecture_reindex(user=Depends(get_current_user)) -> ArchitectureCa
 
 
 @app.post("/integrations/slack/events")
-def slack_events(payload: SlackEvent) -> Dict[str, str]:
+def slack_events(
+    payload: SlackEvent,
+    auth_user: Optional[UserContext] = Depends(get_optional_user),
+) -> Dict[str, str]:
     start = time.time()
-    role = payload.role
-    user = UserContext(user_id=f"slack-{payload.user_id}", roles=[role])
+    integration_user = _resolve_integration_user(
+        auth_user,
+        payload_user_id=payload.user_id,
+        payload_role=payload.role,
+        source="Slack",
+    )
+    role = _effective_role(integration_user.roles)
+    user = UserContext(user_id=f"slack-{integration_user.user_id}", roles=[role])
     text = payload.text.strip()
     if text.startswith("/uc1"):
         query = (
@@ -1020,11 +1416,20 @@ def slack_events(payload: SlackEvent) -> Dict[str, str]:
 
 
 @app.post("/integrations/jira/ticket")
-def jira_ticket(payload: JiraTicket) -> Dict[str, str]:
+def jira_ticket(
+    payload: JiraTicket,
+    auth_user: Optional[UserContext] = Depends(get_optional_user),
+) -> Dict[str, str]:
     start = time.time()
-    role = payload.role
-    user_id = payload.reporter or "jira-user"
-    user = UserContext(user_id=f"jira-{user_id}", roles=[role])
+    payload_user_id = payload.reporter or "jira-user"
+    integration_user = _resolve_integration_user(
+        auth_user,
+        payload_user_id=payload_user_id,
+        payload_role=payload.role,
+        source="Jira",
+    )
+    role = _effective_role(integration_user.roles)
+    user = UserContext(user_id=f"jira-{integration_user.user_id}", roles=[role])
     response = log_intel(LogIntelRequest(logs=payload.description), user)
     comment = (
         f"Summary: {response.summary}\\n"
@@ -1047,7 +1452,7 @@ def handover(
     user=Depends(get_current_user),
 ) -> HandoverResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_rate_limit(user.user_id, role, "uc1")
 
     redacted_query, redaction_events = redact_text(payload.query)
@@ -1173,7 +1578,7 @@ def log_intel(
     user=Depends(get_current_user),
 ) -> LogIntelResponse:
     start = time.time()
-    role = user.roles[0]
+    role = _effective_role(user.roles)
     _ensure_rate_limit(user.user_id, role, "uc2")
 
     redacted_logs, redaction_events = redact_text(payload.logs)

@@ -165,6 +165,8 @@ make quality-backend
 - Auth mode:
   - `AUTH_MODE=local_jwt` (default) or `AUTH_MODE=oidc`
   - OIDC verify: `OIDC_ISSUER`, optional `OIDC_AUDIENCE`, optional `OIDC_JWKS_URL`
+  - optional login hardening: `DEMO_LOGIN_CODE=<shared-code>` (requires code in `POST /auth/login`)
+  - login abuse guard (when login code is enabled): `LOGIN_ATTEMPT_CAPACITY=10`, `LOGIN_ATTEMPT_REFILL_PER_SEC=0.1`
 - JWT key rotation:
   - `JWT_ACTIVE_KID=v2`
   - `JWT_SECRETS="v1:old-secret,v2:new-secret"` (or `JWT_SECRETS_FILE` JSON map)
@@ -174,10 +176,22 @@ make quality-backend
   - `LLM_PROVIDER=stub` (default, offline) or `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
   - `LLM_OPENAI_API_KEY` (or `LLM_OPENAI_API_KEY_FILE`)
   - optional `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
+  - reliability fallback: `LLM_FALLBACK_TO_STUB_ON_ERROR=true` (default)
+  - circuit breaker: `LLM_CIRCUIT_BREAKER_THRESHOLD=3`, `LLM_CIRCUIT_BREAKER_COOLDOWN_SEC=30`
+- Integration auth:
+  - `INTEGRATIONS_REQUIRE_AUTH=true` (default)
+  - when enabled, `POST /integrations/slack/events` and `POST /integrations/jira/ticket` require `Authorization: Bearer <JWT>`
+  - if bearer includes multiple roles, integrations run with highest privilege role (`Admin > Ops > Employee`)
+- Request guardrails:
+  - `REQUEST_MAX_BODY_BYTES=262144` (default)
+  - payloads larger than this return `413 Request body too large`
+  - validation failures return a standard `422` envelope with `request_id` and normalized error list
 - Ops policy and alerts:
   - `GET /ops/policy`
   - `GET /ops/alerts` and `GET /ops/alerts?deliver=true`
   - optional webhook: `OPS_ALERT_WEBHOOK_URL`
+- Event logging hygiene:
+  - service event/control-tower contexts are sanitized before persistence (token/secret/password fields are redacted)
 - Storage backend:
   - `EVENT_STORAGE_BACKEND=sqlite` (default) or `EVENT_STORAGE_BACKEND=jsonl`
   - JSONL paths: `SERVICE_EVENTS_JSONL_PATH`, `CONTROL_TOWER_DECISIONS_JSONL_PATH`, `DAILY_COST_JSON_PATH`
