@@ -152,6 +152,8 @@ make quality-backend
 - 인증 모드:
   - `AUTH_MODE=local_jwt` (기본) 또는 `AUTH_MODE=oidc`
   - OIDC 검증: `OIDC_ISSUER`, 선택 `OIDC_AUDIENCE`, 선택 `OIDC_JWKS_URL`
+  - 선택 로그인 하드닝: `DEMO_LOGIN_CODE=<shared-code>` (`POST /auth/login` 시 코드 요구)
+  - 로그인 남용 방어(로그인 코드 사용 시): `LOGIN_ATTEMPT_CAPACITY=10`, `LOGIN_ATTEMPT_REFILL_PER_SEC=0.1`
 - JWT 키 회전:
   - `JWT_ACTIVE_KID=v2`
   - `JWT_SECRETS="v1:old-secret,v2:new-secret"` (또는 `JWT_SECRETS_FILE` JSON)
@@ -161,10 +163,22 @@ make quality-backend
   - `LLM_PROVIDER=stub` (기본, 오프라인) 또는 `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
   - `LLM_OPENAI_API_KEY` (또는 `LLM_OPENAI_API_KEY_FILE`)
   - 선택 `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
+  - 안정성 fallback: `LLM_FALLBACK_TO_STUB_ON_ERROR=true` (기본)
+  - 서킷 브레이커: `LLM_CIRCUIT_BREAKER_THRESHOLD=3`, `LLM_CIRCUIT_BREAKER_COOLDOWN_SEC=30`
+- Integration 인증:
+  - `INTEGRATIONS_REQUIRE_AUTH=true` (기본)
+  - 활성화 시 `POST /integrations/slack/events`, `POST /integrations/jira/ticket`는 `Authorization: Bearer <JWT>` 필요
+  - Bearer 토큰에 복수 role이 있으면 통합 실행 role은 최고 권한(`Admin > Ops > Employee`)으로 선택
+- 요청 가드레일:
+  - `REQUEST_MAX_BODY_BYTES=262144` (기본)
+  - 이 값을 초과하는 payload는 `413 Request body too large` 반환
+  - 검증 실패는 `request_id`/정규화 에러 목록을 포함한 표준 `422` 응답 형태로 반환
 - 운영 정책/알림:
   - `GET /ops/policy`
   - `GET /ops/alerts` 및 `GET /ops/alerts?deliver=true`
   - 선택 웹훅: `OPS_ALERT_WEBHOOK_URL`
+- 이벤트 로그 위생:
+  - service event/control-tower context 저장 전 token/secret/password 계열 필드를 자동 마스킹
 - 저장소 백엔드:
   - `EVENT_STORAGE_BACKEND=sqlite` (기본) 또는 `EVENT_STORAGE_BACKEND=jsonl`
   - JSONL 경로: `SERVICE_EVENTS_JSONL_PATH`, `CONTROL_TOWER_DECISIONS_JSONL_PATH`, `DAILY_COST_JSON_PATH`

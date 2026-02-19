@@ -30,9 +30,20 @@ COST_COUNTER = Counter(
     ["use_case"],
 )
 
+LLM_FAILURE_COUNTER = Counter(
+    "llm_failures_total",
+    "LLM failures after retry budget exhaustion",
+    ["use_case", "provider"],
+)
+
+LLM_CIRCUIT_EVENT_COUNTER = Counter(
+    "llm_circuit_events_total",
+    "LLM circuit breaker events",
+    ["provider", "event"],
+)
+
 POLICY_EVENT_COUNTER = Counter(
     "policy_events_total",
     "Policy events",
     ["event"],
 )
-
