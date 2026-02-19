@@ -10,6 +10,7 @@ from .models import OIDCLoginRequest, UserContext
 from .oidc import map_oidc_claims_to_roles
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 ALLOWED_ROLES = {"Employee", "Ops", "Admin"}
 _JWK_CLIENTS: Dict[str, jwt.PyJWKClient] = {}
 
@@ -222,6 +223,18 @@ def get_current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> UserContext:
+    token = credentials.credentials
+    user = decode_auth_token(token)
+    request.state.user = user
+    return user
+
+
+def get_optional_user(
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
+) -> Optional[UserContext]:
+    if credentials is None or not credentials.credentials:
+        return None
     token = credentials.credentials
     user = decode_auth_token(token)
     request.state.user = user

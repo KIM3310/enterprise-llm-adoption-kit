@@ -6,7 +6,7 @@
 
 ## Module 2 — Enterprise Integration Pack
 - Folder: `docs/modules/integration-pack/`
-- Endpoints: `/auth/oidc/login`, `/integrations/slack/events`, `/integrations/jira/ticket`
+- Endpoints: `/auth/oidc/login`, `/integrations/slack/events`, `/integrations/jira/ticket` (integration endpoints require Bearer JWT by default)
 - Samples: `app/backend/data/samples/`
 
 ## Module 3 — Workshop-in-a-Box
