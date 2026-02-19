@@ -12,6 +12,7 @@ Covers data ingress (user inputs, logs, docs), retrieval pipeline, tool executio
 ### Spoofing
 - **Threat**: Impersonation via forged JWT
 - **Mitigation**: Signed JWT with short TTL; role claims validated server-side; mocked auth with clear swap path to OIDC/SAML
+- **Additional guard**: integration endpoints (`/integrations/slack/events`, `/integrations/jira/ticket`) require bearer JWT by default
 
 ### Tampering
 - **Threat**: Prompt injection in retrieved documents
@@ -51,4 +52,3 @@ Covers data ingress (user inputs, logs, docs), retrieval pipeline, tool executio
 - Deterministic stub LLM may not mirror real LLM behavior
 - Regex PII detection is baseline only (no ML-based PII detection)
 - Local dev storage lacks enterprise encryption-at-rest controls
-

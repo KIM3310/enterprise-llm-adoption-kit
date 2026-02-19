@@ -201,6 +201,7 @@ function getPageFromHash() {
 const STORAGE_KEYS = {
   userId: "atelier.user_id",
   role: "atelier.role",
+  loginCode: "atelier.login_code",
   scenarioHistory: "atelier.scenario_history.v1"
 };
 
@@ -501,6 +502,7 @@ export default function App() {
     const stored = safeStorageGet(STORAGE_KEYS.role, "Employee");
     return roles.includes(stored) ? stored : "Employee";
   });
+  const [loginCode, setLoginCode] = useState(() => safeStorageGet(STORAGE_KEYS.loginCode, ""));
   const [token, setToken] = useState("");
   const [activeTab, setActiveTab] = useState("architecture");
   const [status, setStatus] = useState("Ready");
@@ -509,8 +511,15 @@ export default function App() {
     status: "unknown",
     startup_status: "",
     auth_mode: "",
+    login_code_required: false,
     data_handling_mode: "",
     storage_backend: "",
+    integrations_require_auth: false,
+    llm_fallback_to_stub_on_error: true,
+    llm_circuit_state: "closed",
+    llm_circuit_open_seconds_remaining: 0,
+    llm_circuit_consecutive_failures: 0,
+    request_max_body_bytes: 0,
     llm_provider: "",
     llm_model: "",
     openai_api_key_configured: false
@@ -529,6 +538,10 @@ export default function App() {
   useEffect(() => {
     safeStorageSet(STORAGE_KEYS.role, role);
   }, [role]);
+
+  useEffect(() => {
+    safeStorageSet(STORAGE_KEYS.loginCode, loginCode);
+  }, [loginCode]);
 
   useEffect(() => {
     writeJsonStorage(STORAGE_KEYS.scenarioHistory, scenarioHistory);
@@ -667,8 +680,15 @@ export default function App() {
           status: String(data.status || "ok"),
           startup_status: String(data.startup_status || ""),
           auth_mode: String(data.auth_mode || ""),
+          login_code_required: Boolean(data.login_code_required),
           data_handling_mode: String(data.data_handling_mode || ""),
           storage_backend: String(data.storage_backend || ""),
+          integrations_require_auth: Boolean(data.integrations_require_auth),
+          llm_fallback_to_stub_on_error: Boolean(data.llm_fallback_to_stub_on_error),
+          llm_circuit_state: String(data.llm_circuit_state || "closed"),
+          llm_circuit_open_seconds_remaining: Number(data.llm_circuit_open_seconds_remaining || 0),
+          llm_circuit_consecutive_failures: Number(data.llm_circuit_consecutive_failures || 0),
+          request_max_body_bytes: Number(data.request_max_body_bytes || 0),
           llm_provider: String(data.llm_provider || ""),
           llm_model: String(data.llm_model || ""),
           openai_api_key_configured: Boolean(data.openai_api_key_configured)
@@ -682,8 +702,15 @@ export default function App() {
           status: "offline",
           startup_status: "",
           auth_mode: "",
+          login_code_required: false,
           data_handling_mode: "",
           storage_backend: "",
+          integrations_require_auth: false,
+          llm_fallback_to_stub_on_error: true,
+          llm_circuit_state: "closed",
+          llm_circuit_open_seconds_remaining: 0,
+          llm_circuit_consecutive_failures: 0,
+          request_max_body_bytes: 0,
           llm_provider: "",
           llm_model: "",
           openai_api_key_configured: false
@@ -705,6 +732,8 @@ export default function App() {
   const backendOnline = healthStatus !== "offline";
   const isAdmin = role === "Admin";
   const isOpsEligible = role === "Ops" || role === "Admin";
+  const loginCodeRequired = Boolean(health.login_code_required);
+  const integrationAuthRequired = Boolean(health.integrations_require_auth);
 
   function navigate(nextPage) {
     window.location.hash = nextPage;
@@ -787,6 +816,30 @@ export default function App() {
 
   async function login(options = {}) {
     const { silent = false, throwOnError = false } = options;
+    const trimmedUserId = String(userId || "").trim();
+    const trimmedLoginCode = String(loginCode || "").trim();
+
+    if (!trimmedUserId) {
+      const message = "user_id is required";
+      if (!silent) {
+        setStatus(message);
+      }
+      if (throwOnError) {
+        throw new Error(message);
+      }
+      return null;
+    }
+    if (loginCodeRequired && !trimmedLoginCode) {
+      const message = "Login code required. Enter the shared code and retry.";
+      if (!silent) {
+        setStatus(message);
+      }
+      if (throwOnError) {
+        throw new Error(message);
+      }
+      return null;
+    }
+
     if (!silent) {
       setStatus("Authenticating...");
     }
@@ -794,7 +847,11 @@ export default function App() {
       const { data, requestId } = await fetchJson("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, role }),
+        body: JSON.stringify({
+          user_id: trimmedUserId,
+          role,
+          login_code: trimmedLoginCode || null
+        }),
         errorMessage: "Login failed"
       });
       setToken(data.access_token);
@@ -932,6 +989,15 @@ export default function App() {
       setStatus("Sending Slack event...");
     }
 
+    if (integrationAuthRequired && !token) {
+      const msg = "Bearer token required. Issue a token in Access Control first.";
+      setSlackError(msg);
+      if (!silent) {
+        setStatus(msg);
+      }
+      return null;
+    }
+
     const text = String(slackText || "").trim();
     if (!text) {
       const msg = "Slack message cannot be empty";
@@ -943,9 +1009,13 @@ export default function App() {
     }
 
     try {
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
       const { data, requestId } = await fetchJson("/integrations/slack/events", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           user_id: userId || "slack-user",
           role,
@@ -976,6 +1046,15 @@ export default function App() {
       setStatus("Generating Jira comment...");
     }
 
+    if (integrationAuthRequired && !token) {
+      const msg = "Bearer token required. Issue a token in Access Control first.";
+      setJiraError(msg);
+      if (!silent) {
+        setStatus(msg);
+      }
+      return null;
+    }
+
     const ticketId = String(jiraTicketId || "").trim();
     const title = String(jiraTitle || "").trim();
     const description = String(jiraDescription || "").trim();
@@ -989,9 +1068,13 @@ export default function App() {
     }
 
     try {
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
       const { data, requestId } = await fetchJson("/integrations/jira/ticket", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           ticket_id: ticketId,
           title,
@@ -1811,6 +1894,14 @@ export default function App() {
       `- llm_provider: ${String(health.llm_provider || "-")} (${String(health.llm_model || "-")})`
     );
     lines.push(`- openai_api_key_configured: ${health.openai_api_key_configured ? "true" : "false"}`);
+    lines.push(`- llm_circuit_state: ${String(health.llm_circuit_state || "closed")}`);
+    lines.push(
+      `- llm_circuit_open_seconds_remaining: ${Number(health.llm_circuit_open_seconds_remaining || 0)}`
+    );
+    lines.push(
+      `- llm_circuit_consecutive_failures: ${Number(health.llm_circuit_consecutive_failures || 0)}`
+    );
+    lines.push(`- request_max_body_bytes: ${Number(health.request_max_body_bytes || 0)}`);
     lines.push("");
 
     return lines.join("\n");
@@ -2357,13 +2448,28 @@ export default function App() {
                       </code>{" "}
                       <code className="mono-inline">
                         api_key={health.openai_api_key_configured ? "set" : "unset"}
+                      </code>{" "}
+                      <code className="mono-inline">
+                        circuit={String(health.llm_circuit_state || "closed")}
+                      </code>{" "}
+                      <code className="mono-inline">
+                        circuit_failures={Number(health.llm_circuit_consecutive_failures || 0)}
                       </code>
                     </li>
                     <li>
                       Modes:{" "}
                       <code className="mono-inline">{health.auth_mode || "-"}</code>{" "}
                       <code className="mono-inline">{health.data_handling_mode || "-"}</code>{" "}
-                      <code className="mono-inline">{health.storage_backend || "-"}</code>
+                      <code className="mono-inline">{health.storage_backend || "-"}</code>{" "}
+                      <code className="mono-inline">
+                        login_code={health.login_code_required ? "required" : "optional"}
+                      </code>{" "}
+                      <code className="mono-inline">
+                        integrations_auth={integrationAuthRequired ? "required" : "optional"}
+                      </code>{" "}
+                      <code className="mono-inline">
+                        max_body={Number(health.request_max_body_bytes || 0)}
+                      </code>
                     </li>
                     {String(health.status || "")
                       .toLowerCase()
@@ -2392,6 +2498,15 @@ export default function App() {
                             </option>
                           ))}
                         </select>
+                      </label>
+                      <label>
+                        Login Code {loginCodeRequired ? "(required)" : "(optional)"}
+                        <input
+                          type="password"
+                          value={loginCode}
+                          onChange={(event) => setLoginCode(event.target.value)}
+                          placeholder={loginCodeRequired ? "Enter demo login code" : "Optional"}
+                        />
                       </label>
                       <button className="cta-primary" onClick={() => login()} disabled={scenarioRun?.running}>
                         Issue JWT
@@ -3243,6 +3358,11 @@ export default function App() {
                       Simulate a Slack command payload. Use <code className="mono-inline">/uc1</code> or{" "}
                       <code className="mono-inline">/uc2</code> prefixes to trigger the corresponding workflow.
                     </p>
+                    {integrationAuthRequired && (
+                      <p className="muted-note">
+                        Integration auth is enabled. Send requests with the JWT issued in Access Control.
+                      </p>
+                    )}
                     <div className="inline-grid">
                       <label>
                         Channel
@@ -3264,7 +3384,11 @@ export default function App() {
                       Slack Message
                       <textarea value={slackText} onChange={(event) => setSlackText(event.target.value)} />
                     </label>
-                    <button className="cta-primary" onClick={sendSlackEvent}>
+                    <button
+                      className="cta-primary"
+                      onClick={sendSlackEvent}
+                      disabled={integrationAuthRequired && !token}
+                    >
                       Send Slack Event
                     </button>
                     {slackError && <p className="error-text">{slackError}</p>}
@@ -3318,7 +3442,11 @@ export default function App() {
                         onChange={(event) => setJiraDescription(event.target.value)}
                       />
                     </label>
-                    <button className="cta-primary" onClick={generateJiraComment}>
+                    <button
+                      className="cta-primary"
+                      onClick={generateJiraComment}
+                      disabled={integrationAuthRequired && !token}
+                    >
                       Generate Jira Comment
                     </button>
                     {jiraError && <p className="error-text">{jiraError}</p>}

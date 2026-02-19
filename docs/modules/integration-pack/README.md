@@ -5,8 +5,8 @@ Focus: mock SSO/OIDC login, Slack-style webhook, and Jira ticket workflow while 
 ## Run (local)
 - Start backend: `python3 -m app`
 - OIDC login: `POST /auth/oidc/login`
-- Slack events: `POST /integrations/slack/events`
-- Jira tickets: `POST /integrations/jira/ticket`
+- Slack events: `POST /integrations/slack/events` (Bearer JWT required by default)
+- Jira tickets: `POST /integrations/jira/ticket` (Bearer JWT required by default)
 
 ## Samples
 See `samples/` and `docs/` for payloads and walkthroughs.

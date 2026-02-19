@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
-BACKEND = ROOT / "app" / "backend"
-sys.path.insert(0, str(BACKEND))
-sys.path.insert(0, str(ROOT))
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+if str(BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.llm_adapter import reset_llm_runtime_settings, update_llm_runtime_settings
 import app.main as main_module
@@ -25,7 +24,7 @@ class _SettingsProxy:
 
 @pytest.fixture(autouse=True)
 def _force_stub_llm_runtime(monkeypatch) -> None:
-    # Keep tests hermetic even when the shell has provider/API key variables set.
+    # Backend tests must be deterministic and offline-first by default.
     monkeypatch.setattr(
         main_module,
         "settings",

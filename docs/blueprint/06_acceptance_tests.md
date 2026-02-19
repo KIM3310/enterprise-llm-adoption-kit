@@ -39,3 +39,6 @@
 - **Step**: Run eval runner CLI
 - **Expect**: Generates report.json + report.md + baseline diff
 
+### AT-09: Integration Auth Boundary
+- **Step**: Call `/integrations/slack/events` and `/integrations/jira/ticket` without bearer token
+- **Expect**: 401 when `INTEGRATIONS_REQUIRE_AUTH=true` (default)
