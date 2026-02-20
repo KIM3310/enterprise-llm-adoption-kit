@@ -89,6 +89,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python3 -m app
 ```
+Optional local Ollama runtime:
+```bash
+# terminal A
+ollama serve
+
+# terminal B (before backend start)
+export LLM_PROVIDER=ollama
+export LLM_MODEL=llama3.1:8b
+export LLM_OLLAMA_BASE_URL=http://127.0.0.1:11434
+python3 -m app
+```
 2) Frontend
 ```
 cd app/frontend
@@ -173,7 +184,8 @@ make quality-backend
 - OIDC token exchange:
   - `POST /auth/oidc/exchange` with `{ "id_token": "..." }`
 - LLM provider:
-  - `LLM_PROVIDER=stub` (default, offline) or `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
+  - `LLM_PROVIDER=stub` (default, offline), `LLM_PROVIDER=ollama`, or `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
+  - `LLM_OLLAMA_BASE_URL` (default `http://127.0.0.1:11434`)
   - `LLM_OPENAI_API_KEY` (or `LLM_OPENAI_API_KEY_FILE`)
   - optional `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
   - reliability fallback: `LLM_FALLBACK_TO_STUB_ON_ERROR=true` (default)

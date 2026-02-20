@@ -1041,6 +1041,29 @@ textarea {
   min-height: 340px;
 }
 
+.byok-panel p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+
+.byok-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sponsored-section {
+  padding-top: 0;
+}
+
+.sponsored-card {
+  display: grid;
+  gap: 10px;
+}
+
+.sponsored-panel .adsense-box,
+.sponsored-panel .adsense-placeholder {
+  min-height: 120px;
+}
+
 .admin-note {
   font-size: 0.86rem;
   color: var(--muted) !important;
