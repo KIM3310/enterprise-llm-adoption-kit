@@ -34,8 +34,12 @@ from .diagnostics import run_startup_diagnostics
 from .injection import detect_injection
 from .llm_adapter import (
     StubLLMAdapter,
+    clear_user_openai_api_key,
+    get_llm_runtime_settings_for_request,
     get_llm_adapter,
     get_llm_runtime_settings,
+    get_user_openai_api_key,
+    set_user_openai_api_key,
     update_llm_runtime_settings,
 )
 from .metrics import (
@@ -65,6 +69,8 @@ from .models import (
     LogIntelResponse,
     OIDCTokenExchangeRequest,
     OIDCLoginRequest,
+    UserLLMApiKeyUpdate,
+    UserLLMApiKeyView,
     OpsAlertsResponse,
     OpsDiagnosticsRefreshResponse,
     OpsRuntimeResponse,
@@ -385,8 +391,8 @@ def _build_citations(chunks) -> List[Dict[str, str]]:
     return citations
 
 
-def _llm_model_config() -> Dict[str, object]:
-    runtime = get_llm_runtime_settings()
+def _llm_model_config(*, api_key_override: Optional[str] = None) -> Dict[str, object]:
+    runtime = get_llm_runtime_settings_for_request(api_key_override=api_key_override)
     return {
         "provider": runtime.get("provider", "stub"),
         "model": runtime.get("model", "stub-llm"),
@@ -395,9 +401,11 @@ def _llm_model_config() -> Dict[str, object]:
     }
 
 
-def _call_llm_with_retry(messages, use_case: str):
+def _call_llm_with_retry(messages, use_case: str, *, api_key_override: Optional[str] = None):
     runtime = get_llm_runtime_settings()
     provider = str(runtime.get("provider", "stub"))
+    if api_key_override and provider == "stub":
+        provider = "openai"
 
     if provider != "stub":
         snapshot = _llm_circuit_snapshot()
@@ -423,7 +431,10 @@ def _call_llm_with_retry(messages, use_case: str):
     last_exc = None
     for _ in range(LLM_MAX_RETRIES):
         try:
-            adapter = get_llm_adapter()
+            if api_key_override:
+                adapter = get_llm_adapter(api_key_override=api_key_override)
+            else:
+                adapter = get_llm_adapter()
             result = adapter.generate(messages, use_case=use_case)
             if provider != "stub":
                 recovered = _llm_circuit_record_success()
@@ -530,6 +541,20 @@ def _architecture_catalog_payload() -> Dict[str, object]:
     summary = summarize_normalized_docs(docs)
     summary["chunk_count"] = int(rag_store.collection.count())
     return summary
+
+
+def _user_api_key_runtime_view(user_id: str) -> UserLLMApiKeyView:
+    user_api_key = get_user_openai_api_key(user_id)
+    runtime = get_llm_runtime_settings_for_request(
+        api_key_override=user_api_key or None,
+    )
+    return UserLLMApiKeyView(
+        user_id=user_id,
+        openai_api_key_configured=bool(user_api_key),
+        effective_provider=str(runtime.get("provider", "stub")),
+        effective_model=str(runtime.get("model", "stub-llm")),
+        effective_openai_base_url=str(runtime.get("openai_base_url", "")),
+    )
 
 
 def _safe_record_service_event(level: str, component: str, message: str, context: Dict) -> None:
@@ -1234,6 +1259,73 @@ def auth_keys(user=Depends(get_current_user)) -> Dict[str, object]:
     return auth_key_metadata()
 
 
+@app.get("/runtime/user-api-key", response_model=UserLLMApiKeyView)
+def user_runtime_api_key(user=Depends(get_current_user)) -> UserLLMApiKeyView:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_rate_limit(user.user_id, role, "user_runtime_api_key_get")
+
+    payload = _user_api_key_runtime_view(user.user_id)
+    latency_s = time.time() - start
+    _record_metrics("/runtime/user-api-key", "runtime", role, "200", latency_s)
+    return payload
+
+
+@app.post("/runtime/user-api-key", response_model=UserLLMApiKeyView)
+def user_runtime_api_key_update(
+    payload: UserLLMApiKeyUpdate,
+    user=Depends(get_current_user),
+) -> UserLLMApiKeyView:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_rate_limit(user.user_id, role, "user_runtime_api_key_post")
+
+    api_key = str(payload.openai_api_key or "").strip()
+    if not api_key:
+        raise HTTPException(status_code=400, detail="openai_api_key cannot be empty")
+
+    set_user_openai_api_key(user.user_id, api_key)
+    view = _user_api_key_runtime_view(user.user_id)
+    _safe_record_service_event(
+        level="INFO",
+        component="user_runtime",
+        message="user api key updated",
+        context={
+            "user_id": user.user_id,
+            "provider": view.effective_provider,
+            "model": view.effective_model,
+            "api_key_configured": view.openai_api_key_configured,
+        },
+    )
+    latency_s = time.time() - start
+    _record_metrics("/runtime/user-api-key", "runtime", role, "200", latency_s)
+    return view
+
+
+@app.delete("/runtime/user-api-key", response_model=UserLLMApiKeyView)
+def user_runtime_api_key_delete(user=Depends(get_current_user)) -> UserLLMApiKeyView:
+    start = time.time()
+    role = user.roles[0]
+    _ensure_rate_limit(user.user_id, role, "user_runtime_api_key_delete")
+
+    cleared = clear_user_openai_api_key(user.user_id)
+    view = _user_api_key_runtime_view(user.user_id)
+    _safe_record_service_event(
+        level="INFO",
+        component="user_runtime",
+        message="user api key cleared" if cleared else "user api key clear requested (no existing key)",
+        context={
+            "user_id": user.user_id,
+            "provider": view.effective_provider,
+            "model": view.effective_model,
+            "api_key_configured": view.openai_api_key_configured,
+        },
+    )
+    latency_s = time.time() - start
+    _record_metrics("/runtime/user-api-key", "runtime", role, "200", latency_s)
+    return view
+
+
 @app.get("/admin/runtime/llm", response_model=AdminLLMRuntimeView)
 def admin_runtime_llm(user=Depends(get_current_user)) -> AdminLLMRuntimeView:
     start = time.time()
@@ -1265,6 +1357,7 @@ def admin_runtime_llm_update(
             max_tokens=payload.max_tokens,
             timeout_sec=payload.timeout_sec,
             openai_base_url=payload.openai_base_url,
+            ollama_base_url=payload.ollama_base_url,
             openai_org=payload.openai_org,
             openai_api_key=payload.openai_api_key,
             reset_to_env=payload.reset_to_env,
@@ -1454,6 +1547,8 @@ def handover(
     start = time.time()
     role = _effective_role(user.roles)
     _ensure_rate_limit(user.user_id, role, "uc1")
+    user_api_key = get_user_openai_api_key(user.user_id)
+    model_config = _llm_model_config(api_key_override=user_api_key or None)
 
     redacted_query, redaction_events = redact_text(payload.query)
     redaction_applied = any(redaction_events.values())
@@ -1483,7 +1578,7 @@ def handover(
                 "user_id": user.user_id,
                 "roles": user.roles,
                 "use_case": "uc1",
-                "model_config": _llm_model_config(),
+                "model_config": model_config,
                 "retrieval_doc_ids": citations,
                 "tool_calls": [],
                 "latency_ms": int(latency_s * 1000),
@@ -1527,7 +1622,11 @@ def handover(
         tokens_out = 1
         cost = 0.0
     else:
-        llm_result = _call_llm_with_retry(messages, use_case="uc1")
+        llm_result = _call_llm_with_retry(
+            messages,
+            use_case="uc1",
+            api_key_override=user_api_key or None,
+        )
         answer = llm_result.text
         tokens_in = llm_result.tokens_in
         tokens_out = llm_result.tokens_out
@@ -1551,7 +1650,7 @@ def handover(
             "user_id": user.user_id,
             "roles": user.roles,
             "use_case": "uc1",
-            "model_config": _llm_model_config(),
+            "model_config": model_config,
             "retrieval_doc_ids": citations,
             "tool_calls": [],
             "latency_ms": int(latency_s * 1000),
@@ -1580,6 +1679,8 @@ def log_intel(
     start = time.time()
     role = _effective_role(user.roles)
     _ensure_rate_limit(user.user_id, role, "uc2")
+    user_api_key = get_user_openai_api_key(user.user_id)
+    model_config = _llm_model_config(api_key_override=user_api_key or None)
 
     redacted_logs, redaction_events = redact_text(payload.logs)
     redaction_applied = any(redaction_events.values())
@@ -1611,7 +1712,7 @@ def log_intel(
                 "user_id": user.user_id,
                 "roles": user.roles,
                 "use_case": "uc2",
-                "model_config": _llm_model_config(),
+                "model_config": model_config,
                 "retrieval_doc_ids": [],
                 "tool_calls": [],
                 "latency_ms": int(latency_s * 1000),
@@ -1691,7 +1792,11 @@ def log_intel(
         {"role": "assistant", "content": f"CONTEXT:\n{context_blob}"},
     ]
 
-    llm_result = _call_llm_with_retry(messages, use_case="uc2")
+    llm_result = _call_llm_with_retry(
+        messages,
+        use_case="uc2",
+        api_key_override=user_api_key or None,
+    )
     summary = llm_result.text
     tokens_in = llm_result.tokens_in
     tokens_out = llm_result.tokens_out
@@ -1715,7 +1820,7 @@ def log_intel(
             "user_id": user.user_id,
             "roles": user.roles,
             "use_case": "uc2",
-            "model_config": _llm_model_config(),
+            "model_config": model_config,
             "retrieval_doc_ids": knowledge_result.get("results", []),
             "tool_calls": [tool_call.model_dump() for tool_call in tool_calls],
             "latency_ms": int(latency_s * 1000),

@@ -89,6 +89,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python3 -m app
 ```
+선택: 로컬 Ollama 런타임 사용
+```bash
+# 터미널 A
+ollama serve
+
+# 터미널 B (백엔드 실행 전)
+export LLM_PROVIDER=ollama
+export LLM_MODEL=llama3.1:8b
+export LLM_OLLAMA_BASE_URL=http://127.0.0.1:11434
+python3 -m app
+```
 2) Frontend
 ```
 cd app/frontend
@@ -160,7 +171,8 @@ make quality-backend
 - OIDC 토큰 교환:
   - `POST /auth/oidc/exchange` with `{ "id_token": "..." }`
 - LLM provider:
-  - `LLM_PROVIDER=stub` (기본, 오프라인) 또는 `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
+  - `LLM_PROVIDER=stub` (기본, 오프라인), `LLM_PROVIDER=ollama`, 또는 `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
+  - `LLM_OLLAMA_BASE_URL` (기본값 `http://127.0.0.1:11434`)
   - `LLM_OPENAI_API_KEY` (또는 `LLM_OPENAI_API_KEY_FILE`)
   - 선택 `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
   - 안정성 fallback: `LLM_FALLBACK_TO_STUB_ON_ERROR=true` (기본)

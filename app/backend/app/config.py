@@ -157,6 +157,7 @@ class Settings:
     llm_max_tokens: int = _parse_int_env("LLM_MAX_TOKENS", 512, min_value=1, max_value=32768)
     llm_timeout_sec: float = _parse_float_env("LLM_TIMEOUT_SEC", 30.0, min_value=1.0, max_value=600.0)
     llm_openai_base_url: str = os.getenv("LLM_OPENAI_BASE_URL", "https://api.openai.com/v1").strip()
+    llm_ollama_base_url: str = os.getenv("LLM_OLLAMA_BASE_URL", "http://127.0.0.1:11434").strip()
     llm_openai_org: str = os.getenv("LLM_OPENAI_ORG", "").strip()
     llm_openai_api_key: str = _load_env_or_file("LLM_OPENAI_API_KEY", "LLM_OPENAI_API_KEY_FILE")
     llm_fallback_to_stub_on_error: bool = _parse_bool_env("LLM_FALLBACK_TO_STUB_ON_ERROR", True)

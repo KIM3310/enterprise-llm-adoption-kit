@@ -15,7 +15,9 @@ class LLMResult:
     cost: float
 
 
-RUNTIME_PROVIDER_OPTIONS = {"stub", "openai", "openai_compatible"}
+RUNTIME_PROVIDER_OPTIONS = {"stub", "openai", "openai_compatible", "ollama"}
+BYOK_FALLBACK_MODEL = "gpt-4o-mini"
+OLLAMA_FALLBACK_MODEL = "llama3.1:8b"
 
 _runtime_lock = Lock()
 _runtime_overrides: Dict[str, Optional[object]] = {
@@ -25,9 +27,12 @@ _runtime_overrides: Dict[str, Optional[object]] = {
     "max_tokens": None,
     "timeout_sec": None,
     "openai_base_url": None,
+    "ollama_base_url": None,
     "openai_org": None,
     "openai_api_key": None,
 }
+_user_api_keys_lock = Lock()
+_user_api_keys: Dict[str, str] = {}
 
 
 def _estimate_tokens(text: str) -> int:
@@ -52,6 +57,21 @@ def _normalize_provider(value: str) -> str:
     return provider
 
 
+def _normalize_runtime_model(provider: str, model: str) -> str:
+    raw = str(model or "").strip()
+    if provider == "stub":
+        return raw or "stub-llm"
+    if provider in {"openai", "openai_compatible"}:
+        if not raw or raw.startswith("stub"):
+            return BYOK_FALLBACK_MODEL
+        return raw
+    if provider == "ollama":
+        if not raw or raw.startswith("stub"):
+            return OLLAMA_FALLBACK_MODEL
+        return raw
+    return raw or "stub-llm"
+
+
 def _active_runtime_config() -> Dict[str, object]:
     with _runtime_lock:
         provider_raw = _runtime_overrides["provider"]
@@ -60,19 +80,21 @@ def _active_runtime_config() -> Dict[str, object]:
         max_tokens_raw = _runtime_overrides["max_tokens"]
         timeout_raw = _runtime_overrides["timeout_sec"]
         base_url_raw = _runtime_overrides["openai_base_url"]
+        ollama_base_url_raw = _runtime_overrides["ollama_base_url"]
         org_raw = _runtime_overrides["openai_org"]
         api_key_raw = _runtime_overrides["openai_api_key"]
 
     provider = _normalize_provider(str(provider_raw or settings.llm_provider or "stub"))
-    model = str(model_raw or settings.llm_model).strip()
-    if not model:
-        model = "stub-llm"
+    model = _normalize_runtime_model(provider, str(model_raw or settings.llm_model).strip())
     temperature = float(
         settings.llm_temperature if temperature_raw is None else temperature_raw
     )
     max_tokens = int(settings.llm_max_tokens if max_tokens_raw is None else max_tokens_raw)
     timeout_sec = float(settings.llm_timeout_sec if timeout_raw is None else timeout_raw)
     base_url = str(settings.llm_openai_base_url if base_url_raw is None else base_url_raw).strip()
+    ollama_base_url = str(
+        settings.llm_ollama_base_url if ollama_base_url_raw is None else ollama_base_url_raw
+    ).strip()
     org = str(settings.llm_openai_org if org_raw is None else org_raw).strip()
     api_key = str(settings.llm_openai_api_key if api_key_raw is None else api_key_raw).strip()
 
@@ -83,9 +105,23 @@ def _active_runtime_config() -> Dict[str, object]:
         "max_tokens": max_tokens,
         "timeout_sec": timeout_sec,
         "openai_base_url": base_url,
+        "ollama_base_url": ollama_base_url,
         "openai_org": org,
         "openai_api_key": api_key,
     }
+
+
+def _runtime_config_for_request(*, api_key_override: Optional[str] = None) -> Dict[str, object]:
+    runtime = _active_runtime_config()
+    if api_key_override is not None:
+        override_key = str(api_key_override).strip()
+        runtime["openai_api_key"] = override_key
+        if override_key and str(runtime.get("provider", "stub")) == "stub":
+            runtime["provider"] = "openai"
+            model = str(runtime.get("model", "")).strip()
+            if not model or model.startswith("stub"):
+                runtime["model"] = BYOK_FALLBACK_MODEL
+    return runtime
 
 
 def get_llm_runtime_settings() -> Dict[str, object]:
@@ -93,6 +129,41 @@ def get_llm_runtime_settings() -> Dict[str, object]:
     api_key = str(config.pop("openai_api_key", "")).strip()
     config["openai_api_key_configured"] = bool(api_key)
     return config
+
+
+def get_llm_runtime_settings_for_request(*, api_key_override: Optional[str] = None) -> Dict[str, object]:
+    config = _runtime_config_for_request(api_key_override=api_key_override)
+    api_key = str(config.pop("openai_api_key", "")).strip()
+    config["openai_api_key_configured"] = bool(api_key)
+    return config
+
+
+def set_user_openai_api_key(user_id: str, api_key: str) -> bool:
+    safe_user_id = str(user_id or "").strip()
+    safe_api_key = str(api_key or "").strip()
+    if not safe_user_id:
+        raise ValueError("user_id is required")
+    if not safe_api_key:
+        raise ValueError("openai_api_key cannot be empty")
+    with _user_api_keys_lock:
+        _user_api_keys[safe_user_id] = safe_api_key
+    return True
+
+
+def get_user_openai_api_key(user_id: str) -> str:
+    safe_user_id = str(user_id or "").strip()
+    if not safe_user_id:
+        return ""
+    with _user_api_keys_lock:
+        return str(_user_api_keys.get(safe_user_id, "")).strip()
+
+
+def clear_user_openai_api_key(user_id: str) -> bool:
+    safe_user_id = str(user_id or "").strip()
+    if not safe_user_id:
+        return False
+    with _user_api_keys_lock:
+        return _user_api_keys.pop(safe_user_id, None) is not None
 
 
 def reset_llm_runtime_settings() -> Dict[str, object]:
@@ -110,6 +181,7 @@ def update_llm_runtime_settings(
     max_tokens: Optional[int] = None,
     timeout_sec: Optional[float] = None,
     openai_base_url: Optional[str] = None,
+    ollama_base_url: Optional[str] = None,
     openai_org: Optional[str] = None,
     openai_api_key: Optional[str] = None,
     reset_to_env: bool = False,
@@ -133,6 +205,8 @@ def update_llm_runtime_settings(
             _runtime_overrides["timeout_sec"] = float(timeout_sec)
         if openai_base_url is not None:
             _runtime_overrides["openai_base_url"] = str(openai_base_url).strip()
+        if ollama_base_url is not None:
+            _runtime_overrides["ollama_base_url"] = str(ollama_base_url).strip()
         if openai_org is not None:
             _runtime_overrides["openai_org"] = str(openai_org).strip()
         if openai_api_key is not None:
@@ -142,8 +216,8 @@ def update_llm_runtime_settings(
 
 
 class OpenAICompatibleAdapter(LLMAdapter):
-    def __init__(self) -> None:
-        runtime = _active_runtime_config()
+    def __init__(self, runtime: Optional[Dict[str, object]] = None) -> None:
+        runtime = runtime or _active_runtime_config()
         self.base_url = str(runtime["openai_base_url"]).rstrip("/")
         self.api_key = str(runtime["openai_api_key"]).strip()
         self.organization = str(runtime["openai_org"]).strip()
@@ -188,6 +262,60 @@ class OpenAICompatibleAdapter(LLMAdapter):
         usage = data.get("usage", {}) if isinstance(data, dict) else {}
         tokens_in = int(usage.get("prompt_tokens") or _estimate_tokens(" ".join([m["content"] for m in messages])))
         tokens_out = int(usage.get("completion_tokens") or _estimate_tokens(text))
+        cost = _estimate_cost(tokens_in, tokens_out)
+        return LLMResult(text=text, tokens_in=tokens_in, tokens_out=tokens_out, cost=cost)
+
+
+class OllamaAdapter(LLMAdapter):
+    def __init__(self, runtime: Optional[Dict[str, object]] = None) -> None:
+        runtime = runtime or _active_runtime_config()
+        self.base_url = str(runtime["ollama_base_url"]).rstrip("/")
+        self.timeout_sec = max(1.0, float(runtime["timeout_sec"]))
+        self.model = str(runtime["model"])
+        self.temperature = float(runtime["temperature"])
+        self.max_tokens = int(runtime["max_tokens"])
+
+    def generate(self, messages: List[Dict[str, str]], use_case: str) -> LLMResult:
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "stream": False,
+            "options": {
+                "temperature": self.temperature,
+                "num_predict": self.max_tokens,
+            },
+        }
+
+        try:
+            response = requests.post(
+                f"{self.base_url}/api/chat",
+                json=payload,
+                timeout=self.timeout_sec,
+            )
+            response.raise_for_status()
+            data = response.json()
+        except requests.RequestException as exc:
+            raise RuntimeError(f"Ollama request failed: {exc}") from exc
+        except ValueError as exc:
+            raise RuntimeError("Ollama response is not valid JSON") from exc
+
+        text = _extract_ollama_response_text(data)
+        tokens_in = int(
+            (
+                data.get("prompt_eval_count", 0)
+                if isinstance(data, dict)
+                else 0
+            )
+            or _estimate_tokens(" ".join([m["content"] for m in messages]))
+        )
+        tokens_out = int(
+            (
+                data.get("eval_count", 0)
+                if isinstance(data, dict)
+                else 0
+            )
+            or _estimate_tokens(text)
+        )
         cost = _estimate_cost(tokens_in, tokens_out)
         return LLMResult(text=text, tokens_in=tokens_in, tokens_out=tokens_out, cost=cost)
 
@@ -357,8 +485,25 @@ def _extract_response_text(data: Dict) -> str:
     return "No response."
 
 
-def get_llm_adapter() -> LLMAdapter:
-    provider = str(_active_runtime_config()["provider"])
+def _extract_ollama_response_text(data: Dict) -> str:
+    if not isinstance(data, dict):
+        return "No response."
+    message = data.get("message")
+    if isinstance(message, dict):
+        content = message.get("content")
+        if isinstance(content, str) and content.strip():
+            return content.strip()
+    response_text = data.get("response")
+    if isinstance(response_text, str) and response_text.strip():
+        return response_text.strip()
+    return "No response."
+
+
+def get_llm_adapter(*, api_key_override: Optional[str] = None) -> LLMAdapter:
+    runtime = _runtime_config_for_request(api_key_override=api_key_override)
+    provider = str(runtime["provider"])
     if provider in {"openai", "openai_compatible"}:
-        return OpenAICompatibleAdapter()
+        return OpenAICompatibleAdapter(runtime=runtime)
+    if provider == "ollama":
+        return OllamaAdapter(runtime=runtime)
     return StubLLMAdapter()
