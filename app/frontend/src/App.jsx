@@ -9,12 +9,8 @@ const GISCUS_REPO = String(import.meta.env.VITE_GISCUS_REPO || "").trim();
 const GISCUS_REPO_ID = String(import.meta.env.VITE_GISCUS_REPO_ID || "").trim();
 const GISCUS_CATEGORY = String(import.meta.env.VITE_GISCUS_CATEGORY || "").trim();
 const GISCUS_CATEGORY_ID = String(import.meta.env.VITE_GISCUS_CATEGORY_ID || "").trim();
-const ADSENSE_CLIENT = String(import.meta.env.VITE_ADSENSE_CLIENT || "").trim();
-const ADSENSE_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim();
-const VALID_ADSENSE_CLIENT =
-  /^ca-pub-\d{16}$/.test(ADSENSE_CLIENT) && ADSENSE_CLIENT !== "ca-pub-0000000000000000";
-const VALID_ADSENSE_SLOT = /^\d{8,20}$/.test(ADSENSE_SLOT) && ADSENSE_SLOT !== "1234567890";
-const ADS_READY = VALID_ADSENSE_CLIENT && VALID_ADSENSE_SLOT;
+const ADSENSE_CLIENT = "ca-pub-4973160293737562";
+const DEFAULT_ADSENSE_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim();
 
 const APP_NAME = "LLM Adoption Atelier";
 const APP_TAGLINE = "Enterprise LLM Readiness Control Tower";
@@ -142,26 +138,17 @@ const SAMPLE_ARCHITECTURE_JSONL = [
   })
 ].join("\n");
 
-function AdSenseSlot() {
+function isValidAdSenseSlot(value) {
+  return /^\d{8,20}$/.test(String(value || "").trim()) && String(value || "").trim() !== "1234567890";
+}
+
+function AdSenseSlot({ slot = "" }) {
   const pushedRef = useRef(false);
+  const activeSlot = String(slot || "").trim();
+  const adsReady = isValidAdSenseSlot(activeSlot);
 
   useEffect(() => {
-    if (!ADS_READY || typeof document === "undefined") {
-      return;
-    }
-    if (document.getElementById("atelier-adsbygoogle-script")) {
-      return;
-    }
-    const script = document.createElement("script");
-    script.id = "atelier-adsbygoogle-script";
-    script.async = true;
-    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
-    script.crossOrigin = "anonymous";
-    document.head.appendChild(script);
-  }, []);
-
-  useEffect(() => {
-    if (!ADS_READY || pushedRef.current) {
+    if (!adsReady || pushedRef.current) {
       return;
     }
     try {
@@ -170,13 +157,13 @@ function AdSenseSlot() {
     } catch (_err) {
       // no-op
     }
-  }, []);
+  }, [adsReady, activeSlot]);
 
-  if (!ADS_READY) {
+  if (!adsReady) {
     return (
       <div className="adsense-placeholder">
-        Sponsored slot is in standby mode. Set valid <code>VITE_ADSENSE_CLIENT</code> and{" "}
-        <code>VITE_ADSENSE_SLOT</code> to enable AdSense.
+        Sponsored slot is in standby mode. Set a valid AdSense slot ID in the Sponsored panel or{" "}
+        <code>VITE_ADSENSE_SLOT</code>.
       </div>
     );
   }
@@ -186,7 +173,7 @@ function AdSenseSlot() {
       className="adsbygoogle adsense-box"
       style={{ display: "block" }}
       data-ad-client={ADSENSE_CLIENT}
-      data-ad-slot={ADSENSE_SLOT}
+      data-ad-slot={activeSlot}
       data-ad-format="auto"
       data-full-width-responsive="true"
     />
@@ -202,7 +189,8 @@ const STORAGE_KEYS = {
   userId: "atelier.user_id",
   role: "atelier.role",
   loginCode: "atelier.login_code",
-  scenarioHistory: "atelier.scenario_history.v1"
+  scenarioHistory: "atelier.scenario_history.v1",
+  adsenseSlot: "atelier.adsense_slot.v1"
 };
 
 function safeStorageGet(key, fallback = "") {
@@ -530,6 +518,11 @@ export default function App() {
     const stored = readJsonStorage(STORAGE_KEYS.scenarioHistory, []);
     return Array.isArray(stored) ? stored : [];
   });
+  const [adsenseSlotInput, setAdsenseSlotInput] = useState(() =>
+    safeStorageGet(STORAGE_KEYS.adsenseSlot, DEFAULT_ADSENSE_SLOT)
+  );
+  const activeAdSenseSlot = String(adsenseSlotInput || "").trim();
+  const adSenseSlotReady = isValidAdSenseSlot(activeAdSenseSlot);
 
   useEffect(() => {
     safeStorageSet(STORAGE_KEYS.userId, userId);
@@ -546,6 +539,10 @@ export default function App() {
   useEffect(() => {
     writeJsonStorage(STORAGE_KEYS.scenarioHistory, scenarioHistory);
   }, [scenarioHistory]);
+
+  useEffect(() => {
+    safeStorageSet(STORAGE_KEYS.adsenseSlot, activeAdSenseSlot);
+  }, [activeAdSenseSlot]);
 
   const [diagnosisQuery, setDiagnosisQuery] = useState(
     "Prioritize the top security and reliability risks in our LLM adoption architecture. Provide evidence-backed mitigation steps."
@@ -585,10 +582,15 @@ export default function App() {
     max_tokens: "512",
     timeout_sec: "30",
     openai_base_url: "https://api.openai.com/v1",
+    ollama_base_url: "http://127.0.0.1:11434",
     openai_org: "",
     openai_api_key: ""
   });
   const [isSavingLlmRuntime, setIsSavingLlmRuntime] = useState(false);
+  const [userApiKeyInput, setUserApiKeyInput] = useState("");
+  const [userApiKeyView, setUserApiKeyView] = useState(null);
+  const [userApiKeyError, setUserApiKeyError] = useState("");
+  const [isSavingUserApiKey, setIsSavingUserApiKey] = useState(false);
   const [architectureCatalog, setArchitectureCatalog] = useState(null);
   const [architectureJsonl, setArchitectureJsonl] = useState("");
   const [architectureError, setArchitectureError] = useState("");
@@ -1110,6 +1112,7 @@ export default function App() {
       max_tokens: String(data.max_tokens ?? "512"),
       timeout_sec: String(data.timeout_sec ?? "30"),
       openai_base_url: String(data.openai_base_url || "https://api.openai.com/v1"),
+      ollama_base_url: String(data.ollama_base_url || "http://127.0.0.1:11434"),
       openai_org: String(data.openai_org || ""),
       openai_api_key: ""
     });
@@ -1164,6 +1167,7 @@ export default function App() {
             max_tokens: Number(llmRuntimeForm.max_tokens),
             timeout_sec: Number(llmRuntimeForm.timeout_sec),
             openai_base_url: llmRuntimeForm.openai_base_url.trim(),
+            ollama_base_url: llmRuntimeForm.ollama_base_url.trim(),
             openai_org: llmRuntimeForm.openai_org.trim(),
             openai_api_key: llmRuntimeForm.openai_api_key.trim() || null
           };
@@ -1190,6 +1194,101 @@ export default function App() {
       setStatus(withRequestId("LLM runtime update error", error.requestId));
     } finally {
       setIsSavingLlmRuntime(false);
+    }
+  }
+
+  async function loadUserApiKeyStatus(options = {}) {
+    const { silent = false } = options;
+    if (!token) {
+      setUserApiKeyView(null);
+      if (!silent) {
+        setUserApiKeyError("JWT required. Issue a token in Access Control first.");
+      }
+      return null;
+    }
+    if (!silent) {
+      setStatus("Loading personal API key status...");
+    }
+    setUserApiKeyError("");
+    try {
+      const { data, requestId } = await fetchJson("/runtime/user-api-key", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "Personal API key status load failed"
+      });
+      setUserApiKeyView(data);
+      if (!silent) {
+        setStatus(withRequestId("Personal API key status loaded", requestId));
+      }
+      return { data, requestId };
+    } catch (error) {
+      setUserApiKeyError(error.message || "Personal API key status load failed");
+      if (!silent) {
+        setStatus(withRequestId("Personal API key status load error", error.requestId));
+      }
+      return null;
+    }
+  }
+
+  async function saveUserApiKey() {
+    if (!token) {
+      setUserApiKeyError("JWT required. Issue a token in Access Control first.");
+      return;
+    }
+    const apiKey = String(userApiKeyInput || "").trim();
+    if (!apiKey) {
+      setUserApiKeyError("Enter an API key first.");
+      return;
+    }
+    setIsSavingUserApiKey(true);
+    setUserApiKeyError("");
+    setStatus("Saving personal API key...");
+    try {
+      const { data, requestId } = await fetchJson("/runtime/user-api-key", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ openai_api_key: apiKey }),
+        errorMessage: "Personal API key save failed"
+      });
+      setUserApiKeyView(data);
+      setUserApiKeyInput("");
+      setStatus(withRequestId("Personal API key saved", requestId));
+    } catch (error) {
+      setUserApiKeyError(error.message || "Personal API key save failed");
+      setStatus(withRequestId("Personal API key save error", error.requestId));
+    } finally {
+      setIsSavingUserApiKey(false);
+    }
+  }
+
+  async function clearUserApiKey() {
+    if (!token) {
+      setUserApiKeyError("JWT required. Issue a token in Access Control first.");
+      return;
+    }
+    setIsSavingUserApiKey(true);
+    setUserApiKeyError("");
+    setStatus("Removing personal API key...");
+    try {
+      const { data, requestId } = await fetchJson("/runtime/user-api-key", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        errorMessage: "Personal API key remove failed"
+      });
+      setUserApiKeyView(data);
+      setUserApiKeyInput("");
+      setStatus(withRequestId("Personal API key removed", requestId));
+    } catch (error) {
+      setUserApiKeyError(error.message || "Personal API key remove failed");
+      setStatus(withRequestId("Personal API key remove error", error.requestId));
+    } finally {
+      setIsSavingUserApiKey(false);
     }
   }
 
@@ -1428,6 +1527,16 @@ export default function App() {
     void loadAdminLlmRuntime({ silent: true });
     void loadArchitectureCatalog({ silent: true });
   }, [page, activeTab, token, role]);
+
+  useEffect(() => {
+    if (!token) {
+      setUserApiKeyView(null);
+      setUserApiKeyError("");
+      setUserApiKeyInput("");
+      return;
+    }
+    void loadUserApiKeyStatus({ silent: true });
+  }, [token]);
 
   const runtimeView = useMemo(() => {
     const snapshot = runtimeSnapshot || {};
@@ -2164,6 +2273,17 @@ export default function App() {
               </Reveal>
             </section>
 
+            <section className="section-block sponsored-section">
+              <Reveal className="sponsored-card" delay={90}>
+                <p className="eyebrow">Sponsored</p>
+                <h3>AdSense Slot</h3>
+                <p>
+                  Ad placement area. Configure the slot ID in Console and this slot will render automatically.
+                </p>
+                <AdSenseSlot key={activeAdSenseSlot || "home-empty-slot"} slot={activeAdSenseSlot} />
+              </Reveal>
+            </section>
+
             <section className="section-block">
               <Reveal className="section-head">
                 <p className="eyebrow">What You Can Validate</p>
@@ -2694,6 +2814,73 @@ export default function App() {
               </div>
             </section>
 
+            <section className="panel byok-panel">
+              <h3 className="panel-title">Personal OpenAI API Key (BYOK)</h3>
+              <p>
+                Enter your own API key. The backend keeps it in memory per user and resets it when the server restarts.
+              </p>
+              <div className="form-grid byok-grid">
+                <label>
+                  OpenAI API Key
+                  <input
+                    type="password"
+                    placeholder="sk-..."
+                    value={userApiKeyInput}
+                    onChange={(event) => setUserApiKeyInput(event.target.value)}
+                    disabled={!token || isSavingUserApiKey}
+                  />
+                </label>
+              </div>
+              <div className="action-row">
+                <button
+                  className="cta-primary"
+                  onClick={saveUserApiKey}
+                  disabled={!token || isSavingUserApiKey || !String(userApiKeyInput || "").trim()}
+                >
+                  {isSavingUserApiKey ? "Saving..." : "Save My API Key"}
+                </button>
+                <button className="cta-ghost" onClick={clearUserApiKey} disabled={!token || isSavingUserApiKey}>
+                  Remove My API Key
+                </button>
+                <button
+                  className="cta-ghost"
+                  onClick={() => loadUserApiKeyStatus()}
+                  disabled={!token || isSavingUserApiKey}
+                >
+                  Refresh Status
+                </button>
+              </div>
+              {userApiKeyError && <p className="error-text">{userApiKeyError}</p>}
+              {userApiKeyView && (
+                <div className="admin-meta">
+                  <p>User: {userApiKeyView.user_id}</p>
+                  <p>API key configured: {userApiKeyView.openai_api_key_configured ? "yes" : "no"}</p>
+                  <p>
+                    Effective model: {userApiKeyView.effective_provider} / {userApiKeyView.effective_model}
+                  </p>
+                </div>
+              )}
+            </section>
+
+            <section className="panel sponsored-panel">
+              <h3 className="panel-title">Sponsored</h3>
+              <p className="admin-note">
+                Set your AdSense slot ID here. Values are stored in local browser storage for this device.
+              </p>
+              <div className="form-grid byok-grid">
+                <label>
+                  AdSense Slot ID
+                  <input
+                    placeholder="1234567890"
+                    value={adsenseSlotInput}
+                    onChange={(event) => setAdsenseSlotInput(event.target.value)}
+                  />
+                </label>
+              </div>
+              <p className="admin-note">Slot status: {adSenseSlotReady ? "valid" : "invalid or missing"}</p>
+              <AdSenseSlot key={activeAdSenseSlot || "console-empty-slot"} slot={activeAdSenseSlot} />
+            </section>
+
             <section className="panel workbench-panel">
               <div className="tab-strip">
                 <button
@@ -2886,6 +3073,7 @@ export default function App() {
                           <option value="stub">stub</option>
                           <option value="openai">openai</option>
                           <option value="openai_compatible">openai_compatible</option>
+                          <option value="ollama">ollama</option>
                         </select>
                       </label>
                       <label>
@@ -2944,6 +3132,16 @@ export default function App() {
                           value={llmRuntimeForm.openai_base_url}
                           onChange={(event) =>
                             setLlmRuntimeForm((prev) => ({ ...prev, openai_base_url: event.target.value }))
+                          }
+                          disabled={!isAdmin}
+                        />
+                      </label>
+                      <label>
+                        Ollama Base URL
+                        <input
+                          value={llmRuntimeForm.ollama_base_url}
+                          onChange={(event) =>
+                            setLlmRuntimeForm((prev) => ({ ...prev, ollama_base_url: event.target.value }))
                           }
                           disabled={!isAdmin}
                         />
@@ -3481,7 +3679,7 @@ export default function App() {
         </div>
         <div className="footer-ad">
           <p>Sponsored</p>
-          <AdSenseSlot />
+          <AdSenseSlot key={activeAdSenseSlot || "footer-empty-slot"} slot={activeAdSenseSlot} />
         </div>
       </footer>
     </div>

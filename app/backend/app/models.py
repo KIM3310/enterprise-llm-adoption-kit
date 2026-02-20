@@ -261,20 +261,34 @@ class AdminLLMRuntimeView(BaseModel):
     max_tokens: int
     timeout_sec: float
     openai_base_url: str
+    ollama_base_url: str
     openai_org: str
     openai_api_key_configured: bool
 
 
 class AdminLLMRuntimeUpdate(BaseModel):
-    provider: Optional[str] = Field(default=None, pattern="^(stub|openai|openai_compatible)$")
+    provider: Optional[str] = Field(default=None, pattern="^(stub|openai|openai_compatible|ollama)$")
     model: Optional[str] = None
     temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
     max_tokens: Optional[int] = Field(default=None, ge=1, le=8192)
     timeout_sec: Optional[float] = Field(default=None, ge=1.0, le=600.0)
     openai_base_url: Optional[str] = None
+    ollama_base_url: Optional[str] = None
     openai_org: Optional[str] = None
     openai_api_key: Optional[str] = None
     reset_to_env: bool = False
+
+
+class UserLLMApiKeyUpdate(BaseModel):
+    openai_api_key: str = Field(min_length=20, max_length=512)
+
+
+class UserLLMApiKeyView(BaseModel):
+    user_id: str
+    openai_api_key_configured: bool
+    effective_provider: str
+    effective_model: str
+    effective_openai_base_url: str
 
 
 class ArchitectureImportRequest(BaseModel):
