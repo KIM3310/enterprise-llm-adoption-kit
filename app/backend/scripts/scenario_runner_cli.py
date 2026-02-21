@@ -7,7 +7,7 @@ Purpose:
   auth -> UC1 -> UC2 -> governance -> metrics
 - Export a shareable Markdown report + an evidence pack (zip) reviewers can inspect.
 
-This script is designed to work in stub/offline mode (LLM_PROVIDER=stub) by default.
+This script works with both stub/offline mode and local Ollama mode.
 """
 
 from __future__ import annotations
