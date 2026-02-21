@@ -2597,6 +2597,8 @@ export default function App() {
                       <li>
                         Start local demo:{" "}
                         <code className="mono-inline">bash scripts/start_demo_local.sh</code>
+                        {" "}or{" "}
+                        <code className="mono-inline">bash scripts/start_demo_ollama_local.sh</code>
                       </li>
                     )}
                     <li>Ops snapshot requires Ops/Admin role.</li>

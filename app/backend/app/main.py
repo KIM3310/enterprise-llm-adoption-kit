@@ -539,7 +539,8 @@ def _resolve_integration_user(
 def _architecture_catalog_payload() -> Dict[str, object]:
     docs = load_normalized_docs()
     summary = summarize_normalized_docs(docs)
-    summary["chunk_count"] = int(rag_store.collection.count())
+    summary["chunk_count"] = int(rag_store.chunk_count())
+    summary["rag_backend"] = str(rag_store.backend_name())
     return summary
 
 
