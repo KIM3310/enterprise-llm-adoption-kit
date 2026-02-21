@@ -4,12 +4,20 @@ import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-import chromadb
 import hashlib
 import numpy as np
-from chromadb.config import Settings as ChromaSettings
 
 from .config import settings, DATA_DIR
+
+try:
+    import chromadb
+    from chromadb.config import Settings as ChromaSettings
+except Exception as exc:  # noqa: BLE001
+    chromadb = None  # type: ignore[assignment]
+    ChromaSettings = None  # type: ignore[assignment]
+    CHROMA_IMPORT_ERROR = str(exc)
+else:
+    CHROMA_IMPORT_ERROR = ""
 
 RAW_DOCS_PATH = str(DATA_DIR / "handover_raw.jsonl")
 NORM_DOCS_PATH = str(DATA_DIR / "handover_normalized.jsonl")
@@ -64,18 +72,47 @@ class RetrievedChunk:
 class RAGStore:
     def __init__(self) -> None:
         os.makedirs(settings.chroma_persist_dir, exist_ok=True)
+        self._embedder = HashEmbedding()
+        self._backend = "chromadb"
+        self._local_entries: List[Dict[str, object]] = []
+
+        if chromadb is None or ChromaSettings is None:
+            self._backend = "local"
+            logging.warning(
+                "chromadb unavailable; using local in-memory retrieval fallback. reason=%s",
+                CHROMA_IMPORT_ERROR or "unknown",
+            )
+            self.client = None
+            self.collection = None
+            return
+
         logging.getLogger("chromadb.telemetry.product.posthog").disabled = True
         self.client = chromadb.PersistentClient(
             path=settings.chroma_persist_dir,
             settings=ChromaSettings(anonymized_telemetry=False),
         )
         self.collection = self.client.get_or_create_collection(
-            COLLECTION_NAME, embedding_function=HashEmbedding()
+            COLLECTION_NAME, embedding_function=self._embedder
         )
 
+    def backend_name(self) -> str:
+        return str(self._backend)
+
+    def chunk_count(self) -> int:
+        if self._backend == "chromadb":
+            try:
+                return int(self.collection.count())
+            except Exception:
+                return 0
+        return int(len(self._local_entries))
+
     def ensure_index(self) -> None:
-        if self.collection.count() > 0:
-            return
+        if self._backend == "chromadb":
+            if self.collection.count() > 0:
+                return
+        else:
+            if self._local_entries:
+                return
         docs = load_normalized_docs()
         self._index_docs(docs)
 
@@ -85,36 +122,53 @@ class RAGStore:
         return self._index_docs(normalized_docs)
 
     def _reset_collection(self) -> None:
+        if self._backend != "chromadb":
+            self._local_entries = []
+            return
+
         try:
             self.client.delete_collection(COLLECTION_NAME)
         except Exception:
             pass
         self.collection = self.client.get_or_create_collection(
-            COLLECTION_NAME, embedding_function=HashEmbedding()
+            COLLECTION_NAME, embedding_function=self._embedder
         )
 
     def _index_docs(self, docs: List[Dict]) -> int:
         ids = []
         documents = []
         metadatas = []
+        local_items: List[Dict[str, object]] = []
         for doc in docs:
             doc_id = doc["doc_id"]
             for field_path, content in _iter_fields(doc):
                 if not content:
                     continue
+                row_id = f"{doc_id}:{field_path}"
+                metadata = {
+                    "doc_id": doc_id,
+                    "field_path": field_path,
+                    "access_group": doc.get("access_group", ""),
+                    "system": doc.get("system", ""),
+                    "env": doc.get("env", ""),
+                }
                 ids.append(f"{doc_id}:{field_path}")
                 documents.append(content)
-                metadatas.append(
-                    {
-                        "doc_id": doc_id,
-                        "field_path": field_path,
-                        "access_group": doc.get("access_group", ""),
-                        "system": doc.get("system", ""),
-                        "env": doc.get("env", ""),
-                    }
-                )
-        if ids:
+                metadatas.append(metadata)
+                if self._backend != "chromadb":
+                    vector = np.array(self._embedder([content])[0], dtype=float)
+                    local_items.append(
+                        {
+                            "id": row_id,
+                            "document": content,
+                            "metadata": metadata,
+                            "vector": vector,
+                        }
+                    )
+        if ids and self._backend == "chromadb":
             self.collection.add(ids=ids, documents=documents, metadatas=metadatas)
+        if self._backend != "chromadb":
+            self._local_entries.extend(local_items)
         return len(ids)
 
     def query(
@@ -131,28 +185,63 @@ class RAGStore:
         if env:
             where["env"] = env
 
-        try:
-            results = self.collection.query(
-                query_texts=[text], n_results=top_k, where=where
-            )
-        except Exception:
-            results = self.collection.query(query_texts=[text], n_results=top_k)
+        if self._backend == "chromadb":
+            try:
+                results = self.collection.query(
+                    query_texts=[text], n_results=top_k, where=where
+                )
+            except Exception:
+                results = self.collection.query(query_texts=[text], n_results=top_k)
+            chunks: List[RetrievedChunk] = []
+            for doc, meta in zip(
+                results.get("documents", [[]])[0], results.get("metadatas", [[]])[0]
+            ):
+                if meta.get("access_group") not in allowed_groups:
+                    continue
+                if system and meta.get("system") != system:
+                    continue
+                if env and meta.get("env") != env:
+                    continue
+                chunks.append(
+                    RetrievedChunk(
+                        doc_id=meta.get("doc_id", ""),
+                        field_path=meta.get("field_path", ""),
+                        content=doc,
+                        metadata=meta,
+                    )
+                )
+            return chunks
+
+        query_vec = np.array(self._embedder([text])[0], dtype=float)
+        scored: List[Tuple[float, Dict[str, object]]] = []
+        for item in self._local_entries:
+            metadata = item["metadata"]
+            if not isinstance(metadata, dict):
+                continue
+            if metadata.get("access_group") not in allowed_groups:
+                continue
+            if system and metadata.get("system") != system:
+                continue
+            if env and metadata.get("env") != env:
+                continue
+            vector = item.get("vector")
+            if not isinstance(vector, np.ndarray):
+                continue
+            score = float(np.dot(query_vec, vector))
+            scored.append((score, item))
+
+        scored.sort(key=lambda row: row[0], reverse=True)
         chunks: List[RetrievedChunk] = []
-        for doc, meta in zip(
-            results.get("documents", [[]])[0], results.get("metadatas", [[]])[0]
-        ):
-            if meta.get("access_group") not in allowed_groups:
-                continue
-            if system and meta.get("system") != system:
-                continue
-            if env and meta.get("env") != env:
+        for _score, item in scored[: max(1, int(top_k))]:
+            metadata = item["metadata"]
+            if not isinstance(metadata, dict):
                 continue
             chunks.append(
                 RetrievedChunk(
-                    doc_id=meta.get("doc_id", ""),
-                    field_path=meta.get("field_path", ""),
-                    content=doc,
-                    metadata=meta,
+                    doc_id=str(metadata.get("doc_id", "")),
+                    field_path=str(metadata.get("field_path", "")),
+                    content=str(item.get("document", "")),
+                    metadata=metadata,
                 )
             )
         return chunks

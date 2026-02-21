@@ -43,6 +43,7 @@ Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 �
 - Safety guardrails: refusal 규칙 + injection 탐지. 확인: `tests/test_safety_guardrails.py`, `tests/test_injection.py`.
 - 감사 로그 데이터 처리: enterprise 모드에서 입력/출력 해시 저장. 확인: `tests/test_data_handling_mode.py`.
 - RAG cold-start: 인덱스 자동 빌드 + normalized 데이터 생성. 확인: 데모 실행 후 UC1 응답에 citations 표시 여부 확인.
+- Python 3.14 호환성: `chromadb` import가 깨지는 경우(pydantic-v1 이슈)에도 deterministic local retrieval 백엔드로 자동 폴백되어 데모 흐름이 계속 동작합니다.
 - LLM 신뢰성: provider 오류 시 exponential backoff 재시도 + `/metrics` 지표 기록.
 
 ## 이 프로젝트가 보여주는 것
@@ -117,8 +118,29 @@ docker-compose up --build
 ## 원커맨드 데모 (Docker 없이)
 Docker가 없다면 로컬 러너 스크립트를 사용하세요:
 ```bash
+# auto 모드: Ollama가 있으면 우선 사용, 없으면 stub으로 자동 폴백
 make demo-local
 ```
+
+## Ollama 빠른 시작 (권장)
+유료 API 키 없이 로컬 모델로 전체 흐름을 바로 체험할 수 있습니다.
+
+```bash
+# Ollama 설치: https://ollama.com/download
+ollama pull llama3.2:latest
+make demo-ollama-local
+```
+
+스크립트가 backend + frontend를 함께 실행하고 `http://localhost:5173`에서 리뷰 가능한 데모를 제공합니다.
+
+## 효용 체감 5분 투어
+기능 확인을 넘어 "왜 유용한지"가 보이는 순서입니다.
+
+1. Access Control에서 `Ops` 토큰 발급
+2. UC1에 핸드오버 질의 입력 (예: "payment-prod handover risks and next actions")
+3. UC2에 timeout/error 로그 입력 후 root cause + runbook step 확인
+4. Scenario Runner에서 report + evidence pack(zip + SHA-256 manifest) 내보내기
+5. `/audit/summary`, `/metrics`를 함께 확인해 거버넌스/운영 신호 검증
 
 ## Scenario Runner (CLI)
 실행 결과를 공유 가능한 리포트(Markdown) + 증빙 패키지(zip)로 내보냅니다.
@@ -128,9 +150,14 @@ make demo-local
 make scenario-run
 ```
 
-원커맨드(로컬 stub 백엔드를 띄우고 시나리오 실행 후 종료):
+원커맨드(auto: Ollama 가능 시 우선 사용, 아니면 stub):
 ```bash
 make scenario-demo-local
+```
+
+Ollama 강제 모드:
+```bash
+make scenario-demo-ollama-local
 ```
 
 출력은 `dist/scenario_runs/` 아래에 저장됩니다(gitignore).
@@ -173,6 +200,7 @@ make quality-backend
 - LLM provider:
   - `LLM_PROVIDER=stub` (기본, 오프라인), `LLM_PROVIDER=ollama`, 또는 `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
   - `LLM_OLLAMA_BASE_URL` (기본값 `http://127.0.0.1:11434`)
+  - Ollama 로컬 모드(키 불필요): `LLM_PROVIDER=ollama`, 선택 `LLM_MODEL=llama3.2:latest`, 선택 `LLM_OLLAMA_BASE_URL=http://127.0.0.1:11434`
   - `LLM_OPENAI_API_KEY` (또는 `LLM_OPENAI_API_KEY_FILE`)
   - 선택 `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
   - 안정성 fallback: `LLM_FALLBACK_TO_STUB_ON_ERROR=true` (기본)

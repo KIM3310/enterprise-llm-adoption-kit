@@ -43,6 +43,7 @@ Korean version: `README.ko.md`
 - Safety guardrails: refusal rules + prompt injection detection. Verification: `tests/test_safety_guardrails.py` and `tests/test_injection.py`.
 - Audit data handling: enterprise mode hashes input/output instead of storing raw text. Verification: `tests/test_data_handling_mode.py`.
 - RAG cold-start: index build on startup + normalized dataset generation when missing. Verification: run the demo and confirm citations appear for UC1.
+- Python 3.14 compatibility: if `chromadb` import fails (pydantic-v1 issue), the app auto-falls back to a deterministic local retrieval backend so demo flows still run.
 - LLM reliability: retry with exponential backoff on provider errors and metrics emitted at `/metrics`.
 
 ## What this demonstrates
@@ -130,8 +131,29 @@ docker-compose up --build
 ## One-command demo (no docker)
 If you don't have Docker installed, use the local runner script:
 ```bash
+# auto mode: tries Ollama first, then falls back to stub
 make demo-local
 ```
+
+## Ollama quick start (recommended)
+Run a local model and experience the full flow without paid API keys.
+
+```bash
+# install Ollama first: https://ollama.com/download
+ollama pull llama3.2:latest
+make demo-ollama-local
+```
+
+The script starts backend + frontend and opens a reviewer-ready local flow on `http://localhost:5173`.
+
+## Value tour (5 minutes)
+Use this sequence to feel the service utility, not just feature checkboxes:
+
+1. In Access Control, issue an `Ops` token.
+2. Run UC1 with a handover query (for example: "Summarize payment-prod handover risks and next actions").
+3. Run UC2 with timeout/error logs and compare generated root causes + runbook steps.
+4. Open Scenario Runner and export the report + evidence pack (zip + SHA-256 manifest).
+5. Review `/audit/summary` and `/metrics` to verify governance and LLMOps signals.
 
 ## Scenario Runner (CLI)
 Generate a shareable validation report (Markdown) + evidence pack (zip).
@@ -141,9 +163,14 @@ Against an already-running backend:
 make scenario-run
 ```
 
-One command (starts a local stub backend, runs the scenario, then stops):
+One command (auto: Ollama if available, otherwise stub):
 ```bash
 make scenario-demo-local
+```
+
+Force Ollama mode:
+```bash
+make scenario-demo-ollama-local
 ```
 
 Output is written under `dist/scenario_runs/` (gitignored).
@@ -186,6 +213,7 @@ make quality-backend
 - LLM provider:
   - `LLM_PROVIDER=stub` (default, offline), `LLM_PROVIDER=ollama`, or `LLM_PROVIDER=openai` / `LLM_PROVIDER=openai_compatible`
   - `LLM_OLLAMA_BASE_URL` (default `http://127.0.0.1:11434`)
+  - Ollama local mode (no API key required): `LLM_PROVIDER=ollama`, optional `LLM_MODEL=llama3.2:latest`, optional `LLM_OLLAMA_BASE_URL=http://127.0.0.1:11434`
   - `LLM_OPENAI_API_KEY` (or `LLM_OPENAI_API_KEY_FILE`)
   - optional `LLM_OPENAI_BASE_URL`, `LLM_OPENAI_ORG`
   - reliability fallback: `LLM_FALLBACK_TO_STUB_ON_ERROR=true` (default)
