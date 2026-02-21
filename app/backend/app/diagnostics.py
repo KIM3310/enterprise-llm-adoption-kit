@@ -123,11 +123,18 @@ def _runbook_check(runbook_path: str) -> Dict:
 
 def _rag_check(rag_store) -> Dict:
     try:
-        count = rag_store.collection.count()
+        if hasattr(rag_store, "chunk_count"):
+            count = int(rag_store.chunk_count())
+        else:
+            count = int(rag_store.collection.count())
+        if hasattr(rag_store, "backend_name"):
+            backend = str(rag_store.backend_name())
+        else:
+            backend = "chromadb"
         return {
             "name": "rag_collection",
             "ok": count > 0,
-            "details": {"collection_count": int(count)},
+            "details": {"collection_count": count, "backend": backend},
         }
     except Exception as exc:  # noqa: BLE001
         return {"name": "rag_collection", "ok": False, "details": {"error": str(exc)}}
