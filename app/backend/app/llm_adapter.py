@@ -17,7 +17,7 @@ class LLMResult:
 
 RUNTIME_PROVIDER_OPTIONS = {"stub", "openai", "openai_compatible", "ollama"}
 BYOK_FALLBACK_MODEL = "gpt-4o-mini"
-OLLAMA_FALLBACK_MODEL = "llama3.2:latest"
+OLLAMA_FALLBACK_MODEL = "llama3.1:8b"
 
 _runtime_lock = Lock()
 _runtime_overrides: Dict[str, Optional[object]] = {
