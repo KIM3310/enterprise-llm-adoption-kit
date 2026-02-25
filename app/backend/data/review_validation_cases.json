@@ -1,0 +1,22 @@
+[
+  {
+    "case_id": "resource-pack-snowflake",
+    "goal": "Snowflake workshop evidence should map to architecture and rollout surfaces without missing links.",
+    "proof_surface": "/ops/customer-architecture-pack?platform=snowflake"
+  },
+  {
+    "case_id": "resource-pack-databricks",
+    "goal": "Databricks control-tower path should stay reviewable from workshop readout through rollout gates.",
+    "proof_surface": "/ops/workshop-readout-pack?platform=databricks"
+  },
+  {
+    "case_id": "resource-pack-runtime",
+    "goal": "Summary-pack claims should remain consistent with runtime scorecard and audit evidence.",
+    "proof_surface": "/ops/runtime/scorecard"
+  },
+  {
+    "case_id": "resource-pack-review-summary",
+    "goal": "Reviewer handoff should stay grounded in the same rollout board and summary-pack signals.",
+    "proof_surface": "/ops/review-summary"
+  }
+]

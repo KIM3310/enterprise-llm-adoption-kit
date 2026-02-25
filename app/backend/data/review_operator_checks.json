@@ -1,0 +1,22 @@
+[
+  {
+    "check_id": "confirm-runtime",
+    "surface": "/health",
+    "why_it_matters": "Reviewers should confirm startup, auth mode, and live-lane posture before any rollout claim."
+  },
+  {
+    "check_id": "open-resource-pack",
+    "surface": "/ops/resource-pack",
+    "why_it_matters": "Built-in synthetic workshop scenarios keep the repo reviewable without private customer material."
+  },
+  {
+    "check_id": "verify-gates",
+    "surface": "/ops/rollout-gates",
+    "why_it_matters": "Go/no-go ownership and rollback posture should stay visible before a pilot is approved."
+  },
+  {
+    "check_id": "inspect-scorecard",
+    "surface": "/ops/runtime/scorecard",
+    "why_it_matters": "Observability and audit posture need to stay inspectable before any production-style discussion."
+  }
+]

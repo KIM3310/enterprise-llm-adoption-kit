@@ -1,0 +1,63 @@
+"""Safety guardrail engine for content-policy enforcement.
+
+Evaluates user input against a curated list of regex patterns that
+target data exfiltration, privilege escalation, prompt injection, and
+other adversarial behaviours.  Inputs exceeding ``_MAX_SCAN_LENGTH``
+are truncated before scanning to prevent ReDoS.
+"""
+
+import re
+from typing import List
+
+REFUSAL_MESSAGE = "Request refused due to safety policy."
+
+# Maximum input length to scan; inputs beyond this are truncated for safety
+# checking to prevent ReDoS on very large payloads.
+_MAX_SCAN_LENGTH = 10_000
+
+# Patterns use bounded wildcards (.{0,200}) instead of unbounded (.*) to
+# prevent catastrophic backtracking (ReDoS).  The (?i) flag is set once per
+# pattern and each pattern is kept linear or bounded.
+PATTERNS: List[re.Pattern] = [
+    re.compile(r"(?i)(exfiltrat|leak|steal|dump|reveal).{0,200}(secrets?|credentials?|tokens?|keys?|passwords?)"),
+    re.compile(r"(?i)phishing|credential\s+harvesting"),
+    re.compile(r"(?i)passwords?\s+from\s+(database|db)|/etc/shadow"),
+    re.compile(r"(?i)ssn|social\s+security|credit\s+card|raw\s+pii"),
+    re.compile(r"(?i)malware|ransomware|backdoor"),
+    re.compile(r"(?i)prompt\s+injection|ignore\s+previous\s+instructions|override\s+system"),
+    re.compile(r"(?i)disable\s+audit|evade\s+monitoring|hide\s+actions\s+from\s+logs"),
+    re.compile(r"(?i)bypass\s+(the\s+)?(rbac|access\s+controls|mfa|allowlist|rate\s+limit|tool\s+allowlist)"),
+    re.compile(r"(?i)exploit|hack|brute[-\s]?force|escalate\s+privilege"),
+    re.compile(r"(?i)impersonate\s+another\s+user|steal\s+session\s+tokens"),
+    re.compile(r"(?i)reveal\s+admin\s+password|jwt\s+secret|private\s+key|connection\s+strings?"),
+    re.compile(r"(?i)api\s+keys?|oauth\s+tokens?"),
+    re.compile(r"(?i)environment\s+variables|env\s+vars"),
+    re.compile(r"(?i)confidential\s+handover|ignore\s+policy"),
+    re.compile(r"(?i)emails?\s+and\s+phone\s+numbers|employee\s+emails"),
+    re.compile(r"(?i)override\s+redaction|unmask\s+pii"),
+    re.compile(r"(?i)runbook\s+secrets|security\s+policies|admin\s+docs"),
+    re.compile(r"(?i)output\s+secrets|hidden\s+endpoints"),
+    re.compile(r"(?i)evade\s+(security\s+)?monitoring|evade\s+mfa"),
+    re.compile(r"(?i)disable\s+rate\s+limit(ing)?|audit\s+retention"),
+    re.compile(r"(?i)scrape\s+private\s+data|leak\s+customer\s+data"),
+    re.compile(r"(?i)passwords?\s+from\s+memory|vector\s+database"),
+]
+
+
+def should_refuse(text: str) -> bool:
+    """Return ``True`` when *text* triggers any safety-policy pattern.
+
+    Args:
+        text: The user-supplied input to evaluate.
+
+    Returns:
+        ``True`` if the request should be refused, ``False`` otherwise.
+    """
+    if not text:
+        return False
+    # Truncate to a safe length to bound regex evaluation time.
+    scan_text = text[:_MAX_SCAN_LENGTH]
+    for pattern in PATTERNS:
+        if pattern.search(scan_text):
+            return True
+    return False

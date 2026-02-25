@@ -1,0 +1,37 @@
+{
+  "request_id": "uc1-1769482500000",
+  "timestamp": "2026-01-27T03:15:00.000Z",
+  "user_id": "demo-employee",
+  "roles": ["Employee"],
+  "use_case": "uc1",
+  "model_config": {
+    "model": "stub-llm",
+    "temperature": 0.2,
+    "max_tokens": 512
+  },
+  "retrieval_doc_ids": [
+    {
+      "doc_id": "HP-0017",
+      "field_path": "summary"
+    },
+    {
+      "doc_id": "HP-0028",
+      "field_path": "risks[0]"
+    }
+  ],
+  "tool_calls": [
+    {
+      "name": "knowledge_search",
+      "status": "ok"
+    }
+  ],
+  "latency_ms": 42,
+  "tokens_in": 74,
+  "tokens_out": 18,
+  "cost_estimate": 0.00042,
+  "policy_events": [
+    {"event": "redaction_applied", "value": true},
+    {"event": "injection_detected", "value": false},
+    {"event": "allowlist_denied", "value": false}
+  ]
+}
