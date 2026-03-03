@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560" role="img" aria-labelledby="title desc">
+  <title id="title">Enterprise LLM Adoption Kit Summary Pack</title>
+  <desc id="desc">Summary pack diagram showing service brief, test assets, rollout tracks, and evaluation APIs.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f3f8ff" />
+      <stop offset="100%" stop-color="#ffffff" />
+    </linearGradient>
+  </defs>
+  <rect width="980" height="560" rx="28" fill="url(#bg)" />
+  <rect x="28" y="28" width="924" height="504" rx="24" fill="#ffffff" stroke="#d7e3f3" />
+  <text x="56" y="78" fill="#16324f" font-family="IBM Plex Sans, Arial, sans-serif" font-size="28" font-weight="700">
+    Enterprise Summary Pack
+  </text>
+  <text x="56" y="110" fill="#4a617a" font-family="IBM Plex Sans, Arial, sans-serif" font-size="16">
+    Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
+  </text>
+
+  <rect x="56" y="142" width="268" height="154" rx="18" fill="#f7fbff" stroke="#d7e3f3" />
+  <text x="78" y="176" fill="#204464" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="700">
+    Evaluation API
+  </text>
+  <text x="78" y="208" fill="#375671" font-family="IBM Plex Mono, monospace" font-size="14">
+    /ops/service-brief
+  </text>
+  <text x="78" y="233" fill="#375671" font-family="IBM Plex Mono, monospace" font-size="14">
+    /ops/summary-pack
+  </text>
+  <text x="78" y="258" fill="#375671" font-family="IBM Plex Mono, monospace" font-size="14">
+    /ops/summary-pack/schema
+  </text>
+  <text x="78" y="283" fill="#375671" font-family="IBM Plex Mono, monospace" font-size="14">
+    /audit/summary  /metrics
+  </text>
+
+  <rect x="350" y="142" width="276" height="154" rx="18" fill="#f8fcf9" stroke="#d5e7da" />
+  <text x="372" y="176" fill="#1e5133" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="700">
+    Proof Assets
+  </text>
+  <text x="372" y="208" fill="#365947" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    Exec dashboard snapshot + markdown
+  </text>
+  <text x="372" y="233" fill="#365947" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    Security compliance packet
+  </text>
+  <text x="372" y="258" fill="#365947" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    Latest eval report
+  </text>
+  <text x="372" y="283" fill="#365947" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    Customer journey blueprint
+  </text>
+
+  <rect x="652" y="142" width="272" height="154" rx="18" fill="#fff8f1" stroke="#efd8be" />
+  <text x="674" y="176" fill="#6e431d" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="700">
+    Platform Dialogue
+  </text>
+  <text x="674" y="208" fill="#7d5833" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    AWS / Databricks / Snowflake
+  </text>
+  <text x="674" y="233" fill="#7d5833" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    Palantir / MariaDB
+  </text>
+  <text x="674" y="258" fill="#7d5833" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    API-first / Workspace-first / Hybrid
+  </text>
+  <text x="674" y="283" fill="#7d5833" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    mapped to one buyer story
+  </text>
+
+  <rect x="56" y="326" width="868" height="84" rx="18" fill="#f6f5ff" stroke="#dbd7f6" />
+  <text x="78" y="360" fill="#3c3471" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="700">
+    Review Actions
+  </text>
+  <text x="78" y="389" fill="#534b81" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    1. Check runtime posture -> 2. Inspect overview -> 3. Verify governance -> 4. Map deployment path
+  </text>
+
+  <rect x="56" y="432" width="868" height="72" rx="18" fill="#f8fbff" stroke="#d7e3f3" />
+  <text x="78" y="466" fill="#204464" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="700">
+    Key Signal
+  </text>
+  <text x="78" y="494" fill="#375671" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
+    One repo ties buyer narrative, governance proof, eval evidence, and runtime surfaces into a integrated review flow.
+  </text>
+</svg>
