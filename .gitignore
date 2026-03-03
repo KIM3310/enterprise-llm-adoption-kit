@@ -26,3 +26,6 @@ app/backend/data/chroma/
 **/.terraform/
 **/*.tfstate
 **/*.tfstate.*
+
+# Debug artifacts
+.venv_*/
