@@ -284,3 +284,16 @@ make sanitize
 - RAG: Retrieval-Augmented Generation
 - OIDC: OpenID Connect
 - IaC: Infrastructure as Code (e.g., Terraform)
+
+<!-- codex:local-verification:start -->
+## Local Verification
+```bash
+make -n
+```
+
+## Repository Hygiene
+- Keep runtime artifacts out of commits (`.codex_runs/`, cache folders, temporary venvs).
+- Prefer running verification commands above before opening a PR.
+
+_Last updated: 2026-03-04_
+<!-- codex:local-verification:end -->
