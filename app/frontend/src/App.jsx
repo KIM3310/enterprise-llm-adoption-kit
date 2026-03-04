@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import heroTower from "./assets/hero-tower.svg";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const API_BASE = String(import.meta.env.VITE_API_BASE || "").trim();
 const FORMSPREE_ENDPOINT = String(import.meta.env.VITE_FORMSPREE_ENDPOINT || "").trim();
 const DISQUS_SHORTNAME = String(import.meta.env.VITE_DISQUS_SHORTNAME || "").trim();
 const DISQUS_IDENTIFIER = String(import.meta.env.VITE_DISQUS_IDENTIFIER || "atelier-home").trim();
