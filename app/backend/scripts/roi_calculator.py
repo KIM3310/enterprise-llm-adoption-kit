@@ -1,6 +1,6 @@
 import argparse
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
@@ -39,7 +39,7 @@ def compute_roi(inputs: ROIInputs) -> dict:
 
 def generate_report(inputs: ROIInputs) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out_path = OUTPUT_DIR / f"{ts}.md"
 
     results = compute_roi(inputs)

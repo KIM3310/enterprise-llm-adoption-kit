@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -20,7 +20,7 @@ def create_snapshot(output_dir: Path) -> Path:
 
     files = generate_workshop_bundle(output_dir, inputs)
     snapshot = output_dir / "snapshot.md"
-    ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
     snapshot.write_text(
         "# Workshop Output Snapshot\n\n"
         f"Generated: {ts}\n\n"

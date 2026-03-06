@@ -1,6 +1,6 @@
 import json
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -15,7 +15,7 @@ def make_doc(i: int) -> dict:
     system = random.choice(SYSTEMS)
     env = random.choice(ENVS)
     access_group = random.choice(ACCESS)
-    date = (datetime.utcnow() - timedelta(days=random.randint(1, 180))).strftime("%Y-%m-%d")
+    date = (datetime.now(timezone.utc) - timedelta(days=random.randint(1, 180))).strftime("%Y-%m-%d")
     return {
         "doc_id": f"HP-{i:04d}",
         "title": f"{system.title()} Handover {env.upper()} #{i:04d}",
