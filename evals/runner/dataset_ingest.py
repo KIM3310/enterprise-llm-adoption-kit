@@ -1,7 +1,7 @@
 import argparse
 import csv
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Tuple
 
@@ -98,7 +98,7 @@ def enrich_records(records: List[dict]) -> Tuple[List[dict], bool]:
 
 def write_output(records: List[dict], source_name: str) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out_path = OUTPUT_DIR / f"{ts}_{source_name}.jsonl"
     with out_path.open("w", encoding="utf-8") as f:
         for record in records:

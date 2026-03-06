@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
@@ -17,7 +17,7 @@ def generate_poc_success(
     rollout_plan: str,
 ) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out_path = OUTPUT_DIR / f"{ts}_success_criteria.md"
 
     content = f"""# PoC Success Criteria (Exec Summary)
