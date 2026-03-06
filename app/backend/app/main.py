@@ -760,9 +760,32 @@ def health(request: Request) -> Dict[str, object]:
     startup_report = getattr(app.state, "startup_report", None)
     status = "ok"
     startup_status = ""
+    diagnostics = {
+        "startup_ready": False,
+        "failed_checks": [],
+        "failed_warning_checks": [],
+        "failed_critical_checks": [],
+        "next_action": "load /ops/runtime for diagnostics",
+    }
     if isinstance(startup_report, dict):
         status = "ok" if startup_report.get("startup_ready", False) else "degraded"
         startup_status = str(startup_report.get("overall_status", "unknown"))
+        failed_critical = list(startup_report.get("failed_critical_checks", []))
+        failed_warning = list(startup_report.get("failed_warning_checks", []))
+        failed_all = list(startup_report.get("failed_checks", []))
+        diagnostics = {
+            "startup_ready": bool(startup_report.get("startup_ready", False)),
+            "failed_checks": failed_all,
+            "failed_warning_checks": failed_warning,
+            "failed_critical_checks": failed_critical,
+            "next_action": (
+                f"investigate critical check: {failed_critical[0]}"
+                if failed_critical
+                else f"review warning check: {failed_warning[0]}"
+                if failed_warning
+                else "system ready"
+            ),
+        }
 
     # Non-sensitive runtime metadata to make preflight/debugging easier in demos.
     runtime = get_llm_runtime_settings()
@@ -786,6 +809,7 @@ def health(request: Request) -> Dict[str, object]:
         "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
         "uptime_seconds": max(0, int(time.time()) - APP_STARTED_AT),
         "request_id": getattr(request.state, "request_id", ""),
+        "diagnostics": diagnostics,
         "capabilities": [
             "rbac-gated-review-console",
             "ops-runtime-observability",
