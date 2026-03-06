@@ -38,5 +38,6 @@ async def test_health_includes_runtime_metadata() -> None:
     assert "ops-runtime-observability" in payload.get("capabilities", [])
     assert "diagnostics" in payload
     assert "next_action" in payload["diagnostics"]
+    assert payload.get("ops_contract", {}).get("schema") == "ops-envelope-v1"
 
     reset_llm_runtime_settings()
