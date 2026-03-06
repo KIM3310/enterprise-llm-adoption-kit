@@ -769,6 +769,7 @@ def health(request: Request) -> Dict[str, object]:
     circuit = _llm_circuit_snapshot()
     return {
         "status": status,
+        "service": settings.app_name,
         "startup_status": startup_status,
         "auth_mode": settings.auth_mode,
         "login_code_required": bool(settings.demo_login_code),
@@ -785,6 +786,18 @@ def health(request: Request) -> Dict[str, object]:
         "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
         "uptime_seconds": max(0, int(time.time()) - APP_STARTED_AT),
         "request_id": getattr(request.state, "request_id", ""),
+        "capabilities": [
+            "rbac-gated-review-console",
+            "ops-runtime-observability",
+            "control-tower-decisioning",
+            "audit-and-cost-tracking",
+        ],
+        "links": {
+            "metrics": "/metrics",
+            "ops_policy": "/ops/policy",
+            "ops_runtime": "/ops/runtime",
+            "control_tower_spec": "/v1/control-tower/spec",
+        },
     }
 
 

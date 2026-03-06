@@ -17,6 +17,7 @@ async def test_health_includes_runtime_metadata() -> None:
 
     assert payload.get("status") in {"ok", "degraded"}
     assert isinstance(payload.get("startup_status", ""), str)
+    assert str(payload.get("service", "")).startswith("Enterprise LLM Adoption Kit")
 
     assert payload.get("llm_provider") == "stub"
     assert payload.get("llm_model") == "stub-llm"
@@ -33,5 +34,7 @@ async def test_health_includes_runtime_metadata() -> None:
     assert isinstance(payload.get("llm_circuit_consecutive_failures"), int)
     assert isinstance(payload.get("request_max_body_bytes"), int)
     assert payload.get("request_max_body_bytes", 0) >= 1024
+    assert payload.get("links", {}).get("ops_runtime") == "/ops/runtime"
+    assert "ops-runtime-observability" in payload.get("capabilities", [])
 
     reset_llm_runtime_settings()
