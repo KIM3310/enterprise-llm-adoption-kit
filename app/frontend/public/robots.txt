@@ -4,4 +4,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://llm-adoption-atelier.pages.dev/sitemap.xml
+Sitemap: https://enterprise-llm-kit.pages.dev/sitemap.xml

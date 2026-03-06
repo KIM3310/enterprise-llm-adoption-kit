@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://llm-adoption-atelier.pages.dev/</loc>
+    <loc>https://enterprise-llm-kit.pages.dev/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://llm-adoption-atelier.pages.dev/privacy.html</loc>
+    <loc>https://enterprise-llm-kit.pages.dev/privacy.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://llm-adoption-atelier.pages.dev/terms.html</loc>
+    <loc>https://enterprise-llm-kit.pages.dev/terms.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://llm-adoption-atelier.pages.dev/contact.html</loc>
+    <loc>https://enterprise-llm-kit.pages.dev/contact.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://llm-adoption-atelier.pages.dev/compliance.html</loc>
+    <loc>https://enterprise-llm-kit.pages.dev/compliance.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://llm-adoption-atelier.pages.dev/about.html</loc>
+    <loc>https://enterprise-llm-kit.pages.dev/about.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
