@@ -36,5 +36,7 @@ async def test_health_includes_runtime_metadata() -> None:
     assert payload.get("request_max_body_bytes", 0) >= 1024
     assert payload.get("links", {}).get("ops_runtime") == "/ops/runtime"
     assert "ops-runtime-observability" in payload.get("capabilities", [])
+    assert "diagnostics" in payload
+    assert "next_action" in payload["diagnostics"]
 
     reset_llm_runtime_settings()
