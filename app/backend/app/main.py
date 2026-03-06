@@ -810,6 +810,11 @@ def health(request: Request) -> Dict[str, object]:
         "uptime_seconds": max(0, int(time.time()) - APP_STARTED_AT),
         "request_id": getattr(request.state, "request_id", ""),
         "diagnostics": diagnostics,
+        "ops_contract": {
+            "schema": "ops-envelope-v1",
+            "version": 1,
+            "required_fields": ["service", "status", "diagnostics.next_action"],
+        },
         "capabilities": [
             "rbac-gated-review-console",
             "ops-runtime-observability",
