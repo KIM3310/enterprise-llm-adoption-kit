@@ -369,7 +369,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    started_at = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+    started_at = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     base_url = str(args.base_url).rstrip("/")
     timeout = float(args.timeout)
 

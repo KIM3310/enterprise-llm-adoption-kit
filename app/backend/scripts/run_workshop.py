@@ -1,6 +1,6 @@
 import argparse
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 try:
@@ -144,7 +144,7 @@ def main() -> None:
 
     output_dir = Path(args.output_dir)
     files = generate_workshop_bundle(output_dir, inputs)
-    ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")
     print(f"Workshop bundle generated at {output_dir} ({ts})")
     for path in files:
         print(f"- {path}")
