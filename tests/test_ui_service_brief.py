@@ -8,3 +8,10 @@ def test_ui_includes_service_brief_board():
     assert "Executive Readiness Board" in content
     assert "Service contract" in content
     assert "Platform targets" in content
+
+
+def test_ui_includes_executive_review_pack():
+    content = (ROOT_DIR / "app/frontend/src/components/ExecutiveReviewPack.jsx").read_text()
+    assert "Executive Review Pack" in content
+    assert "Buyer promises" in content
+    assert "Rollout tracks" in content

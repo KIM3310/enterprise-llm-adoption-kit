@@ -66,13 +66,15 @@ Quick verify:
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/review-pack | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
 ## Service-grade surfaces
 - `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and reviewers
+- `GET /ops/review-pack`: executive-facing proof bundle, rollout tracks, platform dialogue, and review sequence
 - `GET /ops/service-brief/schema`: explicit contract surface for the service brief payload
-- Home/Readiness UI now renders an `Executive Readiness Board`, even in static mode, so the portfolio still reads like a service when the backend is offline
+- Home/Readiness UI now renders an `Executive Readiness Board` plus `Executive Review Pack`, even in static mode, so the portfolio still reads like a service when the backend is offline
 - See `SERVICE_GRADE_SPECKIT.ko.md` for the spec-first reasoning behind this iteration
 
 ## Customer journey (Discovery -> Production)
