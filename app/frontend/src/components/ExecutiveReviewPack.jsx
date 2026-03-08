@@ -12,7 +12,10 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const reviewSequence = Array.isArray(reviewPack.review_sequence) ? reviewPack.review_sequence : [];
   const stageMap = Array.isArray(reviewPack.stage_map) ? reviewPack.stage_map : [];
   const watchouts = Array.isArray(reviewPack.watchouts) ? reviewPack.watchouts : [];
+  const reviewActions = Array.isArray(reviewPack.review_actions) ? reviewPack.review_actions : [];
   const proofBundle = reviewPack.proof_bundle || {};
+  const reviewAssets = Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets : [];
+  const runtimeSurfaces = Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces : [];
   const runtimeSummary = reviewPack.runtime_summary || {};
 
   return (
@@ -47,6 +50,10 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         <article className="service-metric-card">
           <span>Endpoints</span>
           <strong>{Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0}</strong>
+        </article>
+        <article className="service-metric-card">
+          <span>Review Assets</span>
+          <strong>{proofBundle.review_assets_count || reviewAssets.length || 0}</strong>
         </article>
       </div>
 
@@ -96,6 +103,46 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
               <p className="service-card-label" style={{ marginTop: 16 }}>Stage map</p>
               <div className="service-chip-row">
                 {stageMap.map((item) => (
+                  <span key={item} className="tag">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+        </article>
+      </div>
+
+      <div className="review-pack-columns">
+        <article className="service-brief-card">
+          <p className="service-card-label">Review actions</p>
+          <div className="review-pack-action-list">
+            {reviewActions.slice(0, compact ? 2 : 4).map((item) => (
+              <div key={`${item.label}-${item.surface}`} className="review-pack-action-card">
+                <strong>{item.label}</strong>
+                <code className="service-path">{item.surface}</code>
+                <p>{item.proof}</p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="service-brief-card">
+          <p className="service-card-label">Proof assets</p>
+          <div className="review-pack-asset-list">
+            {reviewAssets.slice(0, compact ? 3 : 5).map((item) => (
+              <div key={`${item.label}-${item.path}`} className="review-pack-asset-card">
+                <strong>{item.label}</strong>
+                <p>{item.kind}</p>
+                <code className="service-path">{item.path}</code>
+              </div>
+            ))}
+          </div>
+          {runtimeSurfaces.length > 0 && (
+            <>
+              <p className="service-card-label" style={{ marginTop: 16 }}>Runtime surfaces</p>
+              <div className="service-chip-row">
+                {runtimeSurfaces.map((item) => (
                   <span key={item} className="tag">
                     {item}
                   </span>

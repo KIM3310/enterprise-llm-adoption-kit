@@ -10,6 +10,13 @@ Korean version: `README.ko.md`
 ## Snapshot
 ![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
 
+## Review Pack At A Glance
+- Reviewer API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
+- Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
+- Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
+
+![Enterprise review pack](docs/review-pack.svg)
+
 ## Project summary (entry-level, hands-on focus)
 - Built an end-to-end adoption kit to show how enterprise LLM discovery turns into a secure, testable, and observable PoC.
 - Implemented a working backend + frontend demo so reviewers can run it locally and verify behavior.
@@ -67,14 +74,16 @@ ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/review-pack | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | head -n 40
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
 ## Service-grade surfaces
 - `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and reviewers
 - `GET /ops/review-pack`: executive-facing proof bundle, rollout tracks, platform dialogue, and review sequence
+- `GET /ops/review-pack/schema`: explicit contract surface for review actions, proof assets, and runtime surfaces
 - `GET /ops/service-brief/schema`: explicit contract surface for the service brief payload
-- Home/Readiness UI now renders an `Executive Readiness Board` plus `Executive Review Pack`, even in static mode, so the portfolio still reads like a service when the backend is offline
+- Home/Readiness UI now renders an `Executive Readiness Board` plus `Executive Review Pack`, including review actions, proof assets, and runtime surfaces, even in static mode
 - See `SERVICE_GRADE_SPECKIT.ko.md` for the spec-first reasoning behind this iteration
 
 ## Customer journey (Discovery -> Production)

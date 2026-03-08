@@ -1640,6 +1640,12 @@ textarea {
   gap: 10px;
 }
 
+.review-pack-action-list,
+.review-pack-asset-list {
+  display: grid;
+  gap: 10px;
+}
+
 .review-pack-track-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -1649,7 +1655,23 @@ textarea {
   gap: 6px;
 }
 
+.review-pack-action-card,
+.review-pack-asset-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.86);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
 .review-pack-track-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.review-pack-action-card p,
+.review-pack-asset-card p {
   margin: 0;
   color: var(--muted);
 }
