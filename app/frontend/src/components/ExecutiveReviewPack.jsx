@@ -70,6 +70,19 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     "Enterprise 2-minute review",
     ...twoMinuteReview.map((item) => `- ${item.step}: ${item.surface} (${item.proof})`),
   ].join("\n");
+  const proofBundleText = [
+    "Enterprise executive proof bundle",
+    `Tests: ${proofBundle.tests || 0}`,
+    `Blueprints: ${proofBundle.blueprints || 0}`,
+    `Eval Assets: ${proofBundle.eval_assets || 0}`,
+    `Review Assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
+    ...(reviewAssets.length
+      ? ["", "Review assets", ...reviewAssets.map((item) => `- ${item}`)]
+      : []),
+    ...(runtimeSurfaces.length
+      ? ["", "Runtime surfaces", ...runtimeSurfaces.map((item) => `- ${item}`)]
+      : []),
+  ].join("\n");
 
   const handleCopyRoutes = async () => {
     const ok = await copyTextToClipboard(fastReviewRouteText);
@@ -79,6 +92,11 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const handleCopyTwoMinuteReview = async () => {
     const ok = await copyTextToClipboard(twoMinuteReviewText);
     setCopyStatus(ok ? "Copied executive 2-minute review." : "Failed to copy executive 2-minute review.");
+  };
+
+  const handleCopyProofBundle = async () => {
+    const ok = await copyTextToClipboard(proofBundleText);
+    setCopyStatus(ok ? "Copied executive proof bundle." : "Failed to copy executive proof bundle.");
   };
 
   return (
@@ -126,6 +144,9 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         </button>
         <button type="button" onClick={() => void handleCopyTwoMinuteReview()}>
           Copy 2-Minute Review
+        </button>
+        <button type="button" onClick={() => void handleCopyProofBundle()}>
+          Copy Proof Bundle
         </button>
         {copyStatus ? <span className="review-pack-toolbar-status">{copyStatus}</span> : null}
       </div>
