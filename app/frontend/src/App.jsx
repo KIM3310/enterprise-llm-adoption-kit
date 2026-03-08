@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import heroTower from "./assets/hero-tower.svg";
+import ExecutiveReviewPack from "./components/ExecutiveReviewPack.jsx";
 import ServiceBriefBoard from "./components/ServiceBriefBoard.jsx";
 
 const API_BASE = String(import.meta.env.VITE_API_BASE || "").trim();
@@ -318,6 +319,7 @@ function buildStaticServiceBrief() {
       health: "/health",
       service_brief: "/ops/service-brief",
       service_brief_schema: "/ops/service-brief/schema",
+      review_pack: "/ops/review-pack",
       metrics: "/metrics",
       audit_summary: "/audit/summary",
       ops_runtime: "/ops/runtime",
@@ -367,6 +369,90 @@ function buildStaticServiceBriefSchema() {
       "application_artifacts",
     ],
     stage_keys: ["discovery", "security", "evals", "deployment", "operations"],
+  };
+}
+
+function buildStaticReviewPack() {
+  return {
+    service: "Enterprise LLM Adoption Kit (Korea)",
+    generated_at: new Date().toISOString(),
+    contract_version: "enterprise-adoption-review-pack-v1",
+    headline:
+      "Executive review pack that ties buyer thesis, governance proof, and rollout tracks to one validation story.",
+    buyer_promises: [
+      "Show a secure adoption path before rollout by grounding every claim in tests, docs, or runtime endpoints.",
+      "Keep the architecture conversation concrete across AWS, Snowflake, Palantir, Databricks, and MariaDB-flavored decisions.",
+      "Move from discovery to proof with a runnable system, not a static deck.",
+    ],
+    runtime_summary: {
+      auth_mode: "local_jwt",
+      llm_provider: "stub",
+      llm_model: "stub-llm",
+      startup_status: "portfolio-static",
+      startup_ready: true,
+      llm_circuit_state: "closed",
+    },
+    proof_bundle: {
+      tests: 22,
+      blueprints: 9,
+      module_packs: 4,
+      eval_assets: 14,
+      application_artifacts: 9,
+      review_endpoints: ["/health", "/ops/service-brief", "/ops/review-pack", "/audit/summary", "/metrics"],
+    },
+    rollout_tracks: [
+      {
+        track: "api-first validation",
+        fit_for: ["solution architecture review", "security pilot", "ops workshop"],
+        evidence: "docs/architecture/llm_deployment_options.md",
+      },
+      {
+        track: "workspace-first enablement",
+        fit_for: ["business user pilot", "low-code adoption", "change management"],
+        evidence: "docs/sales/llm_workspace_checklist.md",
+      },
+      {
+        track: "hybrid control tower",
+        fit_for: ["platform governance", "evaluation gate", "quarterly business review"],
+        evidence: "docs/sales/qbr_template.md",
+      },
+    ],
+    platform_dialogues: [
+      "aws: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
+      "databricks: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
+      "mariadb: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
+      "palantir: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
+      "snowflake: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
+    ],
+    review_sequence: [
+      "1. Issue a role-aware token -> /auth/login",
+      "2. Run architecture diagnosis with citations -> /uc1/architecture",
+      "3. Run log-intel and inspect actionability -> /uc2/log-intel",
+      "4. Verify audit, metrics, and ops runtime -> /audit/summary -> /ops/runtime -> /metrics",
+    ],
+    stage_map: [
+      "Discovery to Scope",
+      "Security and Governance",
+      "Evaluation and Regression",
+      "Deployment and Integration",
+      "Operations and Executive Review",
+    ],
+    watchouts: [
+      "Static mode is active until the backend serves /ops/review-pack.",
+      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live reviewer demos.",
+      "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
+    ],
+    links: {
+      health: "/health",
+      service_brief: "/ops/service-brief",
+      review_pack: "/ops/review-pack",
+      metrics: "/metrics",
+      audit_summary: "/audit/summary",
+      customer_journey: "docs/blueprint/09_customer_journey.md",
+      deployment_options: "docs/architecture/llm_deployment_options.md",
+      exec_summary_template: "docs/sales/executive_summary_template.md",
+      qbr_template: "docs/sales/qbr_template.md",
+    },
   };
 }
 
@@ -786,6 +872,7 @@ export default function App() {
   const [healthCheckedAt, setHealthCheckedAt] = useState("");
   const [serviceBrief, setServiceBrief] = useState(() => buildStaticServiceBrief());
   const [serviceBriefSchema, setServiceBriefSchema] = useState(() => buildStaticServiceBriefSchema());
+  const [reviewPack, setReviewPack] = useState(() => buildStaticReviewPack());
   const [scenarioRun, setScenarioRun] = useState(null);
   const [scenarioHistory, setScenarioHistory] = useState(() => {
     const stored = readJsonStorage(STORAGE_KEYS.scenarioHistory, []);
@@ -1033,6 +1120,21 @@ export default function App() {
       } catch (_error) {
         if (!cancelled) {
           setServiceBriefSchema(buildStaticServiceBriefSchema());
+        }
+      }
+
+      try {
+        const response = await fetchWithTimeout(`${API_BASE}/ops/review-pack`, { cache: "no-store" }, 8000);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(parseApiError(data, "Review pack request failed"));
+        }
+        if (!cancelled) {
+          setReviewPack(data);
+        }
+      } catch (_error) {
+        if (!cancelled) {
+          setReviewPack(buildStaticReviewPack());
         }
       }
     }
@@ -2600,6 +2702,12 @@ export default function App() {
               </Reveal>
             </section>
 
+            <section className="section-block">
+              <Reveal delay={90}>
+                <ExecutiveReviewPack reviewPack={reviewPack} />
+              </Reveal>
+            </section>
+
             <section className="section-block sponsored-section">
               <Reveal className="sponsored-card" delay={90}>
                 <p className="eyebrow">Sponsored</p>
@@ -2781,6 +2889,10 @@ export default function App() {
                   checkedAt={healthCheckedAt}
                   variant="compact"
                 />
+              </Reveal>
+
+              <Reveal delay={90}>
+                <ExecutiveReviewPack reviewPack={reviewPack} variant="compact" />
               </Reveal>
 
               <div className="validation-layout">

@@ -1611,6 +1611,57 @@ textarea {
   display: none;
 }
 
+.executive-review-pack {
+  display: grid;
+  gap: 16px;
+  padding: var(--panel-pad);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(244, 248, 255, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
+  box-shadow: var(--shadow-soft);
+}
+
+.review-pack-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 12px;
+}
+
+.review-pack-grid,
+.review-pack-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.review-pack-track-list {
+  display: grid;
+  gap: 10px;
+}
+
+.review-pack-track-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.86);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.review-pack-track-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.executive-review-pack.compact .review-pack-columns {
+  grid-template-columns: 1fr;
+}
+
+.executive-review-pack.compact .service-chip-row {
+  width: 100%;
+}
+
 .site-footer {
   margin-top: 22px;
   padding-top: 4px;
@@ -1698,7 +1749,9 @@ textarea {
 
   .service-brief-meta,
   .service-brief-columns,
-  .service-brief-flow {
+  .service-brief-flow,
+  .review-pack-grid,
+  .review-pack-columns {
     grid-template-columns: 1fr;
   }
 
