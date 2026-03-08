@@ -314,6 +314,28 @@ def build_service_review_pack(
             "proof": "Choose API-first, workspace-first, or hybrid rollout with evidence-backed tradeoffs.",
         },
     ]
+    two_minute_review = [
+        {
+            "step": "1. Runtime posture",
+            "surface": "/ops/service-brief",
+            "proof": "Confirm maturity stage, startup readiness, runtime mode, and evidence counts before the walkthrough.",
+        },
+        {
+            "step": "2. Executive proof bundle",
+            "surface": "/ops/review-pack",
+            "proof": "Use buyer promises, proof assets, and rollout tracks to frame the system in one pass.",
+        },
+        {
+            "step": "3. Governance path",
+            "surface": "/audit/summary -> /metrics",
+            "proof": "Show auditability, policy events, and cost/latency visibility without leaving the runtime surface.",
+        },
+        {
+            "step": "4. Deployment decision",
+            "surface": "docs/architecture/llm_deployment_options.md -> docs/blueprint/09_customer_journey.md",
+            "proof": "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
+        },
+    ]
 
     return {
         "service": brief["service"],
@@ -360,6 +382,7 @@ def build_service_review_pack(
             ],
         },
         "review_actions": review_actions,
+        "two_minute_review": two_minute_review,
         "rollout_tracks": [
             {
                 "track": "api-first validation",
@@ -415,6 +438,7 @@ def build_service_review_pack_schema() -> Dict[str, object]:
             "runtime_summary",
             "proof_bundle",
             "review_actions",
+            "two_minute_review",
             "rollout_tracks",
             "platform_dialogues",
             "review_sequence",
@@ -449,6 +473,11 @@ def build_service_review_pack_schema() -> Dict[str, object]:
         ],
         "review_action_required_fields": [
             "label",
+            "surface",
+            "proof",
+        ],
+        "two_minute_review_required_fields": [
+            "step",
             "surface",
             "proof",
         ],
