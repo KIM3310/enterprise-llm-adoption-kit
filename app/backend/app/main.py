@@ -91,7 +91,11 @@ from .rag import (
 from .rate_limit import RateLimiter
 from .redaction import redact_text
 from .safety import REFUSAL_MESSAGE, should_refuse
-from .service_brief import build_service_brief, build_service_brief_schema
+from .service_brief import (
+    build_service_brief,
+    build_service_brief_schema,
+    build_service_review_pack,
+)
 from .storage import (
     add_cost,
     get_daily_cost,
@@ -767,7 +771,7 @@ def health(request: Request) -> Dict[str, object]:
         "failed_checks": [],
         "failed_warning_checks": [],
         "failed_critical_checks": [],
-        "next_action": "load /ops/runtime for diagnostics",
+        "next_action": "load /ops/review-pack then /ops/runtime for diagnostics",
     }
     if isinstance(startup_report, dict):
         status = "ok" if startup_report.get("startup_ready", False) else "degraded"
@@ -823,6 +827,7 @@ def health(request: Request) -> Dict[str, object]:
             "control-tower-decisioning",
             "audit-and-cost-tracking",
             "service-brief-readiness",
+            "executive-review-pack",
         ],
         "links": {
             "metrics": "/metrics",
@@ -831,6 +836,7 @@ def health(request: Request) -> Dict[str, object]:
             "control_tower_spec": "/v1/control-tower/spec",
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
+            "review_pack": "/ops/review-pack",
         },
     }
 
@@ -847,6 +853,14 @@ def ops_service_brief() -> ServiceBriefResponse:
 @app.get("/ops/service-brief/schema")
 def ops_service_brief_schema() -> Dict[str, object]:
     return build_service_brief_schema()
+
+
+@app.get("/ops/review-pack")
+def ops_review_pack() -> Dict[str, object]:
+    return build_service_review_pack(
+        startup_report=getattr(app.state, "startup_report", None),
+        circuit_snapshot=_llm_circuit_snapshot(),
+    )
 
 
 @app.get("/metrics")

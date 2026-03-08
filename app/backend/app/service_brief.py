@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
@@ -253,12 +254,106 @@ def build_service_brief(
             "health": "/health",
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
+            "review_pack": "/ops/review-pack",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
             "ops_runtime": "/ops/runtime",
             "control_tower_spec": "/v1/control-tower/spec",
             "customer_journey": "docs/blueprint/09_customer_journey.md",
             "role_alignment": "docs/application/role_alignment.md",
+        },
+    }
+
+
+def build_service_review_pack(
+    *,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    brief = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    runtime = brief.get("runtime", {})
+    evidence = brief.get("evidence", {})
+    platform_targets = [str(item) for item in brief.get("platform_targets", [])]
+    review_flow = brief.get("review_flow", [])
+    stage_labels = [
+        str(stage.get("label", stage.get("key", "")))
+        for stage in brief.get("stages", [])
+        if isinstance(stage, dict)
+    ]
+
+    return {
+        "service": brief["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-review-pack-v1",
+        "headline": "Executive review pack that ties buyer thesis, governance proof, and rollout tracks to one validation story.",
+        "buyer_promises": [
+            "Show a secure adoption path before rollout by grounding every claim in tests, docs, or runtime endpoints.",
+            "Keep the architecture conversation concrete across AWS, Snowflake, Palantir, Databricks, and MariaDB-flavored decisions.",
+            "Move from discovery to proof with a runnable system, not a static deck.",
+        ],
+        "runtime_summary": {
+            "auth_mode": runtime.get("auth_mode", ""),
+            "llm_provider": runtime.get("llm_provider", ""),
+            "llm_model": runtime.get("llm_model", ""),
+            "startup_status": runtime.get("startup_status", ""),
+            "startup_ready": bool(runtime.get("startup_ready", False)),
+            "llm_circuit_state": runtime.get("llm_circuit_state", "closed"),
+        },
+        "proof_bundle": {
+            "tests": int(evidence.get("test_files", 0)),
+            "blueprints": int(evidence.get("blueprint_docs", 0)),
+            "module_packs": int(evidence.get("module_packs", 0)),
+            "eval_assets": int(evidence.get("eval_datasets", 0)) + int(evidence.get("eval_reports", 0)),
+            "application_artifacts": int(evidence.get("application_artifacts", 0)),
+            "review_endpoints": [
+                "/health",
+                "/ops/service-brief",
+                "/ops/review-pack",
+                "/audit/summary",
+                "/metrics",
+            ],
+        },
+        "rollout_tracks": [
+            {
+                "track": "api-first validation",
+                "fit_for": ["solution architecture review", "security pilot", "ops workshop"],
+                "evidence": "docs/architecture/llm_deployment_options.md",
+            },
+            {
+                "track": "workspace-first enablement",
+                "fit_for": ["business user pilot", "low-code adoption", "change management"],
+                "evidence": "docs/sales/llm_workspace_checklist.md",
+            },
+            {
+                "track": "hybrid control tower",
+                "fit_for": ["platform governance", "evaluation gate", "quarterly business review"],
+                "evidence": "docs/sales/qbr_template.md",
+            },
+        ],
+        "platform_dialogues": [
+            f"{platform_name}: map discovery, governance, and deployment decisions into the customer's preferred platform language."
+            for platform_name in platform_targets
+        ],
+        "review_sequence": [
+            f"{index + 1}. {step.get('title', 'review step')} -> {step.get('endpoint', '-')}"
+            for index, step in enumerate(review_flow)
+            if isinstance(step, dict)
+        ],
+        "stage_map": stage_labels,
+        "watchouts": [str(item) for item in brief.get("watchouts", [])],
+        "links": {
+            "health": "/health",
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "metrics": "/metrics",
+            "audit_summary": "/audit/summary",
+            "customer_journey": "docs/blueprint/09_customer_journey.md",
+            "deployment_options": "docs/architecture/llm_deployment_options.md",
+            "exec_summary_template": "docs/sales/executive_summary_template.md",
+            "qbr_template": "docs/sales/qbr_template.md",
         },
     }
 
