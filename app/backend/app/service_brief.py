@@ -283,6 +283,37 @@ def build_service_review_pack(
         for stage in brief.get("stages", [])
         if isinstance(stage, dict)
     ]
+    review_assets = _artifacts(
+        [
+            ("Executive dashboard markdown", "docs/sales/exec_value_dashboard/latest.md", "doc"),
+            ("Executive dashboard snapshot", "docs/sales/exec_value_dashboard/snapshot.svg", "doc"),
+            ("Security compliance packet", "docs/sales/security_compliance_packet.md", "doc"),
+            ("Latest eval report", "evals/reports/latest_report.md", "report"),
+            ("Customer journey blueprint", "docs/blueprint/09_customer_journey.md", "doc"),
+        ]
+    )
+    review_actions = [
+        {
+            "label": "Check buyer-ready runtime posture",
+            "surface": "/ops/service-brief",
+            "proof": "Review maturity stage, runtime posture, and stage evidence before the demo.",
+        },
+        {
+            "label": "Inspect executive proof bundle",
+            "surface": "/ops/review-pack",
+            "proof": "Use the review pack to walk buyer promises, rollout tracks, and platform dialogue.",
+        },
+        {
+            "label": "Verify governance signals",
+            "surface": "/audit/summary -> /metrics",
+            "proof": "Confirm auditability, policy events, and cost/latency visibility.",
+        },
+        {
+            "label": "Map the deployment path",
+            "surface": "docs/architecture/llm_deployment_options.md",
+            "proof": "Choose API-first, workspace-first, or hybrid rollout with evidence-backed tradeoffs.",
+        },
+    ]
 
     return {
         "service": brief["service"],
@@ -308,14 +339,27 @@ def build_service_review_pack(
             "module_packs": int(evidence.get("module_packs", 0)),
             "eval_assets": int(evidence.get("eval_datasets", 0)) + int(evidence.get("eval_reports", 0)),
             "application_artifacts": int(evidence.get("application_artifacts", 0)),
+            "review_assets_count": len(review_assets),
+            "review_assets": review_assets,
+            "platform_targets": platform_targets,
+            "runtime_surfaces": [
+                "/health",
+                "/ops/service-brief",
+                "/ops/review-pack",
+                "/ops/review-pack/schema",
+                "/ops/runtime",
+                "/metrics",
+            ],
             "review_endpoints": [
                 "/health",
                 "/ops/service-brief",
                 "/ops/review-pack",
+                "/ops/review-pack/schema",
                 "/audit/summary",
                 "/metrics",
             ],
         },
+        "review_actions": review_actions,
         "rollout_tracks": [
             {
                 "track": "api-first validation",
@@ -348,12 +392,70 @@ def build_service_review_pack(
             "health": "/health",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
+            "review_pack_schema": "/ops/review-pack/schema",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
             "customer_journey": "docs/blueprint/09_customer_journey.md",
             "deployment_options": "docs/architecture/llm_deployment_options.md",
             "exec_summary_template": "docs/sales/executive_summary_template.md",
             "qbr_template": "docs/sales/qbr_template.md",
+        },
+    }
+
+
+def build_service_review_pack_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-review-pack-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "headline",
+            "buyer_promises",
+            "runtime_summary",
+            "proof_bundle",
+            "review_actions",
+            "rollout_tracks",
+            "platform_dialogues",
+            "review_sequence",
+            "stage_map",
+            "watchouts",
+            "links",
+        ],
+        "runtime_summary_required_fields": [
+            "auth_mode",
+            "llm_provider",
+            "llm_model",
+            "startup_status",
+            "startup_ready",
+            "llm_circuit_state",
+        ],
+        "proof_bundle_required_fields": [
+            "tests",
+            "blueprints",
+            "module_packs",
+            "eval_assets",
+            "application_artifacts",
+            "review_assets_count",
+            "review_assets",
+            "platform_targets",
+            "runtime_surfaces",
+            "review_endpoints",
+        ],
+        "review_asset_required_fields": [
+            "label",
+            "path",
+            "kind",
+        ],
+        "review_action_required_fields": [
+            "label",
+            "surface",
+            "proof",
+        ],
+        "links": {
+            "readme": "README.md",
+            "review_pack": "/ops/review-pack",
+            "review_pack_schema": "/ops/review-pack/schema",
         },
     }
 

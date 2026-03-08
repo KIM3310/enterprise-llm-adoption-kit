@@ -9,6 +9,7 @@ Last updated: 2026-03-08
   - 운영자/구매자 관점에서 바로 이해되는 `readiness board`를 홈과 validation 화면에 노출
   - 백엔드 계약형 surface 추가: `GET /ops/service-brief`, `GET /ops/service-brief/schema`
   - executive 시점의 proof bundle을 `GET /ops/review-pack`으로 분리
+  - reviewer가 30초 안에 읽도록 `review actions`, `proof assets`, `review-pack schema`를 추가
 
 ## P - Product Thesis
 - 이 repo의 강점은 기능 수가 아니라 `enterprise rollout 전체 흐름`을 한 저장소 안에서 보여준다는 점이다.
@@ -27,14 +28,17 @@ Last updated: 2026-03-08
   - `GET /ops/service-brief`
   - `GET /ops/service-brief/schema`
   - `GET /ops/review-pack`
+  - `GET /ops/review-pack/schema`
 - 프론트엔드
   - `ServiceBriefBoard` 컴포넌트 추가
   - `ExecutiveReviewPack` 컴포넌트 추가
   - Home/Readiness 상단에 readiness board 삽입
   - Home/Readiness에 buyer thesis와 rollout track을 보여주는 review pack 삽입
+  - review pack 안에 `review actions`, `proof assets`, `runtime surfaces` 노출
   - 백엔드 미연결 상황에서도 static fallback으로 서비스 브리프 유지
 - 문서
   - README / README.ko에 service-grade surface 설명 추가
+  - `docs/review-pack.svg`로 proof-pack narrative 압축
   - 본 문서로 이번 iteration의 spec 기록
 
 ## C - Criteria
@@ -43,6 +47,7 @@ Last updated: 2026-03-08
   - 홈 화면에서 광고보다 먼저 서비스 증거가 보인다
   - validation 화면에서 추상적 체크리스트 대신 실제 artifact/stage 기반 readiness가 보인다
   - reviewer가 buyer promise, rollout track, platform dialogue를 UI에서 바로 읽는다
+  - reviewer가 proof asset과 runtime surface까지 UI에서 바로 읽는다
   - 정적 배포 환경에서도 fallback 데이터로 UX가 무너지지 않는다
   - `pytest -q` 및 `npm run build`가 통과한다
 
@@ -57,6 +62,7 @@ Last updated: 2026-03-08
   - `/ops/service-brief`를 markdown export 가능한 brief로 확장
   - Scenario Runner 결과와 service brief를 연결한 evidence pack 생성
   - Control Tower와 Snowflake/Palantir ontology narrative를 더 정교하게 매핑
+  - hosted demo smoke와 checked-in screenshot/GIF를 더 쌓기
 
 ## T - Trace
 - 관련 surface
@@ -68,3 +74,4 @@ Last updated: 2026-03-08
   - `app/frontend/src/style.css`
   - `tests/test_service_brief.py`
   - `tests/test_ui_service_brief.py`
+  - `docs/review-pack.svg`

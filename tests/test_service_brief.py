@@ -48,5 +48,23 @@ async def test_ops_review_pack_contract() -> None:
     assert body["contract_version"] == "enterprise-adoption-review-pack-v1"
     assert body["runtime_summary"]["llm_provider"] == "stub"
     assert body["proof_bundle"]["tests"] >= 20
+    assert body["proof_bundle"]["review_assets_count"] >= 4
+    assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
+    assert any(item["label"] == "Inspect executive proof bundle" for item in body["review_actions"])
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
+
+
+@pytest.mark.anyio
+async def test_ops_review_pack_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/review-pack/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-review-pack-v1"
+    assert "review_actions" in body["required_fields"]
+    assert "review_assets" in body["proof_bundle_required_fields"]
+    assert "surface" in body["review_action_required_fields"]
