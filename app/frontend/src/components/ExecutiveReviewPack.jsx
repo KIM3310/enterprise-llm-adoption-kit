@@ -13,6 +13,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const stageMap = Array.isArray(reviewPack.stage_map) ? reviewPack.stage_map : [];
   const watchouts = Array.isArray(reviewPack.watchouts) ? reviewPack.watchouts : [];
   const reviewActions = Array.isArray(reviewPack.review_actions) ? reviewPack.review_actions : [];
+  const twoMinuteReview = Array.isArray(reviewPack.two_minute_review) ? reviewPack.two_minute_review : [];
   const proofBundle = reviewPack.proof_bundle || {};
   const reviewAssets = Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets : [];
   const runtimeSurfaces = Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces : [];
@@ -76,6 +77,19 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           </ul>
         </article>
       </div>
+
+      <article className="service-brief-card">
+        <p className="service-card-label">2-minute proof path</p>
+        <div className="review-pack-action-list">
+          {twoMinuteReview.slice(0, compact ? 2 : 4).map((item) => (
+            <div key={`${item.step}-${item.surface}`} className="review-pack-action-card">
+              <strong>{item.step}</strong>
+              <code className="service-path">{item.surface}</code>
+              <p>{item.proof}</p>
+            </div>
+          ))}
+        </div>
+      </article>
 
       <div className="review-pack-columns">
         <article className="service-brief-card">

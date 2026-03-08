@@ -51,6 +51,7 @@ async def test_ops_review_pack_contract() -> None:
     assert body["proof_bundle"]["review_assets_count"] >= 4
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
     assert any(item["label"] == "Inspect executive proof bundle" for item in body["review_actions"])
+    assert len(body["two_minute_review"]) == 4
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
@@ -66,5 +67,7 @@ async def test_ops_review_pack_schema_contract() -> None:
     body = response.json()
     assert body["schema"] == "enterprise-adoption-review-pack-v1"
     assert "review_actions" in body["required_fields"]
+    assert "two_minute_review" in body["required_fields"]
     assert "review_assets" in body["proof_bundle_required_fields"]
     assert "surface" in body["review_action_required_fields"]
+    assert "step" in body["two_minute_review_required_fields"]

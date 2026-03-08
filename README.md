@@ -15,6 +15,12 @@ Korean version: `README.ko.md`
 - Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
 
+## 2-Minute Proof Path
+- `GET /ops/service-brief` -> confirm runtime posture and evidence counts.
+- `GET /ops/review-pack` -> inspect buyer promises, rollout tracks, and proof assets.
+- `GET /audit/summary` + `GET /metrics` -> show governance and LLMOps signals.
+- `docs/architecture/llm_deployment_options.md` + `docs/blueprint/09_customer_journey.md` -> connect evidence to rollout path.
+
 ![Enterprise review pack](docs/review-pack.svg)
 
 ## Project summary (entry-level, hands-on focus)
