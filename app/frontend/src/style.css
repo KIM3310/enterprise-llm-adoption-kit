@@ -1628,6 +1628,34 @@ textarea {
   gap: 12px;
 }
 
+.review-pack-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.review-pack-toolbar button {
+  min-height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  padding: 0 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.review-pack-toolbar button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.review-pack-toolbar-status {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 .review-pack-grid,
 .review-pack-columns {
   display: grid;

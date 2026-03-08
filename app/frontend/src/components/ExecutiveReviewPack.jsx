@@ -1,6 +1,37 @@
 import React from "react";
 
+async function copyTextToClipboard(text) {
+  const payload = typeof text === "string" ? text.trim() : "";
+  if (!payload) return false;
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(payload);
+      return true;
+    }
+  } catch {
+    // Fallback below.
+  }
+
+  try {
+    const helper = document.createElement("textarea");
+    helper.value = payload;
+    helper.setAttribute("readonly", "true");
+    helper.style.position = "absolute";
+    helper.style.left = "-9999px";
+    document.body.appendChild(helper);
+    helper.select();
+    const ok = document.execCommand("copy");
+    helper.remove();
+    return Boolean(ok);
+  } catch {
+    return false;
+  }
+}
+
 export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
+  const [copyStatus, setCopyStatus] = React.useState("");
+
   if (!reviewPack) {
     return null;
   }
@@ -30,6 +61,24 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     deployment_options: "Map API-first, workspace-first, and hybrid rollout options.",
     exec_summary_template: "Keep the narrative anchored in buyer language.",
     qbr_template: "Show how proof rolls forward into executive cadence.",
+  };
+  const fastReviewRouteText = [
+    "Enterprise review routes",
+    ...fastReviewSurfaces.map(([label, surface]) => `- ${label}: ${surface}`),
+  ].join("\n");
+  const twoMinuteReviewText = [
+    "Enterprise 2-minute review",
+    ...twoMinuteReview.map((item) => `- ${item.step}: ${item.surface} (${item.proof})`),
+  ].join("\n");
+
+  const handleCopyRoutes = async () => {
+    const ok = await copyTextToClipboard(fastReviewRouteText);
+    setCopyStatus(ok ? "Copied executive review routes." : "Failed to copy executive review routes.");
+  };
+
+  const handleCopyTwoMinuteReview = async () => {
+    const ok = await copyTextToClipboard(twoMinuteReviewText);
+    setCopyStatus(ok ? "Copied executive 2-minute review." : "Failed to copy executive 2-minute review.");
   };
 
   return (
@@ -69,6 +118,16 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           <span>Review Assets</span>
           <strong>{proofBundle.review_assets_count || reviewAssets.length || 0}</strong>
         </article>
+      </div>
+
+      <div className="review-pack-toolbar">
+        <button type="button" onClick={() => void handleCopyRoutes()}>
+          Copy Review Routes
+        </button>
+        <button type="button" onClick={() => void handleCopyTwoMinuteReview()}>
+          Copy 2-Minute Review
+        </button>
+        {copyStatus ? <span className="review-pack-toolbar-status">{copyStatus}</span> : null}
       </div>
 
       <article className="service-brief-card">
