@@ -398,8 +398,74 @@ function buildStaticReviewPack() {
       module_packs: 4,
       eval_assets: 14,
       application_artifacts: 9,
-      review_endpoints: ["/health", "/ops/service-brief", "/ops/review-pack", "/audit/summary", "/metrics"],
+      review_assets_count: 5,
+      review_assets: [
+        {
+          label: "Executive dashboard markdown",
+          path: "docs/sales/exec_value_dashboard/latest.md",
+          kind: "doc",
+        },
+        {
+          label: "Executive dashboard snapshot",
+          path: "docs/sales/exec_value_dashboard/snapshot.svg",
+          kind: "doc",
+        },
+        {
+          label: "Security compliance packet",
+          path: "docs/sales/security_compliance_packet.md",
+          kind: "doc",
+        },
+        {
+          label: "Latest eval report",
+          path: "evals/reports/latest_report.md",
+          kind: "report",
+        },
+        {
+          label: "Customer journey blueprint",
+          path: "docs/blueprint/09_customer_journey.md",
+          kind: "doc",
+        },
+      ],
+      platform_targets: ["aws", "databricks", "mariadb", "palantir", "snowflake"],
+      runtime_surfaces: [
+        "/health",
+        "/ops/service-brief",
+        "/ops/review-pack",
+        "/ops/review-pack/schema",
+        "/ops/runtime",
+        "/metrics",
+      ],
+      review_endpoints: [
+        "/health",
+        "/ops/service-brief",
+        "/ops/review-pack",
+        "/ops/review-pack/schema",
+        "/audit/summary",
+        "/metrics",
+      ],
     },
+    review_actions: [
+      {
+        label: "Check buyer-ready runtime posture",
+        surface: "/ops/service-brief",
+        proof: "Review maturity stage, runtime posture, and stage evidence before the demo.",
+      },
+      {
+        label: "Inspect executive proof bundle",
+        surface: "/ops/review-pack",
+        proof: "Use the review pack to walk buyer promises, rollout tracks, and platform dialogue.",
+      },
+      {
+        label: "Verify governance signals",
+        surface: "/audit/summary -> /metrics",
+        proof: "Confirm auditability, policy events, and cost/latency visibility.",
+      },
+      {
+        label: "Map the deployment path",
+        surface: "docs/architecture/llm_deployment_options.md",
+        proof: "Choose API-first, workspace-first, or hybrid rollout with evidence-backed tradeoffs.",
+      },
+    ],
     rollout_tracks: [
       {
         track: "api-first validation",
@@ -446,6 +512,7 @@ function buildStaticReviewPack() {
       health: "/health",
       service_brief: "/ops/service-brief",
       review_pack: "/ops/review-pack",
+      review_pack_schema: "/ops/review-pack/schema",
       metrics: "/metrics",
       audit_summary: "/audit/summary",
       customer_journey: "docs/blueprint/09_customer_journey.md",

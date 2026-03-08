@@ -10,6 +10,13 @@ Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 �
 ## 스냅샷
 ![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
 
+## Review Pack 한눈에 보기
+- 리뷰어 API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
+- 증거 번들: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
+- 플랫폼 대화: AWS, Databricks, Snowflake, Palantir, MariaDB 롤아웃 매핑을 한 팩에 압축
+
+![Enterprise review pack](docs/review-pack.svg)
+
 ## 프로젝트 요약 (신입/핸즈온 관점)
 - 엔터프라이즈 LLM 도입의 Discovery 결과가 어떻게 안전하고 검증 가능한 PoC로 이어지는지 end-to-end로 보여주기 위해 만들었습니다.
 - 백엔드 + 프론트엔드 데모를 직접 구성해 로컬에서 재현 가능한 형태로 제공합니다.
@@ -66,13 +73,17 @@ Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 �
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/review-pack | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | head -n 40
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
 ## Service-grade surface
 - `GET /ops/service-brief`: 구매자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
+- `GET /ops/review-pack`: executive proof bundle, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
+- `GET /ops/review-pack/schema`: review actions, proof assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
-- Home/Readiness UI에 `Executive Readiness Board`를 추가해 백엔드가 꺼져 있어도 정적 fallback으로 서비스 문맥이 유지됩니다
+- Home/Readiness UI에 `Executive Readiness Board`와 `Executive Review Pack`을 추가해 review actions, proof assets, runtime surfaces까지 정적 fallback으로 유지합니다
 - 이번 iteration의 spec 기록은 `SERVICE_GRADE_SPECKIT.ko.md` 참고
 
 ## 고객 여정 (Discovery -> Production)
