@@ -74,6 +74,7 @@ from .models import (
     OpsAlertsResponse,
     OpsDiagnosticsRefreshResponse,
     OpsRuntimeResponse,
+    ServiceBriefResponse,
     SlackEvent,
     ToolCall,
     UserContext,
@@ -90,6 +91,7 @@ from .rag import (
 from .rate_limit import RateLimiter
 from .redaction import redact_text
 from .safety import REFUSAL_MESSAGE, should_refuse
+from .service_brief import build_service_brief, build_service_brief_schema
 from .storage import (
     add_cost,
     get_daily_cost,
@@ -820,14 +822,31 @@ def health(request: Request) -> Dict[str, object]:
             "ops-runtime-observability",
             "control-tower-decisioning",
             "audit-and-cost-tracking",
+            "service-brief-readiness",
         ],
         "links": {
             "metrics": "/metrics",
             "ops_policy": "/ops/policy",
             "ops_runtime": "/ops/runtime",
             "control_tower_spec": "/v1/control-tower/spec",
+            "service_brief": "/ops/service-brief",
+            "service_brief_schema": "/ops/service-brief/schema",
         },
     }
+
+
+@app.get("/ops/service-brief", response_model=ServiceBriefResponse)
+def ops_service_brief() -> ServiceBriefResponse:
+    payload = build_service_brief(
+        startup_report=getattr(app.state, "startup_report", None),
+        circuit_snapshot=_llm_circuit_snapshot(),
+    )
+    return ServiceBriefResponse(**payload)
+
+
+@app.get("/ops/service-brief/schema")
+def ops_service_brief_schema() -> Dict[str, object]:
+    return build_service_brief_schema()
 
 
 @app.get("/metrics")

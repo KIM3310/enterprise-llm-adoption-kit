@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import heroTower from "./assets/hero-tower.svg";
+import ServiceBriefBoard from "./components/ServiceBriefBoard.jsx";
 
 const API_BASE = String(import.meta.env.VITE_API_BASE || "").trim();
 const FORMSPREE_ENDPOINT = String(import.meta.env.VITE_FORMSPREE_ENDPOINT || "").trim();
@@ -98,6 +99,276 @@ const scenarioSteps = [
     endpoint: "/audit/summary · /metrics"
   }
 ];
+
+function buildStaticServiceBrief() {
+  return {
+    service: "Enterprise LLM Adoption Kit (Korea)",
+    contract_version: "enterprise-adoption-service-brief-v1",
+    tagline: "Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps",
+    maturity_stage: "pre-production validation system",
+    audiences: [
+      "Solutions Architect",
+      "Platform Engineering",
+      "Security Review",
+      "Customer Success",
+      "Executive Sponsor",
+    ],
+    runtime: {
+      auth_mode: "local_jwt",
+      data_handling_mode: "demo",
+      storage_backend: "sqlite",
+      llm_provider: "stub",
+      llm_model: "stub-llm",
+      openai_api_key_configured: false,
+      login_code_required: false,
+      integrations_require_auth: true,
+      startup_status: "portfolio-static",
+      startup_ready: true,
+      llm_circuit_state: "closed",
+    },
+    evidence: {
+      test_files: 22,
+      blueprint_docs: 9,
+      module_packs: 4,
+      eval_datasets: 5,
+      eval_reports: 9,
+      application_artifacts: 9,
+    },
+    run_modes: ["local-jwt demo", "docker compose", "ollama local", "openai compatible"],
+    platform_targets: ["aws", "databricks", "mariadb", "palantir", "snowflake"],
+    strengths: [
+      "One repo ties discovery, governance, evals, runtime diagnostics, and executive review together.",
+      "Scenario Runner and ops surfaces make the portfolio feel like a working service instead of a static deck.",
+      "Platform mapping speaks directly to AWS, Snowflake, and Palantir-flavored deployment conversations.",
+      "Static fallback keeps the review surface readable even when the backend is not running.",
+    ],
+    watchouts: [
+      "Static mode is active until the backend serves /ops/service-brief.",
+      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live reviewer demos.",
+      "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
+    ],
+    stages: [
+      {
+        key: "discovery",
+        label: "Discovery to Scope",
+        readiness: "ready",
+        artifact_count: 3,
+        highlights: [
+          {
+            label: "Discovery questionnaire",
+            path: "docs/sales/discovery_questionnaire.md",
+            kind: "doc",
+          },
+          {
+            label: "Customer journey blueprint",
+            path: "docs/blueprint/09_customer_journey.md",
+            kind: "doc",
+          },
+          {
+            label: "Role alignment",
+            path: "docs/application/role_alignment.md",
+            kind: "doc",
+          },
+        ],
+      },
+      {
+        key: "security",
+        label: "Security and Governance",
+        readiness: "ready",
+        artifact_count: 4,
+        highlights: [
+          {
+            label: "Security threat model",
+            path: "docs/blueprint/03_security_threat_model.md",
+            kind: "doc",
+          },
+          {
+            label: "Security governance",
+            path: "docs/architecture/security_governance.md",
+            kind: "doc",
+          },
+          {
+            label: "Redaction test",
+            path: "tests/test_redaction.py",
+            kind: "test",
+          },
+          {
+            label: "Injection test",
+            path: "tests/test_injection.py",
+            kind: "test",
+          },
+        ],
+      },
+      {
+        key: "evals",
+        label: "Evaluation and Regression",
+        readiness: "ready",
+        artifact_count: 4,
+        highlights: [
+          {
+            label: "Eval plan",
+            path: "docs/blueprint/04_evals_plan.md",
+            kind: "doc",
+          },
+          {
+            label: "Latest eval report",
+            path: "evals/reports/latest_report.md",
+            kind: "report",
+          },
+          {
+            label: "Eval gate",
+            path: "docs/evals/eval_gate.md",
+            kind: "doc",
+          },
+          {
+            label: "Eval runner test",
+            path: "tests/test_eval_runner.py",
+            kind: "test",
+          },
+        ],
+      },
+      {
+        key: "deployment",
+        label: "Deployment and Integration",
+        readiness: "ready",
+        artifact_count: 4,
+        highlights: [
+          {
+            label: "Deployment options",
+            path: "docs/architecture/llm_deployment_options.md",
+            kind: "doc",
+          },
+          {
+            label: "AWS reference architecture",
+            path: "docs/architecture/aws_openai_reference_architecture.md",
+            kind: "doc",
+          },
+          {
+            label: "Integration pack",
+            path: "docs/modules/integration-pack/README.md",
+            kind: "doc",
+          },
+          {
+            label: "Docker compose",
+            path: "infra/docker-compose.yml",
+            kind: "doc",
+          },
+        ],
+      },
+      {
+        key: "operations",
+        label: "Operations and Executive Review",
+        readiness: "ready",
+        artifact_count: 4,
+        highlights: [
+          {
+            label: "Ops runtime endpoint",
+            path: "app/backend/app/main.py",
+            kind: "endpoint",
+          },
+          {
+            label: "Exec value dashboard",
+            path: "docs/sales/exec_value_dashboard/latest.md",
+            kind: "doc",
+          },
+          {
+            label: "Audit viewer guide",
+            path: "docs/ops/audit_viewer.md",
+            kind: "doc",
+          },
+          {
+            label: "Executive dashboard test",
+            path: "tests/test_exec_dashboard.py",
+            kind: "test",
+          },
+        ],
+      },
+    ],
+    review_flow: [
+      {
+        order: 1,
+        title: "Issue a role-aware token",
+        endpoint: "/auth/login",
+        evidence_path: "docs/blueprint/06_acceptance_tests.md",
+        persona: "operator",
+      },
+      {
+        order: 2,
+        title: "Run architecture diagnosis with citations",
+        endpoint: "/uc1/architecture",
+        evidence_path: "docs/sales/demo_script_exec.md",
+        persona: "buyer",
+      },
+      {
+        order: 3,
+        title: "Run log-intel and inspect actionability",
+        endpoint: "/uc2/log-intel",
+        evidence_path: "docs/ops/eval_report_ko.md",
+        persona: "platform",
+      },
+      {
+        order: 4,
+        title: "Verify audit, metrics, and ops runtime",
+        endpoint: "/audit/summary -> /ops/runtime -> /metrics",
+        evidence_path: "docs/sales/exec_value_dashboard/latest.md",
+        persona: "exec",
+      },
+    ],
+    links: {
+      health: "/health",
+      service_brief: "/ops/service-brief",
+      service_brief_schema: "/ops/service-brief/schema",
+      metrics: "/metrics",
+      audit_summary: "/audit/summary",
+      ops_runtime: "/ops/runtime",
+      control_tower_spec: "/v1/control-tower/spec",
+      customer_journey: "docs/blueprint/09_customer_journey.md",
+      role_alignment: "docs/application/role_alignment.md",
+    },
+  };
+}
+
+function buildStaticServiceBriefSchema() {
+  return {
+    schema: "enterprise-adoption-service-brief-v1",
+    required_fields: [
+      "service",
+      "contract_version",
+      "tagline",
+      "maturity_stage",
+      "audiences",
+      "runtime",
+      "evidence",
+      "run_modes",
+      "platform_targets",
+      "stages",
+      "review_flow",
+      "links",
+    ],
+    runtime_required_fields: [
+      "auth_mode",
+      "data_handling_mode",
+      "storage_backend",
+      "llm_provider",
+      "llm_model",
+      "openai_api_key_configured",
+      "login_code_required",
+      "integrations_require_auth",
+      "startup_status",
+      "startup_ready",
+      "llm_circuit_state",
+    ],
+    evidence_required_fields: [
+      "test_files",
+      "blueprint_docs",
+      "module_packs",
+      "eval_datasets",
+      "eval_reports",
+      "application_artifacts",
+    ],
+    stage_keys: ["discovery", "security", "evals", "deployment", "operations"],
+  };
+}
 
 const SAMPLE_ARCHITECTURE_JSONL = [
   JSON.stringify({
@@ -513,6 +784,8 @@ export default function App() {
     openai_api_key_configured: false
   });
   const [healthCheckedAt, setHealthCheckedAt] = useState("");
+  const [serviceBrief, setServiceBrief] = useState(() => buildStaticServiceBrief());
+  const [serviceBriefSchema, setServiceBriefSchema] = useState(() => buildStaticServiceBriefSchema());
   const [scenarioRun, setScenarioRun] = useState(null);
   const [scenarioHistory, setScenarioHistory] = useState(() => {
     const stored = readJsonStorage(STORAGE_KEYS.scenarioHistory, []);
@@ -723,6 +996,49 @@ export default function App() {
 
     void loadHealth();
     const timerId = window.setInterval(() => void loadHealth(), 12000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timerId);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadServiceBrief() {
+      try {
+        const response = await fetchWithTimeout(`${API_BASE}/ops/service-brief`, { cache: "no-store" }, 8000);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(parseApiError(data, "Service brief request failed"));
+        }
+        if (!cancelled) {
+          setServiceBrief(data);
+        }
+      } catch (_error) {
+        if (!cancelled) {
+          setServiceBrief(buildStaticServiceBrief());
+        }
+      }
+
+      try {
+        const response = await fetchWithTimeout(`${API_BASE}/ops/service-brief/schema`, { cache: "no-store" }, 8000);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(parseApiError(data, "Service brief schema request failed"));
+        }
+        if (!cancelled) {
+          setServiceBriefSchema(data);
+        }
+      } catch (_error) {
+        if (!cancelled) {
+          setServiceBriefSchema(buildStaticServiceBriefSchema());
+        }
+      }
+    }
+
+    void loadServiceBrief();
+    const timerId = window.setInterval(() => void loadServiceBrief(), 30000);
     return () => {
       cancelled = true;
       window.clearInterval(timerId);
@@ -2273,6 +2589,17 @@ export default function App() {
               </Reveal>
             </section>
 
+            <section className="section-block">
+              <Reveal delay={80}>
+                <ServiceBriefBoard
+                  brief={serviceBrief}
+                  schema={serviceBriefSchema}
+                  health={health}
+                  checkedAt={healthCheckedAt}
+                />
+              </Reveal>
+            </section>
+
             <section className="section-block sponsored-section">
               <Reveal className="sponsored-card" delay={90}>
                 <p className="eyebrow">Sponsored</p>
@@ -2444,6 +2771,16 @@ export default function App() {
               <Reveal className="section-head">
                 <p className="eyebrow">Readiness Flow</p>
                 <h2>A structured validation order (before you deploy)</h2>
+              </Reveal>
+
+              <Reveal delay={70}>
+                <ServiceBriefBoard
+                  brief={serviceBrief}
+                  schema={serviceBriefSchema}
+                  health={health}
+                  checkedAt={healthCheckedAt}
+                  variant="compact"
+                />
               </Reveal>
 
               <div className="validation-layout">

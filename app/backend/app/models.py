@@ -254,6 +254,68 @@ class OpsDiagnosticsRefreshResponse(BaseModel):
     startup_report: Dict
 
 
+class ServiceBriefArtifact(BaseModel):
+    label: str
+    path: str
+    kind: str = Field(pattern="^(doc|test|dataset|report|endpoint)$")
+
+
+class ServiceBriefStage(BaseModel):
+    key: str = Field(pattern="^(discovery|security|evals|deployment|operations)$")
+    label: str
+    readiness: str = Field(pattern="^(ready|in_progress|attention)$")
+    artifact_count: int = Field(ge=0)
+    highlights: List[ServiceBriefArtifact] = Field(default_factory=list)
+
+
+class ServiceBriefReviewStep(BaseModel):
+    order: int = Field(ge=1)
+    title: str
+    endpoint: str
+    evidence_path: Optional[str] = None
+    persona: str = Field(pattern="^(buyer|operator|security|platform|exec)$")
+
+
+class ServiceBriefRuntime(BaseModel):
+    auth_mode: str
+    data_handling_mode: str
+    storage_backend: str
+    llm_provider: str
+    llm_model: str
+    openai_api_key_configured: bool
+    login_code_required: bool
+    integrations_require_auth: bool
+    startup_status: str
+    startup_ready: bool
+    llm_circuit_state: str
+
+
+class ServiceBriefEvidence(BaseModel):
+    test_files: int = Field(ge=0)
+    blueprint_docs: int = Field(ge=0)
+    module_packs: int = Field(ge=0)
+    eval_datasets: int = Field(ge=0)
+    eval_reports: int = Field(ge=0)
+    application_artifacts: int = Field(ge=0)
+
+
+class ServiceBriefResponse(BaseModel):
+    service: str
+    contract_version: str
+    tagline: str
+    maturity_stage: str
+    audiences: List[str] = Field(default_factory=list)
+    runtime: ServiceBriefRuntime
+    evidence: ServiceBriefEvidence
+    run_modes: List[str] = Field(default_factory=list)
+    platform_targets: List[str] = Field(default_factory=list)
+    strengths: List[str] = Field(default_factory=list)
+    watchouts: List[str] = Field(default_factory=list)
+    stages: List[ServiceBriefStage] = Field(default_factory=list)
+    review_flow: List[ServiceBriefReviewStep] = Field(default_factory=list)
+    links: Dict[str, str] = Field(default_factory=dict)
+
+
 class AdminLLMRuntimeView(BaseModel):
     provider: str
     model: str
