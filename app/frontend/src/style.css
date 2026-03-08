@@ -1410,6 +1410,207 @@ textarea {
   min-height: 110px;
 }
 
+.service-brief-board {
+  display: grid;
+  gap: 16px;
+  padding: var(--panel-pad);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 255, 0.9) 100%);
+  box-shadow: var(--shadow-soft);
+}
+
+.service-brief-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.service-brief-copy {
+  max-width: 720px;
+}
+
+.service-brief-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.service-brief-chip-stack,
+.service-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-brief-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.service-brief-card,
+.service-stage-card,
+.service-flow-card,
+.service-metric-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: var(--shadow-card);
+}
+
+.service-brief-card,
+.service-stage-card,
+.service-flow-card {
+  padding: 16px;
+}
+
+.service-card-label {
+  margin: 0 0 8px;
+  color: var(--muted-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-brief-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 12px;
+}
+
+.service-metric-card {
+  padding: 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.service-metric-card span {
+  color: var(--muted-2);
+  font-size: 0.85rem;
+}
+
+.service-metric-card strong {
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.service-brief-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.service-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.service-stage-head p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.readiness-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.readiness-badge.ready {
+  color: #166534;
+  background: rgba(22, 163, 74, 0.14);
+}
+
+.readiness-badge.in-progress {
+  color: #9a6700;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.readiness-badge.attention {
+  color: #b42318;
+  background: rgba(220, 38, 38, 0.12);
+}
+
+.service-brief-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.service-brief-list li {
+  display: grid;
+  gap: 4px;
+}
+
+.service-path {
+  display: inline-flex;
+  width: fit-content;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 10px;
+  padding: 4px 8px;
+  overflow-wrap: anywhere;
+}
+
+.service-brief-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.service-brief-flow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.service-flow-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+}
+
+.service-flow-card h4 {
+  margin-bottom: 6px;
+}
+
+.service-flow-card p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.service-flow-index {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.16), rgba(6, 182, 212, 0.12));
+  color: var(--accent);
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 700;
+}
+
+.service-brief-board.compact .service-brief-flow {
+  display: none;
+}
+
 .site-footer {
   margin-top: 22px;
   padding-top: 4px;
@@ -1495,6 +1696,12 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .service-brief-meta,
+  .service-brief-columns,
+  .service-brief-flow {
+    grid-template-columns: 1fr;
+  }
+
   .community-grid {
     grid-template-columns: 1fr;
   }
@@ -1551,6 +1758,10 @@ textarea {
   .gallery-grid,
   .capability-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .service-brief-stage-grid {
+    grid-template-columns: 1fr;
   }
 
   .kpi-grid,
