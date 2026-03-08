@@ -18,6 +18,19 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const reviewAssets = Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets : [];
   const runtimeSurfaces = Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces : [];
   const runtimeSummary = reviewPack.runtime_summary || {};
+  const fastReviewSurfaces = Object.entries(reviewPack.links || {}).filter(([, surface]) => typeof surface === "string" && surface).slice(0, compact ? 4 : 6);
+  const surfaceHints = {
+    health: "Confirm startup posture and runtime state before discussing rollout.",
+    service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
+    review_pack: "Open the executive proof bundle for buyer promises and rollout tracks.",
+    review_pack_schema: "Lock the explicit contract for review actions and proof assets.",
+    metrics: "Show runtime cost and latency visibility without leaving the reviewer path.",
+    audit_summary: "Surface audit and governance signals before making enterprise-readiness claims.",
+    customer_journey: "Tie the technical proof back to adoption sequence.",
+    deployment_options: "Map API-first, workspace-first, and hybrid rollout options.",
+    exec_summary_template: "Keep the narrative anchored in buyer language.",
+    qbr_template: "Show how proof rolls forward into executive cadence.",
+  };
 
   return (
     <section className={`executive-review-pack${compact ? " compact" : ""}`}>
@@ -57,6 +70,19 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           <strong>{proofBundle.review_assets_count || reviewAssets.length || 0}</strong>
         </article>
       </div>
+
+      <article className="service-brief-card">
+        <p className="service-card-label">Fast review surfaces</p>
+        <div className="review-pack-action-list">
+          {fastReviewSurfaces.map(([label, surface]) => (
+            <div key={`${label}-${surface}`} className="review-pack-action-card">
+              <strong>{label.replaceAll("_", " ")}</strong>
+              <code className="service-path">{surface}</code>
+              <p>{surfaceHints[label] || "Reviewer-visible route or doc for the executive walkthrough."}</p>
+            </div>
+          ))}
+        </div>
+      </article>
 
       <div className="review-pack-grid">
         <article className="service-brief-card">
