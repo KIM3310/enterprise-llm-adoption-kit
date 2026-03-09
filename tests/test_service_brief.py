@@ -18,6 +18,7 @@ async def test_ops_service_brief_contract() -> None:
     assert body["evidence"]["test_files"] >= 20
     assert "aws" in body["platform_targets"]
     assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
@@ -51,6 +52,7 @@ async def test_ops_review_pack_contract() -> None:
     assert body["runtime_summary"]["llm_provider"] == "stub"
     assert body["proof_bundle"]["tests"] >= 20
     assert body["proof_bundle"]["review_assets_count"] >= 4
+    assert "/ops/rollout-board" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/runtime/scorecard" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
@@ -58,6 +60,7 @@ async def test_ops_review_pack_contract() -> None:
     assert len(body["two_minute_review"]) == 4
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
@@ -94,7 +97,39 @@ async def test_ops_review_summary_contract() -> None:
     assert body["stage_highlights"][0]["key"] == "operations"
     assert isinstance(body["fastest_review_path"], list)
     assert len(body["fastest_review_path"]) == 3
+    assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["review_summary"] == "/ops/review-summary"
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_board_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-board?track=hybrid%20control%20tower")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "enterprise-adoption-rollout-board-v1"
+    assert body["filters"]["track"] == "hybrid control tower"
+    assert body["summary"]["visible_tracks"] == 1
+    assert body["items"][0]["track"] == "hybrid control tower"
+    assert body["links"]["rollout_board"] == "/ops/rollout-board"
+    assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_board_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-board/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-rollout-board-v1"
+    assert "summary" in body["required_fields"]
+    assert "items" in body["required_fields"]
+    assert "track" in body["item_required_fields"]
+    assert body["links"]["rollout_board"] == "/ops/rollout-board"
 
 
 @pytest.mark.anyio
@@ -120,6 +155,16 @@ async def test_ops_review_summary_rejects_invalid_stage_filter() -> None:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
         response = await client.get("/ops/review-summary?stage=bad-stage")
+
+    assert response.status_code == 400, response.text
+    assert "invalid stage filter" in response.json()["detail"]
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_board_rejects_invalid_track_filter() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-board?track=bad-track")
 
     assert response.status_code == 400, response.text
     assert "invalid stage filter" in response.json()["detail"]

@@ -264,6 +264,7 @@ def build_service_brief(
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
             "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
             "review_summary": "/ops/review-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
@@ -379,6 +380,7 @@ def build_service_review_pack(
                 "/health",
                 "/ops/service-brief",
                 "/ops/review-pack",
+                "/ops/rollout-board",
                 "/ops/review-summary",
                 "/ops/review-pack/schema",
                 "/ops/runtime/scorecard",
@@ -430,6 +432,7 @@ def build_service_review_pack(
             "health": "/health",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
             "review_summary": "/ops/review-summary",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "review_pack_schema": "/ops/review-pack/schema",
@@ -439,6 +442,129 @@ def build_service_review_pack(
             "deployment_options": "docs/architecture/llm_deployment_options.md",
             "exec_summary_template": "docs/sales/executive_summary_template.md",
             "qbr_template": "docs/sales/qbr_template.md",
+        },
+    }
+
+
+def build_service_rollout_board(
+    *,
+    track: Optional[str] = None,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    brief = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    review_pack = build_service_review_pack(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    rollout_tracks = [
+        item for item in review_pack.get("rollout_tracks", []) if isinstance(item, dict)
+    ]
+    track_filter = _normalize_stage_filter(
+        track,
+        [str(item.get("track", "")).lower() for item in rollout_tracks if str(item.get("track", "")).strip()],
+    )
+    visible_tracks = [
+        item
+        for item in rollout_tracks
+        if track_filter is None or str(item.get("track", "")).lower() == track_filter
+    ]
+    runtime = brief.get("runtime", {})
+    evidence = brief.get("evidence", {})
+
+    def classify_track(item: Dict[str, object]) -> Dict[str, object]:
+        track_name = str(item.get("track", ""))
+        if track_name == "api-first validation":
+            readiness = "ready" if bool(runtime.get("startup_ready", False)) else "attention"
+            why_now = "Use this when runtime posture, auth, and backend diagnostics are the main buyer concern."
+        elif track_name == "workspace-first enablement":
+            readiness = "ready" if int(evidence.get("application_artifacts", 0)) >= 1 else "attention"
+            why_now = "Use this when adoption, enablement, and business-user rollout matter more than raw platform control."
+        else:
+            readiness = (
+                "ready"
+                if bool(runtime.get("startup_ready", False)) and int(evidence.get("eval_reports", 0)) >= 1
+                else "attention"
+            )
+            why_now = "Use this when the customer needs governance, evaluation, and platform control in the same story."
+        return {
+            "track": track_name,
+            "readiness": readiness,
+            "fit_for": item.get("fit_for", []),
+            "evidence": item.get("evidence", ""),
+            "why_now": why_now,
+        }
+
+    classified_tracks = [classify_track(item) for item in visible_tracks]
+    ready_tracks = [item for item in classified_tracks if item["readiness"] == "ready"]
+    attention_tracks = [item for item in classified_tracks if item["readiness"] != "ready"]
+
+    return {
+        "service": brief["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-rollout-board-v1",
+        "headline": "Compact rollout board for matching runtime posture, governance proof, and buyer fit to the next delivery lane.",
+        "filters": {
+            "track": track_filter,
+        },
+        "summary": {
+            "visible_tracks": len(classified_tracks),
+            "ready_tracks": len(ready_tracks),
+            "attention_tracks": len(attention_tracks),
+            "startup_ready": bool(runtime.get("startup_ready", False)),
+            "llm_provider": runtime.get("llm_provider", ""),
+        },
+        "items": classified_tracks,
+        "review_actions": [
+            "Use the service brief to confirm runtime posture before choosing a rollout lane.",
+            "Use the review pack to connect proof assets and buyer promises to the selected track.",
+            "Escalate to the ops runtime scorecard when startup readiness or circuit state needs attention.",
+        ],
+        "links": {
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "review_summary": "/ops/review-summary",
+            "rollout_board": "/ops/rollout-board",
+            "ops_runtime_scorecard": "/ops/runtime/scorecard",
+            "deployment_options": "docs/architecture/llm_deployment_options.md",
+        },
+    }
+
+
+def build_service_rollout_board_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-rollout-board-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "summary",
+            "items",
+            "review_actions",
+            "links",
+        ],
+        "summary_required_fields": [
+            "visible_tracks",
+            "ready_tracks",
+            "attention_tracks",
+            "startup_ready",
+            "llm_provider",
+        ],
+        "item_required_fields": [
+            "track",
+            "readiness",
+            "fit_for",
+            "evidence",
+            "why_now",
+        ],
+        "links": {
+            "rollout_board": "/ops/rollout-board",
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "ops_runtime_scorecard": "/ops/runtime/scorecard",
         },
     }
 
@@ -529,6 +655,7 @@ def build_service_review_summary(
         "links": {
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
             "review_summary": "/ops/review-summary",
             "audit_summary": "/audit/summary",
             "metrics": "/metrics",
