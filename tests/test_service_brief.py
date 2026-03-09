@@ -18,6 +18,7 @@ async def test_ops_service_brief_contract() -> None:
     assert body["evidence"]["test_files"] >= 20
     assert "aws" in body["platform_targets"]
     assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
     assert any(stage["key"] == "operations" for stage in body["stages"])
     assert any(step["endpoint"] == "/auth/login" for step in body["review_flow"])
@@ -49,11 +50,13 @@ async def test_ops_review_pack_contract() -> None:
     assert body["runtime_summary"]["llm_provider"] == "stub"
     assert body["proof_bundle"]["tests"] >= 20
     assert body["proof_bundle"]["review_assets_count"] >= 4
+    assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
     assert any(item["label"] == "Inspect executive proof bundle" for item in body["review_actions"])
     assert len(body["two_minute_review"]) == 4
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
 
 
@@ -71,3 +74,35 @@ async def test_ops_review_pack_schema_contract() -> None:
     assert "review_assets" in body["proof_bundle_required_fields"]
     assert "surface" in body["review_action_required_fields"]
     assert "step" in body["two_minute_review_required_fields"]
+
+
+@pytest.mark.anyio
+async def test_ops_review_summary_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/review-summary")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "enterprise-adoption-review-summary-v1"
+    assert body["readiness"]["ready_stage_count"] >= 1
+    assert body["coverage"]["tests"] >= 20
+    assert isinstance(body["fastest_review_path"], list)
+    assert len(body["fastest_review_path"]) == 3
+    assert body["links"]["review_summary"] == "/ops/review-summary"
+
+
+@pytest.mark.anyio
+async def test_ops_review_summary_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/review-summary/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-review-summary-v1"
+    assert "readiness" in body["required_fields"]
+    assert "coverage" in body["required_fields"]
+    assert "top_assets" in body["required_fields"]
+    assert "maturity_stage" in body["readiness_required_fields"]
+    assert "tests" in body["coverage_required_fields"]
