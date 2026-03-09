@@ -112,7 +112,8 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 cd app/backend
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
 python3 -m app
 ```
 Optional local Ollama runtime:
@@ -212,7 +213,7 @@ make demo
 
 ## Tests
 ```bash
-pytest -q
+python -m pytest -q tests app/backend/tests
 ```
 
 ## Backend quality gate
@@ -313,7 +314,12 @@ make sanitize
 <!-- codex:local-verification:start -->
 ## Local Verification
 ```bash
-make -n
+/Library/Developer/CommandLineTools/usr/bin/python3 -m venv app/backend/.venv
+source app/backend/.venv/bin/activate
+python -m pip install -U pip
+python -m pip install -e "./app/backend[dev]"
+python -m pytest -q tests app/backend/tests
+(cd app/frontend && npm run build)
 ```
 
 ## Repository Hygiene
