@@ -1,0 +1,104 @@
+name: Bug Report
+description: Report a bug in the Enterprise LLM Adoption Kit
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug. Please fill in the details below so we can reproduce and fix the issue.
+
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      placeholder: "e.g., backend/auth, backend/snowflake_adapter, frontend, evals, infra/k8s"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the unexpected behavior you observed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Set environment variable `LLM_PROVIDER=openai`
+        2. Send POST to `/uc1/architecture` with role=Employee
+        3. Observe error in response
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened. Include error messages, logs, or screenshots if available.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: LLM Runtime
+      description: Which LLM provider were you using?
+      options:
+        - stub
+        - OpenAI
+        - Ollama
+        - AWS Bedrock
+        - Not applicable
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: Deployment Method
+      description: How is the application deployed?
+      options:
+        - Local (python -m app)
+        - Docker Compose
+        - Kubernetes
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Python version, OS, relevant env vars (redact secrets).
+      placeholder: |
+        - Python: 3.11.8
+        - OS: Ubuntu 22.04 / macOS 14.3
+        - SNOWFLAKE_ACCOUNT: set
+        - DATABRICKS_HOST: not set
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Paste any relevant log output. This will be automatically formatted as code.
+      render: shell
+    validations:
+      required: false

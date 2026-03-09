@@ -1,0 +1,78 @@
+name: Feature Request
+description: Propose a new feature or enhancement for the Enterprise LLM Adoption Kit
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We appreciate feature proposals that align with enterprise governance, security, and LLMOps goals. Please describe your idea in detail.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Feature Area
+      description: Which area does this feature relate to?
+      options:
+        - RBAC / Authentication
+        - Prompt Injection / Safety
+        - PII Redaction / Governance
+        - RAG / Retrieval
+        - Evals Harness
+        - LLMOps / Metrics / Monitoring
+        - Snowflake Integration
+        - Databricks Integration
+        - AWS Bedrock Runtime
+        - Kubernetes / Infrastructure
+        - Frontend / Dashboard
+        - CI/CD / DevOps
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? Who is the target user persona?
+      placeholder: |
+        As a platform engineer, I need to ... so that ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: Describe how you envision the feature working. Include API shapes, config changes, or architecture sketches if applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What other approaches did you consider?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Breaking Change?
+      description: Would this feature require changes to existing APIs, schemas, or configurations?
+      options:
+        - "No"
+        - "Yes"
+        - "Unsure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Links, screenshots, references to similar implementations in other projects.
+    validations:
+      required: false
