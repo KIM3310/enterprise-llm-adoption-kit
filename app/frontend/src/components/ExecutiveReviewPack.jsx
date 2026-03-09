@@ -83,6 +83,20 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
       ? ["", "Runtime surfaces", ...runtimeSurfaces.map((item) => `- ${item}`)]
       : []),
   ].join("\n");
+  const rolloutSnapshotText = [
+    "Enterprise rollout snapshot",
+    `Headline: ${reviewPack.headline}`,
+    `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
+    "",
+    "Buyer promises",
+    ...buyerPromises.slice(0, 4).map((item) => `- ${item}`),
+    "",
+    "Rollout tracks",
+    ...rolloutTracks.slice(0, 4).map((track) => `- ${track.track}: ${track.milestone}`),
+    "",
+    "Platform dialogues",
+    ...platformDialogues.slice(0, 3).map((item) => `- ${item.surface}: ${item.fit_for.join(", ")}`),
+  ].join("\n");
 
   const handleCopyRoutes = async () => {
     const ok = await copyTextToClipboard(fastReviewRouteText);
@@ -97,6 +111,11 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const handleCopyProofBundle = async () => {
     const ok = await copyTextToClipboard(proofBundleText);
     setCopyStatus(ok ? "Copied executive proof bundle." : "Failed to copy executive proof bundle.");
+  };
+
+  const handleCopyRolloutSnapshot = async () => {
+    const ok = await copyTextToClipboard(rolloutSnapshotText);
+    setCopyStatus(ok ? "Copied rollout snapshot." : "Failed to copy rollout snapshot.");
   };
 
   return (
@@ -147,6 +166,9 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         </button>
         <button type="button" onClick={() => void handleCopyProofBundle()}>
           Copy Proof Bundle
+        </button>
+        <button type="button" onClick={() => void handleCopyRolloutSnapshot()}>
+          Copy Rollout Snapshot
         </button>
         {copyStatus ? <span className="review-pack-toolbar-status">{copyStatus}</span> : null}
       </div>
