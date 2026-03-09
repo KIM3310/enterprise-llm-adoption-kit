@@ -98,6 +98,8 @@ from .safety import REFUSAL_MESSAGE, should_refuse
 from .service_brief import (
     build_service_brief,
     build_service_brief_schema,
+    build_service_rollout_board,
+    build_service_rollout_board_schema,
     build_service_review_pack,
     build_service_review_pack_schema,
     build_service_review_summary,
@@ -834,6 +836,7 @@ def health(request: Request) -> Dict[str, object]:
             "control-tower-decisioning",
             "audit-and-cost-tracking",
             "service-brief-readiness",
+            "rollout-board-readiness",
             "executive-review-pack",
         ],
         "links": {
@@ -846,6 +849,8 @@ def health(request: Request) -> Dict[str, object]:
             "service_brief_schema": "/ops/service-brief/schema",
             "review_pack": "/ops/review-pack",
             "review_pack_schema": "/ops/review-pack/schema",
+            "rollout_board": "/ops/rollout-board",
+            "rollout_board_schema": "/ops/rollout-board/schema",
             "review_summary": "/ops/review-summary",
             "review_summary_schema": "/ops/review-summary/schema",
         },
@@ -877,6 +882,23 @@ def ops_review_pack() -> Dict[str, object]:
 @app.get("/ops/review-pack/schema")
 def ops_review_pack_schema() -> Dict[str, object]:
     return build_service_review_pack_schema()
+
+
+@app.get("/ops/rollout-board")
+def ops_rollout_board(track: str | None = None) -> Dict[str, object]:
+    try:
+        return build_service_rollout_board(
+            track=track,
+            startup_report=getattr(app.state, "startup_report", None),
+            circuit_snapshot=_llm_circuit_snapshot(),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/ops/rollout-board/schema")
+def ops_rollout_board_schema() -> Dict[str, object]:
+    return build_service_rollout_board_schema()
 
 
 @app.get("/ops/review-summary")
