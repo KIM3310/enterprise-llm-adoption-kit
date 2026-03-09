@@ -78,13 +78,12 @@ curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | 
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
-## Service-grade surface
+## Runtime Surface
 - `GET /ops/service-brief`: 구매자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
 - `GET /ops/review-pack`: executive proof bundle, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
 - `GET /ops/review-pack/schema`: review actions, proof assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
 - Home/Readiness UI에 `Executive Readiness Board`와 `Executive Review Pack`을 추가해 review actions, proof assets, runtime surfaces까지 정적 fallback으로 유지합니다
-- 이번 iteration의 spec 기록은 `SERVICE_GRADE_SPECKIT.ko.md` 참고
 
 ## 고객 여정 (Discovery -> Production)
 - Blueprint: `docs/blueprint/09_customer_journey.md`

@@ -90,14 +90,13 @@ curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | 
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
-## Service-grade surfaces
+## Runtime Surfaces
 - `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and reviewers
 - `GET /ops/review-pack`: executive-facing proof bundle, rollout tracks, platform dialogue, and review sequence
 - `GET /ops/rollout-board`: compact rollout decision board for matching buyer fit, runtime posture, and delivery lane
 - `GET /ops/review-pack/schema`: explicit contract surface for review actions, proof assets, and runtime surfaces
 - `GET /ops/service-brief/schema`: explicit contract surface for the service brief payload
 - Home/Readiness UI now renders an `Executive Readiness Board` plus `Executive Review Pack`, including review actions, proof assets, and runtime surfaces, even in static mode
-- See `SERVICE_GRADE_SPECKIT.ko.md` for the spec-first reasoning behind this iteration
 
 ## Customer journey (Discovery -> Production)
 - Blueprint: `docs/blueprint/09_customer_journey.md`
