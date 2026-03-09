@@ -80,7 +80,7 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 
 ## Runtime Surface
 - `GET /ops/service-brief`: 구매자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
-- `GET /ops/review-pack`: executive proof bundle, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
+- `GET /ops/review-pack`: executive review surface, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
 - `GET /ops/review-pack/schema`: review actions, proof assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
 - Home/Readiness UI에 `Executive Readiness Board`와 `Executive Review Pack`을 추가해 review actions, proof assets, runtime surfaces까지 정적 fallback으로 유지합니다
