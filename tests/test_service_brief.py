@@ -19,6 +19,7 @@ async def test_ops_service_brief_contract() -> None:
     assert "aws" in body["platform_targets"]
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["review_summary"] == "/ops/review-summary"
+    assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
     assert any(stage["key"] == "operations" for stage in body["stages"])
     assert any(step["endpoint"] == "/auth/login" for step in body["review_flow"])
@@ -51,12 +52,14 @@ async def test_ops_review_pack_contract() -> None:
     assert body["proof_bundle"]["tests"] >= 20
     assert body["proof_bundle"]["review_assets_count"] >= 4
     assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
+    assert "/ops/runtime/scorecard" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
     assert any(item["label"] == "Inspect executive proof bundle" for item in body["review_actions"])
     assert len(body["two_minute_review"]) == 4
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["review_summary"] == "/ops/review-summary"
+    assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
 
 
