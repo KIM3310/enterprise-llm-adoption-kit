@@ -180,7 +180,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           Copy Review Routes
         </button>
         <button type="button" onClick={() => void handleCopyTwoMinuteReview()}>
-          Copy 2-Minute Review
+          Copy Quick Review
         </button>
         <button type="button" onClick={() => void handleCopyProofBundle()}>
           Copy Proof Bundle
