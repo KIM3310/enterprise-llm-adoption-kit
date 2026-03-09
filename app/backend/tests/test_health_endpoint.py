@@ -34,6 +34,7 @@ async def test_health_includes_runtime_metadata() -> None:
     assert isinstance(payload.get("llm_circuit_consecutive_failures"), int)
     assert isinstance(payload.get("request_max_body_bytes"), int)
     assert payload.get("request_max_body_bytes", 0) >= 1024
+    assert payload.get("links", {}).get("ops_runtime_scorecard") == "/ops/runtime/scorecard"
     assert payload.get("links", {}).get("ops_runtime") == "/ops/runtime"
     assert "ops-runtime-observability" in payload.get("capabilities", [])
     assert "diagnostics" in payload
