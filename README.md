@@ -23,11 +23,9 @@ Korean version: `README.ko.md`
 
 ![Enterprise review pack](docs/review-pack.svg)
 
-## Role-Ready Artifacts
+## Further Reading
 
-- AI engineer: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
-- solutions architect: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
-- sales / solution consultant: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
+- Reading guide: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
 
 ## Project summary (entry-level, hands-on focus)
 - Built an end-to-end adoption kit to show how enterprise LLM discovery turns into a secure, testable, and observable PoC.
