@@ -42,6 +42,15 @@ def _stage_readiness(*, artifacts: List[Dict[str, str]], startup_ready: bool = T
     return "ready"
 
 
+def _normalize_stage_filter(value: Optional[str], allowed: List[str]) -> Optional[str]:
+    normalized = str(value or "").strip().lower()
+    if not normalized:
+        return None
+    if normalized not in allowed:
+        raise ValueError(f"invalid stage filter: {value}")
+    return normalized
+
+
 def build_service_brief(
     *,
     startup_report: Optional[Dict[str, object]],
@@ -432,6 +441,7 @@ def build_service_review_pack(
 
 def build_service_review_summary(
     *,
+    stage: Optional[str] = None,
     startup_report: Optional[Dict[str, object]],
     circuit_snapshot: Dict[str, object],
 ) -> Dict[str, object]:
@@ -446,15 +456,24 @@ def build_service_review_summary(
     stages = [
         stage for stage in brief.get("stages", []) if isinstance(stage, dict)
     ]
+    stage_filter = _normalize_stage_filter(
+        stage,
+        [str(item.get("key", "")).lower() for item in stages if str(item.get("key", "")).strip()],
+    )
+    visible_stages = [
+        item
+        for item in stages
+        if stage_filter is None or str(item.get("key", "")).lower() == stage_filter
+    ]
     ready_stages = [
-        str(stage.get("key", ""))
-        for stage in stages
-        if str(stage.get("readiness", "")) == "ready"
+        str(item.get("key", ""))
+        for item in visible_stages
+        if str(item.get("readiness", "")) == "ready"
     ]
     attention_stages = [
-        str(stage.get("key", ""))
-        for stage in stages
-        if str(stage.get("readiness", "")) != "ready"
+        str(item.get("key", ""))
+        for item in visible_stages
+        if str(item.get("readiness", "")) != "ready"
     ]
     proof_bundle = review_pack.get("proof_bundle", {})
     top_assets = [
@@ -475,6 +494,7 @@ def build_service_review_summary(
         "headline": "Compact review summary for buyer, operator, and governance checks before a deeper walkthrough.",
         "readiness": {
             "maturity_stage": brief.get("maturity_stage", ""),
+            "focus_stage": stage_filter,
             "startup_ready": bool(brief.get("runtime", {}).get("startup_ready", False)),
             "llm_provider": brief.get("runtime", {}).get("llm_provider", ""),
             "llm_circuit_state": brief.get("runtime", {}).get("llm_circuit_state", "closed"),
@@ -491,6 +511,15 @@ def build_service_review_summary(
         },
         "priority_watchouts": [str(item) for item in brief.get("watchouts", [])][:3],
         "top_platform_targets": [str(item) for item in brief.get("platform_targets", [])][:5],
+        "stage_highlights": [
+            {
+                "key": str(item.get("key", "")),
+                "label": str(item.get("label", "")),
+                "readiness": str(item.get("readiness", "")),
+                "artifact_count": int(item.get("artifact_count", 0)),
+            }
+            for item in visible_stages[:3]
+        ],
         "fastest_review_path": two_minute_review,
         "top_assets": top_assets,
         "links": {
@@ -515,12 +544,14 @@ def build_service_review_summary_schema() -> Dict[str, object]:
             "coverage",
             "priority_watchouts",
             "top_platform_targets",
+            "stage_highlights",
             "fastest_review_path",
             "top_assets",
             "links",
         ],
         "readiness_required_fields": [
             "maturity_stage",
+            "focus_stage",
             "startup_ready",
             "llm_provider",
             "llm_circuit_state",
@@ -534,6 +565,12 @@ def build_service_review_summary_schema() -> Dict[str, object]:
             "eval_assets",
             "review_assets",
             "platform_targets",
+        ],
+        "stage_highlights_required_fields": [
+            "key",
+            "label",
+            "readiness",
+            "artifact_count",
         ],
         "fastest_review_path_required_fields": [
             "step",

@@ -80,13 +80,15 @@ async def test_ops_review_pack_schema_contract() -> None:
 async def test_ops_review_summary_contract() -> None:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-        response = await client.get("/ops/review-summary")
+        response = await client.get("/ops/review-summary?stage=operations")
 
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["contract_version"] == "enterprise-adoption-review-summary-v1"
-    assert body["readiness"]["ready_stage_count"] >= 1
+    assert body["readiness"]["focus_stage"] == "operations"
+    assert body["readiness"]["ready_stage_count"] + body["readiness"]["attention_stage_count"] >= 1
     assert body["coverage"]["tests"] >= 20
+    assert body["stage_highlights"][0]["key"] == "operations"
     assert isinstance(body["fastest_review_path"], list)
     assert len(body["fastest_review_path"]) == 3
     assert body["links"]["review_summary"] == "/ops/review-summary"
@@ -103,6 +105,18 @@ async def test_ops_review_summary_schema_contract() -> None:
     assert body["schema"] == "enterprise-adoption-review-summary-v1"
     assert "readiness" in body["required_fields"]
     assert "coverage" in body["required_fields"]
+    assert "stage_highlights" in body["required_fields"]
     assert "top_assets" in body["required_fields"]
     assert "maturity_stage" in body["readiness_required_fields"]
+    assert "focus_stage" in body["readiness_required_fields"]
     assert "tests" in body["coverage_required_fields"]
+
+
+@pytest.mark.anyio
+async def test_ops_review_summary_rejects_invalid_stage_filter() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/review-summary?stage=bad-stage")
+
+    assert response.status_code == 400, response.text
+    assert "invalid stage filter" in response.json()["detail"]
