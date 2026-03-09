@@ -96,6 +96,8 @@ from .service_brief import (
     build_service_brief_schema,
     build_service_review_pack,
     build_service_review_pack_schema,
+    build_service_review_summary,
+    build_service_review_summary_schema,
 )
 from .storage import (
     add_cost,
@@ -839,6 +841,8 @@ def health(request: Request) -> Dict[str, object]:
             "service_brief_schema": "/ops/service-brief/schema",
             "review_pack": "/ops/review-pack",
             "review_pack_schema": "/ops/review-pack/schema",
+            "review_summary": "/ops/review-summary",
+            "review_summary_schema": "/ops/review-summary/schema",
         },
     }
 
@@ -868,6 +872,19 @@ def ops_review_pack() -> Dict[str, object]:
 @app.get("/ops/review-pack/schema")
 def ops_review_pack_schema() -> Dict[str, object]:
     return build_service_review_pack_schema()
+
+
+@app.get("/ops/review-summary")
+def ops_review_summary() -> Dict[str, object]:
+    return build_service_review_summary(
+        startup_report=getattr(app.state, "startup_report", None),
+        circuit_snapshot=_llm_circuit_snapshot(),
+    )
+
+
+@app.get("/ops/review-summary/schema")
+def ops_review_summary_schema() -> Dict[str, object]:
+    return build_service_review_summary_schema()
 
 
 @app.get("/metrics")

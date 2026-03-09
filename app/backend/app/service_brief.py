@@ -255,6 +255,7 @@ def build_service_brief(
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
             "review_pack": "/ops/review-pack",
+            "review_summary": "/ops/review-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
             "ops_runtime": "/ops/runtime",
@@ -368,6 +369,7 @@ def build_service_review_pack(
                 "/health",
                 "/ops/service-brief",
                 "/ops/review-pack",
+                "/ops/review-summary",
                 "/ops/review-pack/schema",
                 "/ops/runtime",
                 "/metrics",
@@ -376,6 +378,7 @@ def build_service_review_pack(
                 "/health",
                 "/ops/service-brief",
                 "/ops/review-pack",
+                "/ops/review-summary",
                 "/ops/review-pack/schema",
                 "/audit/summary",
                 "/metrics",
@@ -415,6 +418,7 @@ def build_service_review_pack(
             "health": "/health",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
+            "review_summary": "/ops/review-summary",
             "review_pack_schema": "/ops/review-pack/schema",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
@@ -422,6 +426,130 @@ def build_service_review_pack(
             "deployment_options": "docs/architecture/llm_deployment_options.md",
             "exec_summary_template": "docs/sales/executive_summary_template.md",
             "qbr_template": "docs/sales/qbr_template.md",
+        },
+    }
+
+
+def build_service_review_summary(
+    *,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    brief = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    review_pack = build_service_review_pack(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    stages = [
+        stage for stage in brief.get("stages", []) if isinstance(stage, dict)
+    ]
+    ready_stages = [
+        str(stage.get("key", ""))
+        for stage in stages
+        if str(stage.get("readiness", "")) == "ready"
+    ]
+    attention_stages = [
+        str(stage.get("key", ""))
+        for stage in stages
+        if str(stage.get("readiness", "")) != "ready"
+    ]
+    proof_bundle = review_pack.get("proof_bundle", {})
+    top_assets = [
+        item
+        for item in proof_bundle.get("review_assets", [])
+        if isinstance(item, dict)
+    ][:3]
+    two_minute_review = [
+        item
+        for item in review_pack.get("two_minute_review", [])
+        if isinstance(item, dict)
+    ][:3]
+
+    return {
+        "service": brief["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-review-summary-v1",
+        "headline": "Compact review summary for buyer, operator, and governance checks before a deeper walkthrough.",
+        "readiness": {
+            "maturity_stage": brief.get("maturity_stage", ""),
+            "startup_ready": bool(brief.get("runtime", {}).get("startup_ready", False)),
+            "llm_provider": brief.get("runtime", {}).get("llm_provider", ""),
+            "llm_circuit_state": brief.get("runtime", {}).get("llm_circuit_state", "closed"),
+            "ready_stage_count": len(ready_stages),
+            "attention_stage_count": len(attention_stages),
+            "attention_stages": attention_stages,
+        },
+        "coverage": {
+            "tests": int(brief.get("evidence", {}).get("test_files", 0)),
+            "blueprints": int(brief.get("evidence", {}).get("blueprint_docs", 0)),
+            "eval_assets": int(proof_bundle.get("eval_assets", 0)),
+            "review_assets": int(proof_bundle.get("review_assets_count", 0)),
+            "platform_targets": len(brief.get("platform_targets", [])),
+        },
+        "priority_watchouts": [str(item) for item in brief.get("watchouts", [])][:3],
+        "top_platform_targets": [str(item) for item in brief.get("platform_targets", [])][:5],
+        "fastest_review_path": two_minute_review,
+        "top_assets": top_assets,
+        "links": {
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "review_summary": "/ops/review-summary",
+            "audit_summary": "/audit/summary",
+            "metrics": "/metrics",
+        },
+    }
+
+
+def build_service_review_summary_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-review-summary-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "headline",
+            "readiness",
+            "coverage",
+            "priority_watchouts",
+            "top_platform_targets",
+            "fastest_review_path",
+            "top_assets",
+            "links",
+        ],
+        "readiness_required_fields": [
+            "maturity_stage",
+            "startup_ready",
+            "llm_provider",
+            "llm_circuit_state",
+            "ready_stage_count",
+            "attention_stage_count",
+            "attention_stages",
+        ],
+        "coverage_required_fields": [
+            "tests",
+            "blueprints",
+            "eval_assets",
+            "review_assets",
+            "platform_targets",
+        ],
+        "fastest_review_path_required_fields": [
+            "step",
+            "surface",
+            "proof",
+        ],
+        "top_assets_required_fields": [
+            "label",
+            "path",
+            "kind",
+        ],
+        "links": {
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "review_summary": "/ops/review-summary",
+            "review_summary_schema": "/ops/review-summary/schema",
         },
     }
 
