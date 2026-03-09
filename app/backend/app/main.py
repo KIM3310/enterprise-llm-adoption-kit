@@ -875,11 +875,15 @@ def ops_review_pack_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/review-summary")
-def ops_review_summary() -> Dict[str, object]:
-    return build_service_review_summary(
-        startup_report=getattr(app.state, "startup_report", None),
-        circuit_snapshot=_llm_circuit_snapshot(),
-    )
+def ops_review_summary(stage: str | None = None) -> Dict[str, object]:
+    try:
+        return build_service_review_summary(
+            stage=stage,
+            startup_report=getattr(app.state, "startup_report", None),
+            circuit_snapshot=_llm_circuit_snapshot(),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.get("/ops/review-summary/schema")
