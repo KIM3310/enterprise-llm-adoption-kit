@@ -97,6 +97,19 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     "Platform dialogues",
     ...platformDialogues.slice(0, 3).map((item) => `- ${item.surface}: ${item.fit_for.join(", ")}`),
   ].join("\n");
+  const buyerThesisText = [
+    "Enterprise buyer thesis snapshot",
+    `Headline: ${reviewPack.headline}`,
+    `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
+    `Review assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
+    `Endpoints: ${Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0}`,
+    "",
+    "Buyer promises",
+    ...buyerPromises.slice(0, 3).map((item) => `- ${item}`),
+    "",
+    "Fast review surfaces",
+    ...fastReviewSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
+  ].join("\n");
 
   const handleCopyRoutes = async () => {
     const ok = await copyTextToClipboard(fastReviewRouteText);
@@ -116,6 +129,11 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const handleCopyRolloutSnapshot = async () => {
     const ok = await copyTextToClipboard(rolloutSnapshotText);
     setCopyStatus(ok ? "Copied rollout snapshot." : "Failed to copy rollout snapshot.");
+  };
+
+  const handleCopyBuyerThesis = async () => {
+    const ok = await copyTextToClipboard(buyerThesisText);
+    setCopyStatus(ok ? "Copied buyer thesis snapshot." : "Failed to copy buyer thesis snapshot.");
   };
 
   return (
@@ -169,6 +187,9 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         </button>
         <button type="button" onClick={() => void handleCopyRolloutSnapshot()}>
           Copy Rollout Snapshot
+        </button>
+        <button type="button" onClick={() => void handleCopyBuyerThesis()}>
+          Copy Buyer Thesis
         </button>
         {copyStatus ? <span className="review-pack-toolbar-status">{copyStatus}</span> : null}
       </div>
