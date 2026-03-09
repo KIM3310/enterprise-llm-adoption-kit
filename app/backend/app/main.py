@@ -90,6 +90,10 @@ from .rag import (
 )
 from .rate_limit import RateLimiter
 from .redaction import redact_text
+from .runtime_scorecard import (
+    build_ops_runtime_scorecard,
+    build_ops_runtime_scorecard_schema,
+)
 from .safety import REFUSAL_MESSAGE, should_refuse
 from .service_brief import (
     build_service_brief,
@@ -835,6 +839,7 @@ def health(request: Request) -> Dict[str, object]:
         "links": {
             "metrics": "/metrics",
             "ops_policy": "/ops/policy",
+            "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "ops_runtime": "/ops/runtime",
             "control_tower_spec": "/v1/control-tower/spec",
             "service_brief": "/ops/service-brief",
@@ -889,6 +894,56 @@ def ops_review_summary(stage: str | None = None) -> Dict[str, object]:
 @app.get("/ops/review-summary/schema")
 def ops_review_summary_schema() -> Dict[str, object]:
     return build_service_review_summary_schema()
+
+
+@app.get("/ops/runtime/scorecard")
+def ops_runtime_scorecard(user=Depends(get_current_user)) -> Dict[str, object]:
+    start = time.time()
+    role = _effective_role(user.roles)
+    _ensure_any_role(user.roles, ["Ops", "Admin"])
+    _ensure_rate_limit(user.user_id, role, "ops_runtime_scorecard")
+
+    max_lines = _safe_limit(
+        getattr(settings, "audit_summary_max_lines", 5000),
+        default=5000,
+        min_value=1,
+        max_value=50000,
+    )
+    summary = summarize_log(Path(settings.audit_log_path), max_lines=max_lines)
+    daily_cost_usd = float(get_daily_cost())
+    alerts = evaluate_ops_alerts(summary, daily_cost_usd)
+    events = get_recent_service_events(limit=10)
+    decisions = get_recent_control_tower_decisions(limit=10)
+    startup_report = getattr(app.state, "startup_report", None)
+    if not isinstance(startup_report, dict):
+        startup_report = run_startup_diagnostics(
+            rag_store=rag_store,
+            sqlite_path=settings.sqlite_path,
+            audit_log_path=settings.audit_log_path,
+        )
+        app.state.startup_report = startup_report
+
+    payload = build_ops_runtime_scorecard(
+        service_name=settings.app_name,
+        auth_mode=settings.auth_mode,
+        storage_backend=settings.event_storage_backend,
+        integrations_require_auth=settings.integrations_require_auth,
+        startup_report=startup_report,
+        circuit_snapshot=_llm_circuit_snapshot(),
+        audit_summary=summary,
+        daily_cost_usd=daily_cost_usd,
+        alerts=alerts,
+        service_events=events,
+        recent_decisions=decisions,
+    )
+    latency_s = time.time() - start
+    _record_metrics("/ops/runtime/scorecard", "ops", role, "200", latency_s)
+    return payload
+
+
+@app.get("/ops/runtime/scorecard/schema")
+def ops_runtime_scorecard_schema() -> Dict[str, object]:
+    return build_ops_runtime_scorecard_schema()
 
 
 @app.get("/metrics")
