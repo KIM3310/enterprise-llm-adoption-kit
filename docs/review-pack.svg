@@ -72,7 +72,7 @@
     Review Actions
   </text>
   <text x="78" y="389" fill="#534b81" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
-    1. Check runtime posture -> 2. Inspect proof bundle -> 3. Verify governance -> 4. Map deployment path
+    1. Check runtime posture -> 2. Inspect overview -> 3. Verify governance -> 4. Map deployment path
   </text>
 
   <rect x="56" y="432" width="868" height="72" rx="18" fill="#f8fbff" stroke="#d7e3f3" />

@@ -451,7 +451,7 @@ function buildStaticReviewPack() {
         proof: "Review maturity stage, runtime posture, and stage evidence before the demo.",
       },
       {
-        label: "Inspect executive proof bundle",
+        label: "Inspect executive overview",
         surface: "/ops/review-pack",
         proof: "Use the review pack to walk buyer promises, rollout tracks, and platform dialogue.",
       },
@@ -473,7 +473,7 @@ function buildStaticReviewPack() {
         proof: "Confirm maturity stage, startup readiness, runtime mode, and evidence counts before the walkthrough.",
       },
       {
-        step: "2. Executive proof bundle",
+        step: "2. Executive overview",
         surface: "/ops/review-pack",
         proof: "Use buyer promises, proof assets, and rollout tracks to frame the system in one pass.",
       },

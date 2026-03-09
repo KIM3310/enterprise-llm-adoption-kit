@@ -53,7 +53,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const surfaceHints = {
     health: "Confirm startup posture and runtime state before discussing rollout.",
     service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
-    review_pack: "Open the executive proof bundle for buyer promises and rollout tracks.",
+    review_pack: "Open the executive overview for buyer promises and rollout tracks.",
     review_pack_schema: "Lock the explicit contract for review actions and proof assets.",
     metrics: "Show runtime cost and latency visibility without leaving the reviewer path.",
     audit_summary: "Surface audit and governance signals before making enterprise-readiness claims.",
@@ -67,17 +67,17 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     ...fastReviewSurfaces.map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
   const twoMinuteReviewText = [
-    "Enterprise 2-minute review",
+    "Enterprise review flow",
     ...twoMinuteReview.map((item) => `- ${item.step}: ${item.surface} (${item.proof})`),
   ].join("\n");
-  const proofBundleText = [
-    "Enterprise executive proof bundle",
+  const supportingEvidenceText = [
+    "Enterprise executive overview",
     `Tests: ${proofBundle.tests || 0}`,
     `Blueprints: ${proofBundle.blueprints || 0}`,
     `Eval Assets: ${proofBundle.eval_assets || 0}`,
     `Review Assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
     ...(reviewAssets.length
-      ? ["", "Review assets", ...reviewAssets.map((item) => `- ${item}`)]
+      ? ["", "Supporting assets", ...reviewAssets.map((item) => `- ${item}`)]
       : []),
     ...(runtimeSurfaces.length
       ? ["", "Runtime surfaces", ...runtimeSurfaces.map((item) => `- ${item}`)]
@@ -118,12 +118,12 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
 
   const handleCopyTwoMinuteReview = async () => {
     const ok = await copyTextToClipboard(twoMinuteReviewText);
-    setCopyStatus(ok ? "Copied executive 2-minute review." : "Failed to copy executive 2-minute review.");
+    setCopyStatus(ok ? "Copied executive review flow." : "Failed to copy executive review flow.");
   };
 
-  const handleCopyProofBundle = async () => {
-    const ok = await copyTextToClipboard(proofBundleText);
-    setCopyStatus(ok ? "Copied executive proof bundle." : "Failed to copy executive proof bundle.");
+  const handleCopySupportingEvidence = async () => {
+    const ok = await copyTextToClipboard(supportingEvidenceText);
+    setCopyStatus(ok ? "Copied supporting evidence." : "Failed to copy supporting evidence.");
   };
 
   const handleCopyRolloutSnapshot = async () => {
@@ -141,7 +141,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
       <div className="service-brief-head">
         <div className="service-brief-copy">
           <p className="eyebrow">Executive Review Pack</p>
-          <h3>Buyer thesis, proof bundle, and rollout narrative</h3>
+          <h3>Buyer thesis, supporting evidence, and rollout narrative</h3>
           <p>{reviewPack.headline}</p>
         </div>
         <div className="service-chip-row">
@@ -180,10 +180,10 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           Copy Review Routes
         </button>
         <button type="button" onClick={() => void handleCopyTwoMinuteReview()}>
-          Copy Quick Review
+          Copy Review Flow
         </button>
-        <button type="button" onClick={() => void handleCopyProofBundle()}>
-          Copy Proof Bundle
+        <button type="button" onClick={() => void handleCopySupportingEvidence()}>
+          Copy Supporting Evidence
         </button>
         <button type="button" onClick={() => void handleCopyRolloutSnapshot()}>
           Copy Rollout Snapshot
