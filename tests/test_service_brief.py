@@ -56,7 +56,7 @@ async def test_ops_review_pack_contract() -> None:
     assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/runtime/scorecard" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
-    assert any(item["label"] == "Inspect executive proof bundle" for item in body["review_actions"])
+    assert any(item["label"] == "Inspect executive overview" for item in body["review_actions"])
     assert len(body["two_minute_review"]) == 4
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
