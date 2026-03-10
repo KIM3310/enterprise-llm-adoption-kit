@@ -1,4 +1,4 @@
-# Enterprise LLM Adoption Kit (Korea) - Portfolio
+# Enterprise LLM Adoption Kit
 Tagline: Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
 Portfolio note: all customers, data, and rollout scenarios in this repo are synthetic. The goal is a reviewable enterprise-style validation kit, not a fictional production claim.
 
@@ -10,11 +10,16 @@ Korean version: `README.ko.md`
 - The strongest proof is the service brief, executive review pack, audit/metrics routes, and checked-in eval artifacts.
 - Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
-
 ## Role signals
 - **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are all runnable, not just described.
 - **Solution architect:** deployment options, security posture, and platform mapping are documented alongside the working demo.
 - **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough.
+
+## Repository surfaces
+- **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
+- **Supporting evidence:** `docs/`, `evals/`, and `tools/` collect architecture notes, review artifacts, and validation utilities.
+- **Generated review bundles:** `dist/application_bundle_*` is kept as exportable evidence, not as the source of truth for the implementation.
+- **Start here if you're new:** run the app first, then use the review pack and eval artifacts as supporting proof.
 
 ## Demo video
 - YouTube: https://youtu.be/yMq03b0js0E
@@ -66,6 +71,12 @@ Korean version: `README.ko.md`
 - React (Vite) frontend for demo and review workflows
 - Chroma for retrieval store (local persistence)
 - SQLite for daily cost rollups
+
+## Canonical runtime + artifact map
+- Canonical runtime: `app/backend` FastAPI plus the `app/frontend` React/Vite reviewer UI.
+- `docs/` is the editable source for the architecture, sales, and eval collateral referenced by the review APIs.
+- `dist/application_bundle_*` contains timestamped review/export snapshots assembled from `docs/`; treat those folders as published bundles, not the authoring source.
+- `app/frontend/dist/` is the static publish output for the reviewer shell, while `dist/scenario_runs/` is generated Scenario Runner output.
 
 ## Troubleshooting & verification notes (reproducible checks)
 - RBAC leakage risk: access-group filtering enforced in retrieval and re-checked post-query. Verification: `tests/test_rbac.py` and AT-02 in `docs/blueprint/06_acceptance_tests.md`.
