@@ -13,6 +13,10 @@ rm -f app/backend/data/audit.log
 rm -f app/backend/data/app.db app/backend/data/app.db-shm app/backend/data/app.db-wal
 rm -f app/backend/data/app.db-*
 rm -rf app/backend/data/chroma
+rm -f app/data/audit.log app/data/app.db app/data/app.db-shm app/data/app.db-wal
+rm -f app/data/app.db-*
+rm -f app/data/handover_normalized.jsonl
+rm -rf app/data/chroma
 
 echo "[sanitize] removing frontend build outputs..."
 rm -rf app/frontend/dist
