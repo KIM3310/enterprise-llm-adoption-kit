@@ -1297,6 +1297,19 @@ export default function App() {
     setStatus(ok ? "Reviewer bundle copied" : "Failed to copy reviewer bundle");
   }
 
+  async function copyConsoleSnapshot() {
+    const text = [
+      "LLM Adoption Atelier console snapshot",
+      `Page: ${page}`,
+      `Role: ${role}`,
+      `Console tab: ${activeTab}`,
+      `Backend: ${health.status || "unknown"}`,
+      `Share link: ${buildReviewerShareUrl({ page, tab: activeTab, role })}`,
+    ].join("\n");
+    const ok = await copyTextToClipboard(text);
+    setStatus(ok ? "Console snapshot copied" : "Failed to copy console snapshot");
+  }
+
   function cycleRole(direction = 1) {
     const currentIndex = roles.indexOf(role);
     const nextIndex = (currentIndex + direction + roles.length) % roles.length;
@@ -1342,6 +1355,12 @@ export default function App() {
       if (event.shiftKey && event.key.toLowerCase() === "b") {
         event.preventDefault();
         void copyReviewerBundle();
+        return;
+      }
+
+      if (event.shiftKey && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        void copyConsoleSnapshot();
         return;
       }
 
@@ -2874,12 +2893,15 @@ export default function App() {
           <button className="cta-light" onClick={() => void copyReviewerBundle()}>
             Copy Reviewer Bundle
           </button>
+          <button className="cta-light" onClick={() => void copyConsoleSnapshot()}>
+            Copy Console Snapshot
+          </button>
           <button className="cta-light" onClick={() => navigate("console")}>
             Open Console
           </button>
         </div>
         <p className="status-line" style={{ marginTop: "0.75rem" }}>
-          Shortcuts: 1-5 pages · G role · [ / ] console tabs · H/L prev-next page · ⇧L link · ⇧B reviewer bundle
+          Shortcuts: 1-5 pages · G role · [ / ] console tabs · H/L prev-next page · ⇧L link · ⇧B reviewer bundle · ⇧S console snapshot
         </p>
       </header>
 
