@@ -28,3 +28,10 @@ app/backend/data/chroma/
 **/*.tfstate
 **/*.tfstate.*
 .codex_runs/
+
+# Review/export bundles
+app/data/app.db
+app/data/app.db-*
+app/data/app.db-shm
+app/data/app.db-wal
+dist/application_bundle_*/
