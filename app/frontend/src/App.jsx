@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import heroTower from "./assets/hero-tower.svg";
 import ExecutiveReviewPack from "./components/ExecutiveReviewPack.jsx";
 import ServiceBriefBoard from "./components/ServiceBriefBoard.jsx";
+import {
+  buildReviewerShareUrl,
+  parseReviewerUrlState,
+  replaceReviewerUrlState,
+} from "./urlState.js";
 
 const API_BASE = String(import.meta.env.VITE_API_BASE || "").trim();
 const FORMSPREE_ENDPOINT = String(import.meta.env.VITE_FORMSPREE_ENDPOINT || "").trim();
@@ -930,15 +935,22 @@ function Icon({ name = "default" }) {
 }
 
 export default function App() {
-  const [page, setPage] = useState(() => getPageFromHash());
+  const initialReviewerUrlState =
+    typeof window === "undefined"
+      ? {}
+      : parseReviewerUrlState(window.location.search, window.location.hash);
+  const [page, setPage] = useState(() => initialReviewerUrlState.page || getPageFromHash());
   const [userId, setUserId] = useState(() => safeStorageGet(STORAGE_KEYS.userId, "acme-demo"));
   const [role, setRole] = useState(() => {
+    if (initialReviewerUrlState.role && roles.includes(initialReviewerUrlState.role)) {
+      return initialReviewerUrlState.role;
+    }
     const stored = safeStorageGet(STORAGE_KEYS.role, "Employee");
     return roles.includes(stored) ? stored : "Employee";
   });
   const [loginCode, setLoginCode] = useState(() => safeStorageGet(STORAGE_KEYS.loginCode, ""));
   const [token, setToken] = useState("");
-  const [activeTab, setActiveTab] = useState("architecture");
+  const [activeTab, setActiveTab] = useState(() => initialReviewerUrlState.tab || "architecture");
   const [status, setStatus] = useState("Ready");
   const [lastRequestId, setLastRequestId] = useState("");
   const [health, setHealth] = useState({
@@ -1072,6 +1084,10 @@ export default function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
+
+  useEffect(() => {
+    replaceReviewerUrlState({ page, tab: activeTab, role });
+  }, [activeTab, page, role]);
 
   useEffect(() => {
     if (!DISQUS_SHORTNAME || typeof document === "undefined" || disqusLoadedRef.current) {
@@ -1247,6 +1263,12 @@ export default function App() {
   function navigate(nextPage) {
     window.location.hash = nextPage;
     setPage(nextPage);
+  }
+
+  async function copyCurrentReviewLink() {
+    const url = buildReviewerShareUrl({ page, tab: activeTab, role });
+    const ok = await copyTextToClipboard(url);
+    setStatus(ok ? "Current review link copied" : "Failed to copy current review link");
   }
 
   async function fetchJson(path, options = {}) {
@@ -2731,6 +2753,13 @@ export default function App() {
                 ? "Degraded"
                 : "Offline"}
           </span>
+          <span className="chip">Role: {role}</span>
+          <span className="chip">
+            {page === "console" ? `Tab: ${activeTab}` : `Page: ${page}`}
+          </span>
+          <button className="cta-light" onClick={() => void copyCurrentReviewLink()}>
+            Copy Review Link
+          </button>
           <button className="cta-light" onClick={() => navigate("console")}>
             Open Console
           </button>
