@@ -1,8 +1,14 @@
 # Enterprise LLM Adoption Kit (Korea) - Portfolio
 Tagline: Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
-Note: This is a personal portfolio project. No real customers or production deployments are represented; all data and scenarios are synthetic or hypothetical.
+Portfolio note: all customers, data, and rollout scenarios in this repo are synthetic. The goal is a reviewable enterprise-style validation kit, not a fictional production claim.
 
 Korean version: `README.ko.md`
+
+
+## Portfolio posture
+- Treat this repo as a runnable enterprise review kit, not a slide deck pretending to be software.
+- The strongest proof is the service brief, executive review pack, audit/metrics routes, and checked-in eval artifacts.
+- Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
 ## Demo video
 - YouTube: https://youtu.be/yMq03b0js0E
