@@ -10,6 +10,12 @@ Korean version: `README.ko.md`
 - The strongest proof is the service brief, executive review pack, audit/metrics routes, and checked-in eval artifacts.
 - Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
+
+## Role signals
+- **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are all runnable, not just described.
+- **Solution architect:** deployment options, security posture, and platform mapping are documented alongside the working demo.
+- **Field / sales engineer:** executive review pack, rollout tracks, and proof assets support buyer-facing storytelling.
+
 ## Demo video
 - YouTube: https://youtu.be/yMq03b0js0E
 
