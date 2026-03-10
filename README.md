@@ -18,7 +18,7 @@ Korean version: `README.ko.md`
 ## Repository surfaces
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
 - **Supporting evidence:** `docs/`, `evals/`, and `tools/` collect architecture notes, review artifacts, and validation utilities.
-- **Generated review bundles:** `dist/application_bundle_*` is kept as exportable evidence, not as the source of truth for the implementation.
+- **Generated review bundles:** `dist/application_bundle_*` is generated on demand by `scripts/package_application.sh` and is intentionally not kept as source-of-truth content in the repo.
 - **Start here if you're new:** run the app first, then use the review pack and eval artifacts as supporting proof.
 
 ## Demo video
@@ -75,7 +75,7 @@ Korean version: `README.ko.md`
 ## Canonical runtime + artifact map
 - Canonical runtime: `app/backend` FastAPI plus the `app/frontend` React/Vite reviewer UI.
 - `docs/` is the editable source for the architecture, sales, and eval collateral referenced by the review APIs.
-- `dist/application_bundle_*` contains timestamped review/export snapshots assembled from `docs/`; treat those folders as published bundles, not the authoring source.
+- `scripts/package_application.sh` assembles timestamped review/export snapshots from `docs/` into `dist/application_bundle_*` when you need a handoff bundle.
 - `app/frontend/dist/` is the static publish output for the reviewer shell, while `dist/scenario_runs/` is generated Scenario Runner output.
 
 ## Troubleshooting & verification notes (reproducible checks)
