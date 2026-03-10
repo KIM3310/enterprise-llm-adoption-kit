@@ -1271,6 +1271,117 @@ export default function App() {
     setStatus(ok ? "Current review link copied" : "Failed to copy current review link");
   }
 
+  async function copyReviewerBundle() {
+    const reviewRoutes =
+      reviewPack?.review_routes?.length
+        ? reviewPack.review_routes
+        : reviewPack?.two_minute_review?.map((item) => item.surface || item).filter(Boolean) || [];
+    const proofAssets = Array.isArray(reviewPack?.proof_assets) ? reviewPack.proof_assets : [];
+    const text = [
+      "LLM Adoption Atelier reviewer bundle",
+      `Page: ${page}`,
+      `Role: ${role}`,
+      `Console tab: ${activeTab}`,
+      `Backend: ${health.status || "unknown"}`,
+      `Share link: ${buildReviewerShareUrl({ page, tab: activeTab, role })}`,
+      "",
+      "Review routes",
+      ...(reviewRoutes.length > 0 ? reviewRoutes.map((item) => `- ${item}`) : ["- Review routes unavailable."]),
+      "",
+      "Proof assets",
+      ...(proofAssets.length > 0
+        ? proofAssets.slice(0, 6).map((item) => `- ${item.label || item.kind || "asset"}: ${item.path || item.href || "-"}`)
+        : ["- Proof assets unavailable."]),
+    ].join("\n");
+    const ok = await copyTextToClipboard(text);
+    setStatus(ok ? "Reviewer bundle copied" : "Failed to copy reviewer bundle");
+  }
+
+  function cycleRole(direction = 1) {
+    const currentIndex = roles.indexOf(role);
+    const nextIndex = (currentIndex + direction + roles.length) % roles.length;
+    setRole(roles[nextIndex]);
+  }
+
+  function goToRelativePage(direction = 1) {
+    const currentIndex = pages.indexOf(page);
+    const safeIndex = currentIndex === -1 ? 0 : currentIndex;
+    const nextIndex = (safeIndex + direction + pages.length) % pages.length;
+    navigate(pages[nextIndex]);
+  }
+
+  function goToRelativeConsoleTab(direction = 1) {
+    const tabs = ["architecture", "ops", "governance", "integrations"];
+    const currentIndex = tabs.indexOf(activeTab);
+    const safeIndex = currentIndex === -1 ? 0 : currentIndex;
+    if (page !== "console") {
+      navigate("console");
+    }
+    setActiveTab(tabs[(safeIndex + direction + tabs.length) % tabs.length]);
+  }
+
+  useEffect(() => {
+    const handleKeyboardShortcuts = (event) => {
+      const target = event.target;
+      const tagName = String(target?.tagName || "").toLowerCase();
+      const isTypingTarget =
+        Boolean(target?.isContentEditable) ||
+        tagName === "input" ||
+        tagName === "textarea" ||
+        tagName === "select";
+      if (isTypingTarget || event.altKey || event.metaKey || event.ctrlKey) {
+        return;
+      }
+
+      if (event.shiftKey && event.key.toLowerCase() === "l") {
+        event.preventDefault();
+        void copyCurrentReviewLink();
+        return;
+      }
+
+      if (event.shiftKey && event.key.toLowerCase() === "b") {
+        event.preventDefault();
+        void copyReviewerBundle();
+        return;
+      }
+
+      if (!event.shiftKey && /^[1-5]$/.test(event.key)) {
+        event.preventDefault();
+        navigate(pages[Number(event.key) - 1]);
+        return;
+      }
+
+      if (!event.shiftKey && event.key.toLowerCase() === "g") {
+        event.preventDefault();
+        cycleRole(1);
+        return;
+      }
+
+      if (!event.shiftKey && event.key === "[") {
+        event.preventDefault();
+        goToRelativeConsoleTab(-1);
+        return;
+      }
+
+      if (!event.shiftKey && event.key === "]") {
+        event.preventDefault();
+        goToRelativeConsoleTab(1);
+        return;
+      }
+
+      if (!event.shiftKey && event.key.toLowerCase() === "h") {
+        event.preventDefault();
+        goToRelativePage(-1);
+      } else if (!event.shiftKey && event.key.toLowerCase() === "l") {
+        event.preventDefault();
+        goToRelativePage(1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyboardShortcuts);
+    return () => window.removeEventListener("keydown", handleKeyboardShortcuts);
+  }, [activeTab, page, role, reviewPack, health.status]);
+
   async function fetchJson(path, options = {}) {
     const { errorMessage = "Request failed", timeoutMs = 20000, ...fetchOptions } = options;
     let res;
@@ -2760,10 +2871,16 @@ export default function App() {
           <button className="cta-light" onClick={() => void copyCurrentReviewLink()}>
             Copy Review Link
           </button>
+          <button className="cta-light" onClick={() => void copyReviewerBundle()}>
+            Copy Reviewer Bundle
+          </button>
           <button className="cta-light" onClick={() => navigate("console")}>
             Open Console
           </button>
         </div>
+        <p className="status-line" style={{ marginTop: "0.75rem" }}>
+          Shortcuts: 1-5 pages · G role · [ / ] console tabs · H/L prev-next page · ⇧L link · ⇧B reviewer bundle
+        </p>
       </header>
 
       <main className="main-content">
