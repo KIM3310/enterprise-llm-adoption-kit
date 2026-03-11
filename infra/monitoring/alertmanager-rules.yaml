@@ -1,0 +1,149 @@
+# AlertManager rules for Enterprise LLM Adoption Kit
+# Load into Prometheus via: rule_files: ["alertmanager-rules.yaml"]
+
+groups:
+  - name: llm-backend-availability
+    interval: 30s
+    rules:
+      - alert: HighErrorRate
+        expr: >
+          sum(rate(requests_total{status!="ok"}[5m]))
+          / sum(rate(requests_total[5m]))
+          > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "High error rate on LLM backend"
+          description: >
+            Error rate is {{ $value | humanizePercentage }} over the last 5 minutes,
+            exceeding the 5% threshold.
+
+      - alert: HighLatencyP95
+        expr: >
+          histogram_quantile(0.95,
+            sum by (le) (rate(request_latency_seconds_bucket[5m]))
+          ) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "P95 latency above 5s"
+          description: >
+            95th percentile latency is {{ $value | humanizeDuration }}.
+
+      - alert: BackendDown
+        expr: up{job="llm-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "LLM backend instance is down"
+          description: "Instance {{ $labels.instance }} has been unreachable for 2 minutes."
+
+  - name: llm-provider-health
+    interval: 30s
+    rules:
+      - alert: LLMCircuitBreakerOpen
+        expr: >
+          sum(rate(llm_circuit_events_total{event="opened"}[5m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "LLM circuit breaker has opened"
+          description: >
+            The LLM provider circuit breaker opened for provider {{ $labels.provider }}.
+            Requests are falling back to the stub adapter.
+
+      - alert: LLMHighFailureRate
+        expr: >
+          sum(rate(llm_failures_total[5m])) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "Elevated LLM provider failure rate"
+          description: >
+            LLM failures are occurring at {{ $value }} per second over the last 5 minutes.
+
+      - alert: LLMCostSpike
+        expr: >
+          sum(rate(llm_cost_usd_total[1h])) * 3600 > 50
+        for: 15m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "LLM cost is projected to exceed $50/hour"
+          description: >
+            Current hourly cost projection is ${{ $value | printf "%.2f" }}.
+
+  - name: llm-policy-safety
+    interval: 60s
+    rules:
+      - alert: HighInjectionRate
+        expr: >
+          sum(rate(policy_events_total{event="injection_detected"}[15m]))
+          / sum(rate(requests_total[15m]))
+          > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "High prompt injection detection rate"
+          description: >
+            Injection detection rate is {{ $value | humanizePercentage }} over 15 minutes,
+            which may indicate an attack or overly aggressive detection.
+
+      - alert: HighRefusalRate
+        expr: >
+          sum(rate(policy_events_total{event="safety_refusal"}[15m]))
+          / sum(rate(requests_total[15m]))
+          > 0.2
+        for: 10m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "High safety refusal rate"
+          description: >
+            Safety refusal rate is {{ $value | humanizePercentage }} over 15 minutes.
+
+  - name: llm-resource-utilization
+    interval: 60s
+    rules:
+      - alert: HighMemoryUsage
+        expr: >
+          container_memory_working_set_bytes{container="backend"}
+          / container_spec_memory_limit_bytes{container="backend"}
+          > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "Backend container memory usage above 85%"
+          description: >
+            Memory usage is {{ $value | humanizePercentage }} for pod {{ $labels.pod }}.
+
+      - alert: HighCPUUsage
+        expr: >
+          rate(container_cpu_usage_seconds_total{container="backend"}[5m])
+          / container_spec_cpu_quota{container="backend"}
+          * container_spec_cpu_period{container="backend"}
+          > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: enterprise-llm-adoption-kit
+        annotations:
+          summary: "Backend container CPU usage above 85%"
+          description: >
+            CPU usage is {{ $value | humanizePercentage }} for pod {{ $labels.pod }}.
