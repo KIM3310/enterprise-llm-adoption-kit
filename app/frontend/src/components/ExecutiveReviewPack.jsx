@@ -110,6 +110,36 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     "Fast review surfaces",
     ...fastReviewSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
+  const rolloutDecisionBriefText = [
+    "Enterprise rollout decision brief",
+    `Headline: ${reviewPack.headline}`,
+    `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
+    `Circuit: ${runtimeSummary.llm_circuit_state || "-"}`,
+    `Review assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
+    `Endpoints: ${Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0}`,
+    "",
+    "Recommended rollout tracks",
+    ...(rolloutTracks.length > 0
+      ? rolloutTracks.slice(0, 2).map(
+          (track, index) =>
+            `${index + 1}. ${track.track}: ${track.milestone} (${Array.isArray(track.fit_for) ? track.fit_for.join(", ") : "fit review"})`
+        )
+      : ["1. Review pack unavailable. Start with /ops/service-brief and /ops/rollout-board."]),
+    "",
+    "Platform dialogue",
+    ...(platformDialogues.length > 0
+      ? platformDialogues.slice(0, 3).map(
+          (item) =>
+            `- ${item.surface}: ${Array.isArray(item.fit_for) ? item.fit_for.join(", ") : "review fit"}`
+        )
+      : ["- Platform dialogue unavailable."]),
+    "",
+    "Watchouts",
+    ...(watchouts.length > 0 ? watchouts.slice(0, 3).map((item) => `- ${item}`) : ["- No active watchouts."]),
+    "",
+    "Fast review surfaces",
+    ...fastReviewSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
+  ].join("\n");
 
   const handleCopyRoutes = async () => {
     const ok = await copyTextToClipboard(fastReviewRouteText);
@@ -134,6 +164,11 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const handleCopyBuyerThesis = async () => {
     const ok = await copyTextToClipboard(buyerThesisText);
     setCopyStatus(ok ? "Copied buyer thesis snapshot." : "Failed to copy buyer thesis snapshot.");
+  };
+
+  const handleCopyRolloutDecisionBrief = async () => {
+    const ok = await copyTextToClipboard(rolloutDecisionBriefText);
+    setCopyStatus(ok ? "Copied rollout decision brief." : "Failed to copy rollout decision brief.");
   };
 
   return (
@@ -190,6 +225,9 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         </button>
         <button type="button" onClick={() => void handleCopyBuyerThesis()}>
           Copy Buyer Thesis
+        </button>
+        <button type="button" onClick={() => void handleCopyRolloutDecisionBrief()}>
+          Copy Rollout Decision Brief
         </button>
         {copyStatus ? <span className="review-pack-toolbar-status">{copyStatus}</span> : null}
       </div>
