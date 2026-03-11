@@ -1,6 +1,6 @@
 # Enterprise LLM Adoption Kit (Korea) - 포트폴리오
 Tagline: Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
-Note: 개인 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 배포는 없으며 모든 데이터와 시나리오는 합성 또는 가정된 내용입니다.
+Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 배포는 없으며 모든 데이터와 시나리오는 합성 또는 가정된 내용입니다.
 
 영문 버전: `README.md`
 
