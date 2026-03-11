@@ -16,7 +16,7 @@ const GISCUS_REPO = String(import.meta.env.VITE_GISCUS_REPO || "").trim();
 const GISCUS_REPO_ID = String(import.meta.env.VITE_GISCUS_REPO_ID || "").trim();
 const GISCUS_CATEGORY = String(import.meta.env.VITE_GISCUS_CATEGORY || "").trim();
 const GISCUS_CATEGORY_ID = String(import.meta.env.VITE_GISCUS_CATEGORY_ID || "").trim();
-const ADSENSE_CLIENT = "ca-pub-4973160293737562";
+const ADSENSE_CLIENT = String(import.meta.env.VITE_ADSENSE_CLIENT || "ca-pub-4973160293737562").trim();
 const DEFAULT_ADSENSE_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim();
 
 const APP_NAME = "LLM Adoption Atelier";

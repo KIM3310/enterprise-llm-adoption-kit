@@ -44,7 +44,13 @@ Korean version: `README.ko.md`
 
 - Reading guide: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
 
-## Project summary (entry-level, hands-on focus)
+## Monetization and analytics posture
+
+- AdSense and analytics are optional review-surface extras, not part of the core product proof.
+- Keep monetization IDs and analytics consent settings environment-specific when moving beyond review/demo deployments.
+- For enterprise walkthroughs, prioritize the service brief, review pack, and audit/metrics routes before any sponsored/community surfaces.
+
+## Project summary (implementation-focused)
 - Built an end-to-end adoption kit to show how enterprise LLM discovery turns into a secure, testable, and observable PoC.
 - Implemented a working backend + frontend demo so reviewers can run it locally and verify behavior.
 - Kept the scope realistic: stub LLM adapter, synthetic data, and explicit limitations so the portfolio stays honest.
