@@ -12,7 +12,7 @@ Korean version: `README.ko.md`
 
 ## Role signals
 - **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are all runnable, not just described.
-- **Solution architect:** deployment options, security posture, and platform mapping are documented alongside the working demo.
+- **Solution / cloud architect:** deployment options, security posture, and platform mapping are documented alongside the working demo.
 - **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough.
 
 ## Repository surfaces
