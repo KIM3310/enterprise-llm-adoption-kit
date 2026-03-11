@@ -17,3 +17,4 @@ def test_ui_includes_executive_review_pack():
     assert "Rollout tracks" in content
     assert "Review actions" in content
     assert "Proof assets" in content
+    assert "Copy Rollout Decision Brief" in content
