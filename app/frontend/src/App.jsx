@@ -106,6 +106,77 @@ const scenarioSteps = [
   }
 ];
 
+const homeLenses = {
+  recruiter: {
+    label: "Recruiter",
+    eyebrow: "Recruiter quick path",
+    headline: "See the proof in three moves",
+    description:
+      "Start with the readiness board, jump to the scenario runner, then copy a compact reviewer bundle when the story is clear.",
+    cards: [
+      ["01 · Service brief", "Runtime posture, proof inventory, and rollout stages in one board."],
+      ["02 · Scenario runner", "Show identity, architecture, and ops flow without leaving the product surface."],
+      ["03 · Reviewer bundle", "Send one compact handoff instead of narrating the whole repo live."],
+    ],
+    actions: [
+      { label: "Open Readiness", type: "page", value: "validation" },
+      { label: "Open Scenario Runner", type: "page", value: "scenario" },
+      { label: "Copy Reviewer Bundle", type: "bundle" },
+    ],
+  },
+  architect: {
+    label: "Architect",
+    eyebrow: "Solution architect lens",
+    headline: "Map trust boundary before platform talk",
+    description:
+      "Use this lens when the reviewer cares more about deployment posture, governance boundaries, and why the control tower is safe enough to scale.",
+    cards: [
+      ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
+      ["02 · Platform fit", "Capabilities and rollout tracks show how the same stack maps to platform conversations."],
+      ["03 · Review routes", "A shareable review link keeps the architecture discussion grounded in real proof surfaces."],
+    ],
+    actions: [
+      { label: "Open Capabilities", type: "page", value: "capabilities" },
+      { label: "Open Readiness", type: "page", value: "validation" },
+      { label: "Copy Review Link", type: "link" },
+    ],
+  },
+  operator: {
+    label: "Operator",
+    eyebrow: "Operator lens",
+    headline: "Show the control loop, not just the deck",
+    description:
+      "Use this path when you want to prove the console can move from login and diagnostics to a scenario decision without leaving the product.",
+    cards: [
+      ["01 · Scenario start", "Kick off the end-to-end path with a role-aware login and one concrete use case."],
+      ["02 · Console evidence", "Runtime events, diagnostics, and route health make the operator posture visible."],
+      ["03 · Snapshot handoff", "Copy a console snapshot once the control loop reads clearly."],
+    ],
+    actions: [
+      { label: "Open Scenario Runner", type: "page", value: "scenario" },
+      { label: "Open Console", type: "page", value: "console" },
+      { label: "Copy Console Snapshot", type: "snapshot" },
+    ],
+  },
+  executive: {
+    label: "Executive",
+    eyebrow: "Executive lens",
+    headline: "Tie buyer promises to rollout decisions",
+    description:
+      "Use this when the audience wants rollout confidence, proof assets, and a fast answer to what ships first versus what waits for deeper validation.",
+    cards: [
+      ["01 · Readiness board", "Explain maturity stage, evidence depth, and what is still demo-safe."],
+      ["02 · Review pack", "Turn technical proof into buyer promises, rollout tracks, and trust boundaries."],
+      ["03 · Decision brief", "End with the reviewer bundle so the next step feels like a deliberate rollout call."],
+    ],
+    actions: [
+      { label: "Open Readiness", type: "page", value: "validation" },
+      { label: "Open Console", type: "page", value: "console" },
+      { label: "Copy Reviewer Bundle", type: "bundle" },
+    ],
+  },
+};
+
 function buildStaticServiceBrief() {
   return {
     service: "Enterprise LLM Adoption Kit (Korea)",
@@ -1103,6 +1174,7 @@ export default function App() {
   const [communityMessage, setCommunityMessage] = useState("");
   const [communitySubmitStatus, setCommunitySubmitStatus] = useState("idle");
   const [communityNotice, setCommunityNotice] = useState("");
+  const [homeLens, setHomeLens] = useState("recruiter");
   const disqusLoadedRef = useRef(false);
   const giscusContainerRef = useRef(null);
 
@@ -1339,6 +1411,24 @@ export default function App() {
     ].join("\n");
     const ok = await copyTextToClipboard(text);
     setStatus(ok ? "Console snapshot copied" : "Failed to copy console snapshot");
+  }
+
+  async function runHomeLensAction(action) {
+    if (action.type === "page") {
+      navigate(action.value);
+      return;
+    }
+    if (action.type === "bundle") {
+      await copyReviewerBundle();
+      return;
+    }
+    if (action.type === "snapshot") {
+      await copyConsoleSnapshot();
+      return;
+    }
+    if (action.type === "link") {
+      await copyCurrentReviewLink();
+    }
   }
 
   function cycleRole(direction = 1) {
@@ -2983,38 +3073,42 @@ export default function App() {
               <Reveal className="quick-path-card" delay={70}>
                 <div className="quick-path-head">
                   <div>
-                    <p className="eyebrow">Recruiter quick path</p>
-                    <h2>See the proof in three moves</h2>
-                    <p>
-                      Open the readiness board first, jump to the scenario runner second, then copy the reviewer
-                      bundle once the story is clear.
-                    </p>
+                    <div className="lens-toggle" role="tablist" aria-label="home lens selector">
+                      {Object.entries(homeLenses).map(([key, lens]) => (
+                        <button
+                          key={key}
+                          type="button"
+                          className={`lens-btn${homeLens === key ? " active" : ""}`}
+                          aria-pressed={homeLens === key}
+                          onClick={() => setHomeLens(key)}
+                        >
+                          {lens.label}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="eyebrow">{homeLenses[homeLens].eyebrow}</p>
+                    <h2>{homeLenses[homeLens].headline}</h2>
+                    <p className="quick-path-subtitle">{homeLenses[homeLens].description}</p>
                   </div>
                   <div className="quick-path-actions">
-                    <button className="cta-light" onClick={() => navigate("validation")}>
-                      Open Readiness
-                    </button>
-                    <button className="cta-light" onClick={() => navigate("scenario")}>
-                      Open Scenario Runner
-                    </button>
-                    <button className="cta-light" onClick={() => void copyReviewerBundle()}>
-                      Copy Reviewer Bundle
-                    </button>
+                    {homeLenses[homeLens].actions.map((action) => (
+                      <button
+                        key={`${homeLens}-${action.label}`}
+                        className="cta-light"
+                        onClick={() => void runHomeLensAction(action)}
+                      >
+                        {action.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
                 <div className="quick-path-grid">
-                  <article className="quick-path-item">
-                    <strong>01 · Service brief</strong>
-                    <span>Runtime posture, proof inventory, and rollout stages in one board.</span>
-                  </article>
-                  <article className="quick-path-item">
-                    <strong>02 · Scenario runner</strong>
-                    <span>Show identity, architecture, and ops flow without leaving the product surface.</span>
-                  </article>
-                  <article className="quick-path-item">
-                    <strong>03 · Reviewer bundle</strong>
-                    <span>Send one compact handoff instead of narrating the whole repo live.</span>
-                  </article>
+                  {homeLenses[homeLens].cards.map(([title, body]) => (
+                    <article key={`${homeLens}-${title}`} className="quick-path-item">
+                      <strong>{title}</strong>
+                      <span>{body}</span>
+                    </article>
+                  ))}
                 </div>
               </Reveal>
             </section>
