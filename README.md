@@ -6,8 +6,8 @@ Korean version: `README.ko.md`
 
 
 ## Portfolio posture
-- Treat this repo as a runnable enterprise review kit, not a slide deck pretending to be software.
-- The strongest proof is the service brief, executive review pack, audit/metrics routes, and checked-in eval artifacts.
+- Treat this repo as an enterprise decision lab you can actually run, not as a sales deck wearing a UI.
+- The strongest proof is still service brief -> executive review pack -> audit/metrics -> checked-in eval artifacts.
 - Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
 ## Role signals
@@ -19,7 +19,7 @@ Korean version: `README.ko.md`
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
 - **Supporting evidence:** `docs/`, `evals/`, and `tools/` collect architecture notes, review artifacts, and validation utilities.
 - **Generated review bundles:** `dist/application_bundle_*` is generated on demand by `scripts/package_application.sh` and is intentionally not kept as source-of-truth content in the repo.
-- **Start here if you're new:** run the app first, then use the review pack and eval artifacts as supporting proof.
+- **If you're new:** run the app first, then pull in the review pack and eval artifacts once the runtime story is already clear.
 
 ## Demo video
 - YouTube: https://youtu.be/yMq03b0js0E
