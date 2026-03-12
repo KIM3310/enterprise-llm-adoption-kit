@@ -274,6 +274,35 @@ h5 {
   gap: 18px;
 }
 
+.lens-toggle {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.lens-btn {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--muted);
+  font-weight: 700;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.lens-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.lens-btn.active {
+  color: var(--text);
+  border-color: rgba(37, 99, 235, 0.28);
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.12), rgba(6, 182, 212, 0.12));
+}
+
 .quick-path-head {
   display: flex;
   align-items: flex-start;
@@ -291,6 +320,10 @@ h5 {
   color: var(--muted);
   max-width: 760px;
   line-height: 1.7;
+}
+
+.quick-path-subtitle {
+  min-height: 3.4em;
 }
 
 .quick-path-actions {
