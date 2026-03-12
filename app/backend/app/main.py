@@ -99,6 +99,8 @@ from .service_brief import (
     build_service_brief,
     build_service_brief_schema,
     build_service_rollout_board,
+    build_service_rollout_drill,
+    build_service_rollout_drill_schema,
     build_service_rollout_board_schema,
     build_service_review_pack,
     build_service_review_pack_schema,
@@ -899,6 +901,23 @@ def ops_rollout_board(track: str | None = None) -> Dict[str, object]:
 @app.get("/ops/rollout-board/schema")
 def ops_rollout_board_schema() -> Dict[str, object]:
     return build_service_rollout_board_schema()
+
+
+@app.get("/ops/rollout-drill")
+def ops_rollout_drill(track: str | None = None) -> Dict[str, object]:
+    try:
+        return build_service_rollout_drill(
+            track=track,
+            startup_report=getattr(app.state, "startup_report", None),
+            circuit_snapshot=_llm_circuit_snapshot(),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/ops/rollout-drill/schema")
+def ops_rollout_drill_schema() -> Dict[str, object]:
+    return build_service_rollout_drill_schema()
 
 
 @app.get("/ops/review-summary")

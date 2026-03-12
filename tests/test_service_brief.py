@@ -19,6 +19,7 @@ async def test_ops_service_brief_contract() -> None:
     assert "aws" in body["platform_targets"]
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
+    assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
@@ -53,6 +54,7 @@ async def test_ops_review_pack_contract() -> None:
     assert body["proof_bundle"]["tests"] >= 20
     assert body["proof_bundle"]["review_assets_count"] >= 4
     assert "/ops/rollout-board" in body["proof_bundle"]["runtime_surfaces"]
+    assert "/ops/rollout-drill" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/runtime/scorecard" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
@@ -61,6 +63,7 @@ async def test_ops_review_pack_contract() -> None:
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
+    assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
@@ -130,6 +133,37 @@ async def test_ops_rollout_board_schema_contract() -> None:
     assert "items" in body["required_fields"]
     assert "track" in body["item_required_fields"]
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_drill_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-drill?track=hybrid%20control%20tower")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "enterprise-adoption-rollout-drill-v1"
+    assert body["filters"]["track"] == "hybrid control tower"
+    assert body["summary"]["visible_tracks"] == 1
+    assert body["items"][0]["track"] == "hybrid control tower"
+    assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
+    assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_drill_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-drill/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-rollout-drill-v1"
+    assert "summary" in body["required_fields"]
+    assert "items" in body["required_fields"]
+    assert "rollback_eta_minutes" in body["item_required_fields"]
+    assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
 
 
 @pytest.mark.anyio

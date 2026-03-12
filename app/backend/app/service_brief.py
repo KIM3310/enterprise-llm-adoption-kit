@@ -265,6 +265,7 @@ def build_service_brief(
             "service_brief_schema": "/ops/service-brief/schema",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
             "review_summary": "/ops/review-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
@@ -381,6 +382,7 @@ def build_service_review_pack(
                 "/ops/service-brief",
                 "/ops/review-pack",
                 "/ops/rollout-board",
+                "/ops/rollout-drill",
                 "/ops/review-summary",
                 "/ops/review-pack/schema",
                 "/ops/runtime/scorecard",
@@ -433,6 +435,7 @@ def build_service_review_pack(
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
             "review_summary": "/ops/review-summary",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "review_pack_schema": "/ops/review-pack/schema",
@@ -528,6 +531,7 @@ def build_service_rollout_board(
             "review_pack": "/ops/review-pack",
             "review_summary": "/ops/review-summary",
             "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "deployment_options": "docs/architecture/llm_deployment_options.md",
         },
@@ -562,9 +566,110 @@ def build_service_rollout_board_schema() -> Dict[str, object]:
         ],
         "links": {
             "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
+        },
+    }
+
+
+def build_service_rollout_drill(
+    *,
+    track: Optional[str] = None,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    rollout_board = build_service_rollout_board(
+        track=track,
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    runtime = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    ).get("runtime", {})
+
+    items = []
+    for item in rollout_board.get("items", []):
+        readiness = str(item.get("readiness", "attention"))
+        items.append(
+            {
+                "track": item.get("track", ""),
+                "readiness": readiness,
+                "guardrail_trip_points": [
+                    "quality regression above threshold",
+                    "latency budget exceeded",
+                    "cost guardrail breached",
+                ],
+                "rollback_eta_minutes": 15 if readiness == "ready" else 45,
+                "kill_switch_owner": "ops-oncall",
+                "rollback_path": "ops/runtime -> review pack -> disable staged rollout",
+                "why_now": item.get("why_now", ""),
+            }
+        )
+
+    return {
+        "service": rollout_board["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-rollout-drill-v1",
+        "headline": "Rollout and rollback drill surface for proving kill-switch posture before a go-live decision.",
+        "filters": rollout_board.get("filters", {}),
+        "summary": {
+            "visible_tracks": len(items),
+            "ready_tracks": len([item for item in items if item["readiness"] == "ready"]),
+            "attention_tracks": len([item for item in items if item["readiness"] != "ready"]),
+            "kill_switch_ready": str(runtime.get("llm_circuit_state", "closed")) == "closed",
+            "llm_provider": runtime.get("llm_provider", ""),
+        },
+        "items": items,
+        "review_actions": [
+            "Use the rollout board to choose a lane, then prove rollback posture with this drill view.",
+            "Keep guardrail trip points visible in executive review instead of implying they exist off-screen.",
+            "Escalate to the ops runtime scorecard when startup readiness or circuit posture changes.",
+        ],
+        "links": {
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
+            "ops_runtime_scorecard": "/ops/runtime/scorecard",
+        },
+    }
+
+
+def build_service_rollout_drill_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-rollout-drill-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "summary",
+            "items",
+            "review_actions",
+            "links",
+        ],
+        "summary_required_fields": [
+            "visible_tracks",
+            "ready_tracks",
+            "attention_tracks",
+            "kill_switch_ready",
+            "llm_provider",
+        ],
+        "item_required_fields": [
+            "track",
+            "readiness",
+            "guardrail_trip_points",
+            "rollback_eta_minutes",
+            "kill_switch_owner",
+            "rollback_path",
+        ],
+        "links": {
+            "rollout_drill": "/ops/rollout-drill",
+            "rollout_board": "/ops/rollout-board",
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
         },
     }
 
