@@ -849,10 +849,19 @@ function Reveal({ children, className = "", delay = 0 }) {
       return undefined;
     }
 
+    const fallbackTimer = window.setTimeout(() => {
+      node.classList.add("is-visible");
+    }, 220);
+
+    if (typeof IntersectionObserver !== "function") {
+      return () => window.clearTimeout(fallbackTimer);
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            window.clearTimeout(fallbackTimer);
             node.classList.add("is-visible");
             observer.unobserve(node);
           }
@@ -863,7 +872,10 @@ function Reveal({ children, className = "", delay = 0 }) {
 
     observer.observe(node);
 
-    return () => observer.disconnect();
+    return () => {
+      window.clearTimeout(fallbackTimer);
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -2952,6 +2964,46 @@ export default function App() {
                 <div className="media-frame">
                   <img src={heroTower} alt="Control tower visualization" />
                   <div className="media-tag">CONTROL TOWER</div>
+                </div>
+              </Reveal>
+            </section>
+
+            <section className="section-block">
+              <Reveal className="quick-path-card" delay={70}>
+                <div className="quick-path-head">
+                  <div>
+                    <p className="eyebrow">Recruiter quick path</p>
+                    <h2>See the proof in three moves</h2>
+                    <p>
+                      Open the readiness board first, jump to the scenario runner second, then copy the reviewer
+                      bundle once the story is clear.
+                    </p>
+                  </div>
+                  <div className="quick-path-actions">
+                    <button className="cta-light" onClick={() => navigate("validation")}>
+                      Open Readiness
+                    </button>
+                    <button className="cta-light" onClick={() => navigate("scenario")}>
+                      Open Scenario Runner
+                    </button>
+                    <button className="cta-light" onClick={() => void copyReviewerBundle()}>
+                      Copy Reviewer Bundle
+                    </button>
+                  </div>
+                </div>
+                <div className="quick-path-grid">
+                  <article className="quick-path-item">
+                    <strong>01 · Service brief</strong>
+                    <span>Runtime posture, proof inventory, and rollout stages in one board.</span>
+                  </article>
+                  <article className="quick-path-item">
+                    <strong>02 · Scenario runner</strong>
+                    <span>Show identity, architecture, and ops flow without leaving the product surface.</span>
+                  </article>
+                  <article className="quick-path-item">
+                    <strong>03 · Reviewer bundle</strong>
+                    <span>Send one compact handoff instead of narrating the whole repo live.</span>
+                  </article>
                 </div>
               </Reveal>
             </section>
