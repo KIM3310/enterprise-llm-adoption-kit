@@ -1177,6 +1177,28 @@ export default function App() {
   const [homeLens, setHomeLens] = useState("recruiter");
   const disqusLoadedRef = useRef(false);
   const giscusContainerRef = useRef(null);
+  const homeFrontDoor = useMemo(() => {
+    const proofBundle = reviewPack?.proof_bundle || {};
+    const reviewAssets =
+      Number(proofBundle.review_assets_count || 0) ||
+      (Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets.length : 0) ||
+      (Array.isArray(reviewPack?.review_actions) ? reviewPack.review_actions.length : 0) ||
+      5;
+    const reviewRoutes =
+      (Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0) ||
+      (Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces.length : 0) ||
+      Object.values(reviewPack?.links || {}).filter((value) => String(value || "").startsWith("/")).length ||
+      8;
+    return {
+      readinessStages: Array.isArray(serviceBrief?.stages) ? serviceBrief.stages.length : 5,
+      reviewAssets,
+      reviewRoutes,
+      reviewActions: Array.isArray(reviewPack?.review_actions) ? reviewPack.review_actions.slice(0, 3) : [],
+      rolloutTracks: Array.isArray(reviewPack?.rollout_tracks) ? reviewPack.rollout_tracks.slice(0, 3) : [],
+      buyerPromises: Array.isArray(reviewPack?.buyer_promises) ? reviewPack.buyer_promises.slice(0, 2) : [],
+      maturityStage: serviceBrief?.maturity_stage || "pre-production validation system",
+    };
+  }, [reviewPack, serviceBrief]);
 
   useEffect(() => {
     const onHashChange = () => setPage(getPageFromHash());
@@ -3031,40 +3053,79 @@ export default function App() {
           <div className="page-view">
             <section className="hero-grid">
               <Reveal className="hero-copy">
-                <p className="eyebrow">Enterprise Adoption Sandbox</p>
-                <h1>{APP_NAME}</h1>
+                <p className="eyebrow">Discovery → Governance → Rollout</p>
+                <h1>Give the rollout answer before the architecture review drifts into theory.</h1>
                 <p className="lead">
-                  A production-minded validation kit for enterprise LLM adoption. Use it to test governance,
-                  grounded answers, and operational signals before you ship into sensitive environments.
+                  {APP_NAME} turns enterprise LLM adoption into one readable proof path: confirm runtime posture,
+                  run a role-aware scenario, then hand over an executive bundle with rollout tracks and governance
+                  evidence already stitched together.
                 </p>
                 <div className="hero-actions">
-                  <button className="cta-primary" onClick={() => navigate("capabilities")}>
-                    Explore Capabilities
+                  <button className="cta-primary" onClick={() => navigate("validation")}>
+                    Open Readiness Board
                   </button>
                   <button className="cta-ghost" onClick={() => navigate("scenario")}>
-                    Run End-to-End Scenario
+                    Run Scenario Runner
+                  </button>
+                  <button className="cta-ghost" onClick={() => void copyReviewerBundle()}>
+                    Copy Decision Brief
                   </button>
                 </div>
                 <div className="kpi-grid">
                   <article className="kpi-item">
-                    <p>03</p>
-                    <span>Roles (Employee/Ops/Admin)</span>
+                    <p>{String(homeFrontDoor.readinessStages).padStart(2, "0")}</p>
+                    <span>Validation stages</span>
                   </article>
                   <article className="kpi-item">
-                    <p>02</p>
-                    <span>Use Cases (UC1/UC2)</span>
+                    <p>{String(homeFrontDoor.reviewAssets).padStart(2, "0")}</p>
+                    <span>Review assets</span>
                   </article>
                   <article className="kpi-item">
-                    <p>01</p>
-                    <span>Control Tower Snapshot</span>
+                    <p>{String(homeFrontDoor.reviewRoutes).padStart(2, "0")}</p>
+                    <span>Runtime review routes</span>
                   </article>
+                </div>
+                <div className="hero-proof-strip" aria-label="buyer promises">
+                  {homeFrontDoor.buyerPromises.map((promise) => (
+                    <article key={promise} className="hero-proof-pill">
+                      {promise}
+                    </article>
+                  ))}
                 </div>
               </Reveal>
 
               <Reveal className="hero-media" delay={120}>
-                <div className="media-frame">
-                  <img src={heroTower} alt="Control tower visualization" />
-                  <div className="media-tag">CONTROL TOWER</div>
+                <div className="media-frame media-proof-board">
+                  <div className="media-proof-head">
+                    <div>
+                      <p className="eyebrow">Decision theater</p>
+                      <h2>Show what ships first, what stays gated, and why the buyer should trust the path.</h2>
+                    </div>
+                    <div className="media-proof-stage">{homeFrontDoor.maturityStage}</div>
+                  </div>
+                  <div className="media-proof-hero">
+                    <img src={heroTower} alt="Control tower visualization" />
+                    <div className="media-tag">CONTROL TOWER</div>
+                  </div>
+                  <div className="media-proof-grid">
+                    {homeFrontDoor.reviewActions.map((action, index) => (
+                      <article key={action.label} className="media-proof-card">
+                        <span>{`0${index + 1}`}</span>
+                        <strong>{action.label}</strong>
+                        <p>{action.proof}</p>
+                        <code>{action.surface}</code>
+                      </article>
+                    ))}
+                  </div>
+                  <div className="rollout-track-strip">
+                    {homeFrontDoor.rolloutTracks.map((track) => (
+                      <article key={track.track} className="rollout-track-card">
+                        <strong>{track.track}</strong>
+                        <p>{track.fit_for.join(" · ")}</p>
+                        <code>{track.evidence}</code>
+                      </article>
+                    ))}
+                  </div>
                 </div>
               </Reveal>
             </section>
