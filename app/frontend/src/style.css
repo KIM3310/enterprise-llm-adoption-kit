@@ -264,6 +264,67 @@ h5 {
   align-items: stretch;
 }
 
+.quick-path-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: var(--shadow-card);
+  padding: var(--panel-pad);
+  display: grid;
+  gap: 18px;
+}
+
+.quick-path-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.quick-path-head h2 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  margin-bottom: 8px;
+}
+
+.quick-path-head p:last-child {
+  margin: 0;
+  color: var(--muted);
+  max-width: 760px;
+  line-height: 1.7;
+}
+
+.quick-path-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.quick-path-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quick-path-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.88);
+  padding: 14px 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.quick-path-item strong {
+  font-size: 0.95rem;
+}
+
+.quick-path-item span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
 .hero-copy {
   position: relative;
   display: flex;
@@ -1791,6 +1852,7 @@ textarea {
 
 @media (max-width: 1040px) {
   .hero-grid,
+  .quick-path-grid,
   .validation-layout,
   .scenario-layout,
   .console-header {
@@ -1856,6 +1918,10 @@ textarea {
     top: 10px;
     border-radius: 20px;
     flex-wrap: wrap;
+  }
+
+  .quick-path-head {
+    flex-direction: column;
   }
 
   .gallery-grid,
