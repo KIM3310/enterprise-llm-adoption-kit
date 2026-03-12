@@ -6,7 +6,7 @@ Korean version: `README.ko.md`
 
 
 ## Portfolio posture
-- Treat this repo as an enterprise decision lab you can actually run, not as a sales deck wearing a UI.
+- Read this repo like an enterprise decision lab you can actually run, not like a sales deck wearing a UI.
 - The strongest proof is still service brief -> executive review pack -> audit/metrics -> checked-in eval artifacts.
 - Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
