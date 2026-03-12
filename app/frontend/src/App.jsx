@@ -959,6 +959,17 @@ export default function App() {
     typeof window === "undefined"
       ? {}
       : parseReviewerUrlState(window.location.search, window.location.hash);
+
+  useEffect(() => {
+    document.body.dataset.appMounted = "true";
+    const fallback = document.getElementById("boot-fallback");
+    fallback?.remove();
+
+    return () => {
+      delete document.body.dataset.appMounted;
+    };
+  }, []);
+
   const [page, setPage] = useState(() => initialReviewerUrlState.page || getPageFromHash());
   const [userId, setUserId] = useState(() => safeStorageGet(STORAGE_KEYS.userId, "acme-demo"));
   const [role, setRole] = useState(() => {
