@@ -50,6 +50,20 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const runtimeSurfaces = Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces : [];
   const runtimeSummary = reviewPack.runtime_summary || {};
   const fastReviewSurfaces = Object.entries(reviewPack.links || {}).filter(([, surface]) => typeof surface === "string" && surface).slice(0, compact ? 4 : 6);
+  const describePlatformDialogue = (item) => {
+    if (typeof item === "string") {
+      return item;
+    }
+    const surface = item?.surface || item?.platform || "platform";
+    const fitFor = Array.isArray(item?.fit_for) && item.fit_for.length > 0 ? item.fit_for.join(", ") : "review fit";
+    return `${surface}: ${fitFor}`;
+  };
+  const platformDialogueKey = (item, index) => {
+    if (typeof item === "string") {
+      return item;
+    }
+    return item?.surface || item?.platform || `platform-${index}`;
+  };
   const surfaceHints = {
     health: "Confirm startup posture and runtime state before discussing rollout.",
     service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
@@ -95,7 +109,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     ...rolloutTracks.slice(0, 4).map((track) => `- ${track.track}: ${track.milestone}`),
     "",
     "Platform dialogues",
-    ...platformDialogues.slice(0, 3).map((item) => `- ${item.surface}: ${item.fit_for.join(", ")}`),
+    ...platformDialogues.slice(0, 3).map((item) => `- ${describePlatformDialogue(item)}`),
   ].join("\n");
   const buyerThesisText = [
     "Enterprise buyer thesis snapshot",
@@ -295,8 +309,8 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         <article className="service-brief-card">
           <p className="service-card-label">Platform dialogues</p>
           <ul className="service-brief-list">
-            {platformDialogues.slice(0, compact ? 3 : 5).map((item) => (
-              <li key={item}>{item}</li>
+            {platformDialogues.slice(0, compact ? 3 : 5).map((item, index) => (
+              <li key={platformDialogueKey(item, index)}>{describePlatformDialogue(item)}</li>
             ))}
           </ul>
           {!compact && stageMap.length > 0 && (
