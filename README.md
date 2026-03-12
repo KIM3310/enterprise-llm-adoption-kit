@@ -15,6 +15,12 @@ Korean version: `README.ko.md`
 - **Solution / cloud architect:** deployment options, security posture, and platform mapping are documented alongside the working demo.
 - **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough.
 
+
+## Portfolio context
+- **Portfolio family:** applied document and workflow systems
+- **This repo's role:** flagship enterprise decision lab and buyer-facing systems proof repo.
+- **Related repos:** `Upstage-DocuAgent`, `secure-xl2hwp-local`, `beaver-study-orchestrator`
+
 ## Repository surfaces
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
 - **Supporting evidence:** `docs/`, `evals/`, and `tools/` collect architecture notes, review artifacts, and validation utilities.
