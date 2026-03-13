@@ -113,6 +113,10 @@ const homeLenses = {
     headline: "See the proof in three moves",
     description:
       "Start with the readiness board, jump to the scenario runner, then copy a compact reviewer bundle when the story is clear.",
+    nextStep: {
+      label: "Open Readiness",
+      reason: "Start on the readiness board so runtime posture, proof inventory, and rollout stage are visible before the walkthrough branches.",
+    },
     cards: [
       ["01 · Service brief", "Runtime posture, proof inventory, and rollout stages in one board."],
       ["02 · Scenario runner", "Show identity, architecture, and ops flow without leaving the product surface."],
@@ -130,6 +134,10 @@ const homeLenses = {
     headline: "Map trust boundary before platform talk",
     description:
       "Use this lens when the reviewer cares more about deployment posture, governance boundaries, and why the control tower is safe enough to scale.",
+    nextStep: {
+      label: "Open Capabilities",
+      reason: "Lead with platform fit and trust boundary so the architecture conversation stays grounded in what the product can already prove.",
+    },
     cards: [
       ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
       ["02 · Platform fit", "Capabilities and rollout tracks show how the same stack maps to platform conversations."],
@@ -147,6 +155,10 @@ const homeLenses = {
     headline: "Show the control loop, not just the deck",
     description:
       "Use this path when you want to prove the console can move from login and diagnostics to a scenario decision without leaving the product.",
+    nextStep: {
+      label: "Open Scenario Runner",
+      reason: "Start the live loop with one role-aware scenario so the console evidence feels like the next operator move, not a detached dashboard.",
+    },
     cards: [
       ["01 · Scenario start", "Kick off the end-to-end path with a role-aware login and one concrete use case."],
       ["02 · Console evidence", "Runtime events, diagnostics, and route health make the operator posture visible."],
@@ -164,6 +176,10 @@ const homeLenses = {
     headline: "Tie buyer promises to rollout decisions",
     description:
       "Use this when the audience wants rollout confidence, proof assets, and a fast answer to what ships first versus what waits for deeper validation.",
+    nextStep: {
+      label: "Open Readiness",
+      reason: "Anchor the conversation in rollout stage and proof depth before you jump to bundles or console details.",
+    },
     cards: [
       ["01 · Readiness board", "Explain maturity stage, evidence depth, and what is still demo-safe."],
       ["02 · Review pack", "Turn technical proof into buyer promises, rollout tracks, and trust boundaries."],
@@ -3198,6 +3214,10 @@ export default function App() {
                     <p className="eyebrow">{homeLenses[homeLens].eyebrow}</p>
                     <h2>{homeLenses[homeLens].headline}</h2>
                     <p className="quick-path-subtitle">{homeLenses[homeLens].description}</p>
+                    <div className="quick-path-item" style={{ marginTop: "0.9rem" }}>
+                      <strong>Right now · {homeLenses[homeLens].nextStep.label}</strong>
+                      <span>{homeLenses[homeLens].nextStep.reason}</span>
+                    </div>
                   </div>
                   <div className="quick-path-actions">
                     {homeLenses[homeLens].actions.map((action) => (
