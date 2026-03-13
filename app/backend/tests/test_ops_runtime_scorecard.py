@@ -85,6 +85,34 @@ async def test_ops_runtime_scorecard_contract(monkeypatch) -> None:
 
 
 @pytest.mark.anyio
+async def test_ops_runtime_scorecard_flags_review_gate_when_startup_is_degraded(monkeypatch) -> None:
+    monkeypatch.setattr(main_module, "summarize_log", lambda *_args, **_kwargs: {"requests": 0, "top_users": [], "tools_used": [], "policy_events": [], "total_cost": 0.0})
+    monkeypatch.setattr(main_module, "get_daily_cost", lambda: 0.0)
+    monkeypatch.setattr(main_module, "evaluate_ops_alerts", lambda *_args, **_kwargs: [])
+    monkeypatch.setattr(main_module, "get_recent_service_events", lambda limit=10: [])
+    monkeypatch.setattr(main_module, "get_recent_control_tower_decisions", lambda limit=10: [])
+    main_module.app.state.startup_report = {
+        "overall_status": "degraded",
+        "startup_ready": True,
+        "failed_checks": ["runbooks"],
+        "failed_warning_checks": ["runbooks"],
+    }
+
+    transport = httpx.ASGITransport(app=main_module.app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get(
+            "/ops/runtime/scorecard",
+            headers=_headers(role="Ops", user_id="ops-scorecard-degraded"),
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["review_gate"]["status"] == "attention"
+    assert "runbooks" in body["review_gate"]["blocker"]
+    assert "/health" in body["review_gate"]["next_step"]
+
+
+@pytest.mark.anyio
 async def test_ops_runtime_scorecard_requires_ops_or_admin() -> None:
     transport = httpx.ASGITransport(app=main_module.app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
