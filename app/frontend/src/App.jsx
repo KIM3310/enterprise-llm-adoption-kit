@@ -3048,21 +3048,21 @@ export default function App() {
             <section className="hero-grid">
               <Reveal className="hero-copy">
                 <p className="eyebrow">Discovery → Governance → Rollout</p>
-                <h1>Give the rollout answer before the architecture review drifts into theory.</h1>
+                <h1>Answer what ships first before the architecture review drifts into theory.</h1>
                 <p className="lead">
-                  {APP_NAME} turns enterprise LLM adoption into one readable proof path: confirm runtime posture,
-                  run a role-aware scenario, then hand over an executive bundle with rollout tracks and governance
-                  evidence already stitched together.
+                  {APP_NAME} turns enterprise LLM adoption into one readable proof path: confirm runtime posture on
+                  the readiness board, run one role-aware scenario, then hand over an executive bundle with rollout
+                  tracks and governance evidence already aligned.
                 </p>
                 <div className="hero-actions">
                   <button className="cta-primary" onClick={() => navigate("validation")}>
-                    Open Readiness Board
+                    Start 2-Minute Proof Path
                   </button>
                   <button className="cta-ghost" onClick={() => navigate("scenario")}>
                     Run Scenario Runner
                   </button>
                   <button className="cta-ghost" onClick={() => void copyReviewerBundle()}>
-                    Copy Decision Brief
+                    Copy Executive Brief
                   </button>
                 </div>
                 <div className="kpi-grid">
