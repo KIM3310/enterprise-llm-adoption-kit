@@ -339,6 +339,36 @@ h5 {
   gap: 12px;
 }
 
+.scenario-starter-card {
+  display: grid;
+  gap: 18px;
+  padding: var(--panel-pad);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: var(--shadow-card);
+}
+
+.scenario-starter-card.ready {
+  border-color: rgba(37, 99, 235, 0.18);
+}
+
+.scenario-starter-card.go {
+  border-color: rgba(22, 163, 74, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(240, 253, 244, 0.92));
+}
+
+.scenario-starter-card.attention {
+  border-color: rgba(245, 158, 11, 0.24);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 251, 235, 0.94));
+}
+
+.scenario-starter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .quick-path-item {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -2018,6 +2048,7 @@ textarea {
 @media (max-width: 1040px) {
   .hero-grid,
   .quick-path-grid,
+  .scenario-starter-grid,
   .media-proof-grid,
   .rollout-track-strip,
   .validation-layout,

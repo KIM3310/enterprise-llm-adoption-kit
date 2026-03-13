@@ -1384,6 +1384,60 @@ export default function App() {
   const isOpsEligible = role === "Ops" || role === "Admin";
   const loginCodeRequired = Boolean(health.login_code_required);
   const integrationAuthRequired = Boolean(health.integrations_require_auth);
+  const scenarioAssistant = (() => {
+    const trimmedUserId = String(userId || "").trim();
+    const trimmedLoginCode = String(loginCode || "").trim();
+
+    if (!backendOnline) {
+      return {
+        title: "Start the runtime first",
+        tone: "attention",
+        summary:
+          "The backend is still offline, so the strongest first move is to bring the runtime up before you narrate any enterprise proof path.",
+        checks: [
+          `API base ${API_BASE || "(same origin)"} is not serving the scenario routes yet`,
+          "Start the local demo runtime, then return once /health is reachable",
+          "Use the readiness board for static review only until the backend is online",
+        ],
+        actionLabel: "Open Readiness",
+        action: () => navigate("validation"),
+      };
+    }
+
+    if (!trimmedUserId || (loginCodeRequired && !trimmedLoginCode) || !token) {
+      return {
+        title: "Lock identity before the first run",
+        tone: "ready",
+        summary:
+          "Issue a role-aware JWT first so UC1, UC2, and the governance snapshot feel like one controlled enterprise walkthrough instead of disconnected API calls.",
+        checks: [
+          trimmedUserId ? `User ID ${trimmedUserId} is set` : "Add a reviewer-safe user ID",
+          loginCodeRequired
+            ? trimmedLoginCode
+              ? "Required login code is present"
+              : "Required login code is still missing"
+            : "Login code is optional in this posture",
+          `${role} ${isOpsEligible ? "can" : "cannot"} export the ops snapshot`,
+        ],
+        actionLabel: "Issue JWT",
+        action: () => login(),
+      };
+    }
+
+    return {
+      title: "Run the strongest proof path now",
+      tone: "go",
+      summary:
+        "Runtime and identity are ready, so the next best move is the full scenario run that ties architecture diagnosis, log-intel, and governance into one exportable story.",
+      checks: [
+        `JWT ready for ${role}`,
+        `LLM posture ${health.llm_provider || "-"} / ${health.llm_model || "-"}`,
+        `${isOpsEligible ? "Ops snapshot will be included" : "Ops snapshot remains role-gated"}`,
+      ],
+      actionLabel: scenarioRun?.running ? "Running..." : "Run Scenario",
+      action: () => runScenarioRunner(),
+    };
+  })();
 
   function navigate(nextPage) {
     window.location.hash = nextPage;
@@ -3412,6 +3466,34 @@ export default function App() {
                   Issue a token, execute UC1/UC2, review governance signals, and export a report you can share with
                   reviewers.
                 </p>
+              </Reveal>
+
+              <Reveal className={`scenario-starter-card ${scenarioAssistant.tone}`} delay={40}>
+                <div>
+                  <p className="eyebrow">Next best move</p>
+                  <h3>{scenarioAssistant.title}</h3>
+                  <p className="quick-path-subtitle">{scenarioAssistant.summary}</p>
+                </div>
+                <div className="scenario-starter-grid">
+                  {scenarioAssistant.checks.map((item) => (
+                    <article key={item} className="quick-path-item">
+                      <strong>Check</strong>
+                      <span>{item}</span>
+                    </article>
+                  ))}
+                </div>
+                <div className="quick-path-actions">
+                  <button
+                    className="cta-primary"
+                    onClick={() => void scenarioAssistant.action()}
+                    disabled={scenarioRun?.running}
+                  >
+                    {scenarioAssistant.actionLabel}
+                  </button>
+                  <button className="cta-light" onClick={() => void copyCurrentReviewLink()}>
+                    Copy Review Link
+                  </button>
+                </div>
               </Reveal>
 
               <div className="scenario-layout">
