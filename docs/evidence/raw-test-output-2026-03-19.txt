@@ -1,0 +1,65 @@
+enterprise-llm-adoption-kit test run — 2026-03-19
+Runner: pytest 8.3.5
+Platform: darwin (macOS), Python 3.11.15
+
+============================= test session starts ==============================
+platform darwin -- Python 3.11.15, pytest-8.3.5, pluggy-1.6.0
+rootdir: /Users/doeonkim/repo-audit/enterprise-llm-adoption-kit
+plugins: anyio-4.12.1, langsmith-0.7.20
+collected 53 items
+
+tests/test_audit_log_schema.py::test_sample_audit_schema PASSED          [  1%]
+tests/test_audit_viewer.py::test_audit_viewer_summary PASSED             [  3%]
+tests/test_data_handling_mode.py::test_data_handling_enterprise_hashes PASSED [  5%]
+tests/test_dataset_ingest.py::test_dataset_ingest_adds_suggestions PASSED [  7%]
+tests/test_demo_placeholders.py::test_demo_placeholders_created PASSED   [  9%]
+tests/test_discovery_wizard.py::test_generate_brief_creates_file PASSED  [ 11%]
+tests/test_eval_runner.py::test_score_sample_uc1_groundedness PASSED     [ 13%]
+tests/test_eval_runner.py::test_aggregate_scores PASSED                  [ 15%]
+tests/test_exec_dashboard.py::test_generate_exec_dashboard PASSED        [ 16%]
+tests/test_exec_deck.py::test_exec_deck_html_contains_title PASSED       [ 18%]
+tests/test_frontend_metadata.py::test_frontend_index_includes_review_surface_metadata PASSED [ 20%]
+tests/test_injection.py::test_detect_injection PASSED                    [ 22%]
+tests/test_kr_dataset.py::test_kr_dataset_schema PASSED                  [ 24%]
+tests/test_rbac.py::test_allowed_groups PASSED                           [ 26%]
+tests/test_redaction.py::test_redaction_email_phone_id PASSED            [ 28%]
+tests/test_repo_hygiene.py::test_public_repo_hygiene_files_exist PASSED  [ 30%]
+tests/test_repo_hygiene.py::test_readme_and_application_docs_reference_proof_map PASSED [ 32%]
+tests/test_repo_hygiene.py::test_makefile_includes_project_review_targets PASSED [ 33%]
+tests/test_roi_calculator.py::test_compute_roi PASSED                    [ 35%]
+tests/test_safety_guardrails.py::test_should_refuse_detects_exfiltration PASSED [ 37%]
+tests/test_safety_guardrails.py::test_uc2_refusal_response PASSED        [ 39%]
+tests/test_service_brief.py::test_ops_service_brief_contract[asyncio] PASSED [ 41%]
+tests/test_service_brief.py::test_ops_service_brief_schema_contract[asyncio] PASSED [ 43%]
+tests/test_service_brief.py::test_ops_review_pack_contract[asyncio] PASSED [ 45%]
+tests/test_service_brief.py::test_ops_customer_architecture_pack_contract[asyncio] PASSED [ 47%]
+tests/test_service_brief.py::test_ops_customer_architecture_pack_schema_contract[asyncio] PASSED [ 49%]
+tests/test_service_brief.py::test_ops_workshop_readout_pack_contract[asyncio] PASSED [ 50%]
+tests/test_service_brief.py::test_ops_live_workshop_preview_contract[asyncio] PASSED [ 52%]
+tests/test_service_brief.py::test_ops_workshop_readout_pack_schema_contract[asyncio] PASSED [ 54%]
+tests/test_service_brief.py::test_ops_review_pack_flags_degraded_runtime_posture[asyncio] PASSED [ 56%]
+tests/test_service_brief.py::test_ops_review_pack_schema_contract[asyncio] PASSED [ 58%]
+tests/test_service_brief.py::test_ops_review_summary_contract[asyncio] PASSED [ 60%]
+tests/test_service_brief.py::test_ops_rollout_board_contract[asyncio] PASSED [ 62%]
+tests/test_service_brief.py::test_ops_rollout_board_schema_contract[asyncio] PASSED [ 64%]
+tests/test_service_brief.py::test_ops_rollout_drill_contract[asyncio] PASSED [ 66%]
+tests/test_service_brief.py::test_ops_rollout_drill_schema_contract[asyncio] PASSED [ 67%]
+tests/test_service_brief.py::test_ops_rollout_gates_contract[asyncio] PASSED [ 69%]
+tests/test_service_brief.py::test_ops_rollout_gates_schema_contract[asyncio] PASSED [ 71%]
+tests/test_service_brief.py::test_ops_review_summary_schema_contract[asyncio] PASSED [ 73%]
+tests/test_service_brief.py::test_ops_review_summary_rejects_invalid_stage_filter[asyncio] PASSED [ 75%]
+tests/test_service_brief.py::test_ops_rollout_board_rejects_invalid_track_filter[asyncio] PASSED [ 77%]
+tests/test_service_brief.py::test_ops_rollout_gates_rejects_invalid_track_filter[asyncio] PASSED [ 79%]
+tests/test_slack_webhook.py::test_slack_uc1_route[asyncio] PASSED        [ 81%]
+tests/test_slack_webhook.py::test_slack_unknown_command[asyncio] PASSED  [ 83%]
+tests/test_sso_rbac_mapping.py::test_oidc_role_mapping_ops_and_admin PASSED [ 84%]
+tests/test_sso_rbac_mapping.py::test_oidc_role_mapping_default_employee PASSED [ 86%]
+tests/test_ticket_integration.py::test_jira_ticket_integration[asyncio] PASSED [ 88%]
+tests/test_tools.py::test_tool_allowlist_denies_unknown PASSED           [ 90%]
+tests/test_ui_service_brief.py::test_ui_includes_service_brief_board PASSED [ 92%]
+tests/test_ui_service_brief.py::test_ui_includes_executive_review_pack PASSED [ 94%]
+tests/test_ui_tabs.py::test_ui_includes_discovery_audit_tab PASSED       [ 96%]
+tests/test_workshop_generator.py::test_workshop_bundle_generation PASSED [ 98%]
+tests/test_workshop_snapshot.py::test_workshop_snapshot PASSED           [100%]
+
+======================== 53 passed, 2 warnings in 0.19s ========================

@@ -1,0 +1,1 @@
+UC1 response with citations (doc_id + field_path).
