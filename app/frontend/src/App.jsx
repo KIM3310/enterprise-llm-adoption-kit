@@ -118,6 +118,10 @@ const homeLenses = {
       reason: "Start on the readiness board so runtime posture, proof inventory, and rollout stage are visible before the walkthrough branches.",
       followUp: "Then jump to Scenario Runner once the rollout posture reads clearly.",
     },
+    confidenceCheck:
+      "If the readiness board still reads static or degraded, keep the walkthrough on proof inventory and rollout posture before you open the scenario surface.",
+    decisionRule:
+      "Move to Scenario Runner only after runtime posture, proof depth, and rollout stage read clearly in one pass.",
     cards: [
       ["01 · Service brief", "Runtime posture, proof inventory, and rollout stages in one board."],
       ["02 · Scenario runner", "Show identity, architecture, and ops flow without leaving the product surface."],
@@ -140,6 +144,10 @@ const homeLenses = {
       reason: "Lead with platform fit and trust boundary so the architecture conversation stays grounded in what the product can already prove.",
       followUp: "Then open Readiness to confirm the current runtime and evidence posture.",
     },
+    confidenceCheck:
+      "If the audience starts asking about deployment targets or governance boundaries, stay in Capabilities until the trust boundary and platform fit are explicit.",
+    decisionRule:
+      "Only move to Readiness after the architecture fit is clear enough that runtime posture becomes the next real question.",
     cards: [
       ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
       ["02 · Platform fit", "Capabilities and rollout tracks show how the same stack maps to platform conversations."],
@@ -162,6 +170,10 @@ const homeLenses = {
       reason: "Start the live loop with one role-aware scenario so the console evidence feels like the next operator move, not a detached dashboard.",
       followUp: "Then open Console only after one role-aware run makes the operator loop visible.",
     },
+    confidenceCheck:
+      "If login, citations, or ops steps are still fuzzy, keep the story inside one scenario run before you let the console fan out.",
+    decisionRule:
+      "Open Console only after one end-to-end role-aware run proves the operator loop without extra narration.",
     cards: [
       ["01 · Scenario start", "Kick off the end-to-end path with a role-aware login and one concrete use case."],
       ["02 · Console evidence", "Runtime events, diagnostics, and route health make the operator posture visible."],
@@ -184,6 +196,10 @@ const homeLenses = {
       reason: "Anchor the conversation in rollout stage and proof depth before you jump to bundles or console details.",
       followUp: "Then copy the reviewer bundle once the rollout decision reads cleanly.",
     },
+    confidenceCheck:
+      "If the rollout stage is still pre-production or demo-safe, keep the conversation on decision support and proof assets instead of live-runtime promises.",
+    decisionRule:
+      "Copy the reviewer bundle only after the readiness board makes the shipping posture feel like an explicit executive call.",
     cards: [
       ["01 · Readiness board", "Explain maturity stage, evidence depth, and what is still demo-safe."],
       ["02 · Review pack", "Turn technical proof into buyer promises, rollout tracks, and trust boundaries."],
@@ -3222,6 +3238,12 @@ export default function App() {
                       <strong>Right now · {homeLenses[homeLens].nextStep.label}</strong>
                       <span>{homeLenses[homeLens].nextStep.reason}</span>
                       <span>Then · {homeLenses[homeLens].nextStep.followUp}</span>
+                    </div>
+
+                    <div className="quick-path-item">
+                      <strong>Confidence check</strong>
+                      <span>{homeLenses[homeLens].confidenceCheck}</span>
+                      <span>Decision rule · {homeLenses[homeLens].decisionRule}</span>
                     </div>
                   </div>
                   <div className="quick-path-actions">
