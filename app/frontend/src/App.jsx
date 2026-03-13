@@ -116,6 +116,7 @@ const homeLenses = {
     nextStep: {
       label: "Open Readiness",
       reason: "Start on the readiness board so runtime posture, proof inventory, and rollout stage are visible before the walkthrough branches.",
+      followUp: "Then jump to Scenario Runner once the rollout posture reads clearly.",
     },
     cards: [
       ["01 · Service brief", "Runtime posture, proof inventory, and rollout stages in one board."],
@@ -137,6 +138,7 @@ const homeLenses = {
     nextStep: {
       label: "Open Capabilities",
       reason: "Lead with platform fit and trust boundary so the architecture conversation stays grounded in what the product can already prove.",
+      followUp: "Then open Readiness to confirm the current runtime and evidence posture.",
     },
     cards: [
       ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
@@ -158,6 +160,7 @@ const homeLenses = {
     nextStep: {
       label: "Open Scenario Runner",
       reason: "Start the live loop with one role-aware scenario so the console evidence feels like the next operator move, not a detached dashboard.",
+      followUp: "Then open Console only after one role-aware run makes the operator loop visible.",
     },
     cards: [
       ["01 · Scenario start", "Kick off the end-to-end path with a role-aware login and one concrete use case."],
@@ -179,6 +182,7 @@ const homeLenses = {
     nextStep: {
       label: "Open Readiness",
       reason: "Anchor the conversation in rollout stage and proof depth before you jump to bundles or console details.",
+      followUp: "Then copy the reviewer bundle once the rollout decision reads cleanly.",
     },
     cards: [
       ["01 · Readiness board", "Explain maturity stage, evidence depth, and what is still demo-safe."],
@@ -3217,6 +3221,7 @@ export default function App() {
                     <div className="quick-path-item" style={{ marginTop: "0.9rem" }}>
                       <strong>Right now · {homeLenses[homeLens].nextStep.label}</strong>
                       <span>{homeLenses[homeLens].nextStep.reason}</span>
+                      <span>Then · {homeLenses[homeLens].nextStep.followUp}</span>
                     </div>
                   </div>
                   <div className="quick-path-actions">
