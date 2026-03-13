@@ -20,7 +20,26 @@ def build_ops_runtime_scorecard(
 ) -> Dict[str, object]:
     startup_state = startup_report if isinstance(startup_report, dict) else {}
     failed_checks = list(startup_state.get("failed_checks", []))
+    startup_status = str(startup_state.get("overall_status", "unknown"))
+    startup_ready = bool(startup_state.get("startup_ready", False))
     top_alert = alerts[0] if alerts else None
+    review_gate = {
+        "status": "ready" if startup_ready and startup_status == "healthy" else "attention",
+        "blocker": (
+            f"Startup diagnostics need review: {failed_checks[0]}"
+            if failed_checks
+            else (
+                f"Startup status is {startup_status}."
+                if startup_status not in {"healthy", "unknown"}
+                else None
+            )
+        ),
+        "next_step": (
+            "Open /health, confirm the degraded startup checks, then refresh /ops/runtime before sharing reviewer proof."
+            if failed_checks or startup_status in {"degraded", "critical"}
+            else "Use /ops/runtime/scorecard and /ops/review-pack together before executive review."
+        ),
+    }
     return {
         "service": service_name,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
@@ -34,8 +53,8 @@ def build_ops_runtime_scorecard(
             "llm_circuit_open_seconds_remaining": int(circuit_snapshot.get("open_seconds_remaining", 0)),
         },
         "summary": {
-            "startup_ready": bool(startup_state.get("startup_ready", False)),
-            "startup_status": str(startup_state.get("overall_status", "unknown")),
+            "startup_ready": startup_ready,
+            "startup_status": startup_status,
             "failed_checks": failed_checks[:5],
             "request_count": int(audit_summary.get("requests", 0)),
             "alert_count": len(alerts),
@@ -44,6 +63,7 @@ def build_ops_runtime_scorecard(
             "daily_cost_usd": round(float(daily_cost_usd), 6),
         },
         "top_alert": top_alert,
+        "review_gate": review_gate,
         "top_service_event": service_events[0] if service_events else None,
         "top_decision": recent_decisions[0] if recent_decisions else None,
         "fastest_review_path": [
@@ -79,6 +99,7 @@ def build_ops_runtime_scorecard_schema() -> Dict[str, object]:
             "contract_version",
             "runtime",
             "summary",
+            "review_gate",
             "fastest_review_path",
             "links.ops_runtime_scorecard",
         ],
