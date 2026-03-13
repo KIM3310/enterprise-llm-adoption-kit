@@ -13,6 +13,8 @@ def test_ui_includes_service_brief_board():
 def test_ui_includes_executive_review_pack():
     content = (ROOT_DIR / "app/frontend/src/components/ExecutiveReviewPack.jsx").read_text()
     assert "Executive Review Pack" in content
+    assert "Review gate" in content
+    assert "Fallback posture" in content
     assert "Buyer promises" in content
     assert "Rollout tracks" in content
     assert "Review actions" in content

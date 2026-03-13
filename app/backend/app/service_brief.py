@@ -349,6 +349,15 @@ def build_service_review_pack(
             "proof": "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
         },
     ]
+    startup_ready = bool(runtime.get("startup_ready", False))
+    startup_status = str(runtime.get("startup_status", "") or "unknown")
+    circuit_state = str(runtime.get("llm_circuit_state", "") or "unknown")
+    review_gate_ready = startup_ready and circuit_state == "closed"
+    review_gate_blockers = []
+    if not startup_ready:
+        review_gate_blockers.append(f"startup is {startup_status}")
+    if circuit_state != "closed":
+        review_gate_blockers.append(f"LLM circuit is {circuit_state}")
 
     return {
         "service": brief["service"],
@@ -367,6 +376,24 @@ def build_service_review_pack(
             "startup_status": runtime.get("startup_status", ""),
             "startup_ready": bool(runtime.get("startup_ready", False)),
             "llm_circuit_state": runtime.get("llm_circuit_state", "closed"),
+        },
+        "review_gate": {
+            "status": "ready" if review_gate_ready else "attention",
+            "fallback_posture": (
+                "Executive review can stay on service brief, review pack, and review summary while runtime recovery is in progress."
+                if not review_gate_ready
+                else "Runtime posture is stable enough to move from the review pack into runtime scorecard and audit evidence."
+            ),
+            "blocker": (
+                "Runtime posture is stable across startup and circuit checks."
+                if review_gate_ready
+                else ", ".join(review_gate_blockers)
+            ),
+            "next_step": (
+                "Open /ops/runtime/scorecard and /audit/summary to confirm live runtime evidence before rollout decisions."
+                if review_gate_ready
+                else "Open /ops/runtime/scorecard, confirm the degraded posture, then keep the executive walkthrough on /ops/review-summary until startup and circuit checks recover."
+            ),
         },
         "proof_bundle": {
             "tests": int(evidence.get("test_files", 0)),
