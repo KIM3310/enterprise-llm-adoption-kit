@@ -60,6 +60,8 @@ async def test_ops_review_pack_contract() -> None:
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
     assert any(item["label"] == "Inspect executive overview" for item in body["review_actions"])
     assert len(body["two_minute_review"]) == 4
+    assert body["review_gate"]["status"] in {"ready", "attention"}
+    assert body["review_gate"]["next_step"]
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
@@ -67,6 +69,24 @@ async def test_ops_review_pack_contract() -> None:
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
+
+
+@pytest.mark.anyio
+async def test_ops_review_pack_flags_degraded_runtime_posture(monkeypatch) -> None:
+    import app.main as main_module
+
+    monkeypatch.setattr(main_module.settings, "startup_status", "degraded", raising=False)
+    monkeypatch.setattr(main_module.settings, "llm_circuit_state", "open", raising=False)
+
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/review-pack")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["review_gate"]["status"] == "attention"
+    assert "startup" in body["review_gate"]["blocker"].lower() or "circuit" in body["review_gate"]["blocker"].lower()
+    assert "/ops/runtime/scorecard" in body["review_gate"]["next_step"]
 
 
 @pytest.mark.anyio

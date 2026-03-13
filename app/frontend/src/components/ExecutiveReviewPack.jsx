@@ -45,6 +45,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const watchouts = Array.isArray(reviewPack.watchouts) ? reviewPack.watchouts : [];
   const reviewActions = Array.isArray(reviewPack.review_actions) ? reviewPack.review_actions : [];
   const twoMinuteReview = Array.isArray(reviewPack.two_minute_review) ? reviewPack.two_minute_review : [];
+  const reviewGate = reviewPack.review_gate || {};
   const proofBundle = reviewPack.proof_bundle || {};
   const reviewAssets = Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets : [];
   const runtimeSurfaces = Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces : [];
@@ -221,6 +222,20 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         <article className="service-metric-card">
           <span>Review Assets</span>
           <strong>{proofBundle.review_assets_count || reviewAssets.length || 0}</strong>
+        </article>
+      </div>
+
+      <div className="review-pack-grid">
+        <article className="service-brief-card">
+          <p className="service-card-label">Review gate</p>
+          <strong>{reviewGate.status || "unknown"}</strong>
+          <p>{reviewGate.blocker || "No explicit blocker recorded."}</p>
+          <p className="meta-text">{reviewGate.next_step || "Open the review pack before moving into runtime-specific claims."}</p>
+        </article>
+        <article className="service-brief-card">
+          <p className="service-card-label">Fallback posture</p>
+          <strong>{runtimeSummary.startup_status || "-"}</strong>
+          <p>{reviewGate.fallback_posture || "Keep the walkthrough grounded in checked-in proof assets if runtime evidence is degraded."}</p>
         </article>
       </div>
 
