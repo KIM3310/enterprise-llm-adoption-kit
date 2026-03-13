@@ -10,4 +10,5 @@ def test_ui_includes_discovery_audit_tab():
     assert "Console" in content
     assert "Governance and Observability" in content
     assert "Right now ·" in content
+    assert "Then ·" in content
     assert "Start on the readiness board" in content
