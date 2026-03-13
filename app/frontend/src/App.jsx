@@ -3030,14 +3030,8 @@ export default function App() {
           <span className="chip">
             {page === "console" ? `Tab: ${activeTab}` : `Page: ${page}`}
           </span>
-          <button className="cta-light" onClick={() => void copyCurrentReviewLink()}>
-            Copy Review Link
-          </button>
           <button className="cta-light" onClick={() => void copyReviewerBundle()}>
             Copy Reviewer Bundle
-          </button>
-          <button className="cta-light" onClick={() => void copyConsoleSnapshot()}>
-            Copy Console Snapshot
           </button>
           <button className="cta-light" onClick={() => navigate("console")}>
             Open Console
