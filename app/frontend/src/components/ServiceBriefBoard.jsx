@@ -164,7 +164,7 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
         </div>
 
         <div className="service-brief-card">
-          <p className="service-card-label">Deployment targets</p>
+          <p className="service-card-label">Platform targets</p>
           <p className="service-support-note">Platform language for rollout and hiring-fit conversations.</p>
           <div className="service-chip-row" style={{ marginBottom: 14 }}>
             {platformTargets.map((target) => (
