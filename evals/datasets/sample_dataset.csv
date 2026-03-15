@@ -1,0 +1,3 @@
+id,use_case,input,expected,role,sensitivity
+c1,uc1,Summarize handover risks for payments prod,,Employee,low
+c2,uc2,ERROR Timeout while calling payments API,,Ops,medium

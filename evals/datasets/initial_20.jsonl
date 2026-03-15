@@ -1,0 +1,20 @@
+{"id": "uc1-01", "use_case": "uc1", "input": "Summarize handover risks for payments prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-02", "use_case": "uc1", "input": "List open incidents for identity staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-03", "use_case": "uc1", "input": "What are the current dependencies for analytics prod?", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-04", "use_case": "uc1", "input": "Provide handover notes for inventory dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-05", "use_case": "uc1", "input": "What runbook steps exist for notifications prod?", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-06", "use_case": "uc1", "input": "Show recent changes in payments prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-07", "use_case": "uc1", "input": "Summarize risks for analytics staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc1-08", "use_case": "uc1", "input": "Give the latest owner contact for identity prod", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Admin"}
+{"id": "uc1-09", "use_case": "uc1", "input": "List dependencies for inventory staging", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Employee"}
+{"id": "uc1-10", "use_case": "uc1", "input": "Highlight handover summary for notifications dev", "expected": "", "tags": ["handover", "rag"], "sensitivity": "low", "role": "Ops"}
+{"id": "uc2-01", "use_case": "uc2", "input": "ERROR Timeout while calling payments API", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-02", "use_case": "uc2", "input": "Build failed: Connection refused to redis", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-03", "use_case": "uc2", "input": "Deployment error 502 Server Error", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-04", "use_case": "uc2", "input": "OutOfMemoryError in worker", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-05", "use_case": "uc2", "input": "Permission denied writing to /var/log", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-06", "use_case": "uc2", "input": "Service unreachable after rollout", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-07", "use_case": "uc2", "input": "Database timeout while executing query", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
+{"id": "uc2-08", "use_case": "uc2", "input": "Kubernetes pod crashloop backoff", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Admin"}
+{"id": "uc2-09", "use_case": "uc2", "input": "TLS handshake failed during deploy", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Employee"}
+{"id": "uc2-10", "use_case": "uc2", "input": "Disk space exceeded in staging", "expected": "", "tags": ["logs", "devops"], "sensitivity": "medium", "role": "Ops"}
