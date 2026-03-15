@@ -60,8 +60,8 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
           <p className="eyebrow">Service Brief</p>
           <h3>Executive Readiness Board</h3>
           <p>
-            {brief.tagline}. Review the runtime posture, proof inventory, and rollout stages without leaving the
-            product surface.
+            {brief.tagline}. Review governance posture, deployment fit, proof inventory, and rollout stages without
+            leaving the product surface.
           </p>
         </div>
         <div className="service-brief-chip-stack">
@@ -91,7 +91,7 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
         </div>
 
         <div className="service-brief-card">
-          <p className="service-card-label">Runtime posture</p>
+          <p className="service-card-label">Governance + runtime posture</p>
           <ul className="service-brief-list">
             <li>
               auth=<code className="mono-inline">{runtime.auth_mode || "-"}</code> · data=
@@ -111,6 +111,9 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
               <code className="mono-inline">{runtime.openai_api_key_configured ? "set" : "unset"}</code>
             </li>
           </ul>
+          <p className="service-support-note">
+            Deployment modes: {runModes.slice(0, compact ? 2 : 3).join(" · ") || "-"}
+          </p>
         </div>
       </div>
 
@@ -161,7 +164,8 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
         </div>
 
         <div className="service-brief-card">
-          <p className="service-card-label">Platform targets</p>
+          <p className="service-card-label">Deployment targets</p>
+          <p className="service-support-note">Platform language for rollout and hiring-fit conversations.</p>
           <div className="service-chip-row" style={{ marginBottom: 14 }}>
             {platformTargets.map((target) => (
               <span key={target} className="tag">
