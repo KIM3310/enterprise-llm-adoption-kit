@@ -193,7 +193,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
       <div className="service-brief-head">
         <div className="service-brief-copy">
           <p className="eyebrow">Executive Review Pack</p>
-          <h3>Buyer thesis, supporting evidence, and rollout narrative</h3>
+          <h3>Buyer thesis, governance proof, and deployment narrative</h3>
           <p>{reviewPack.headline}</p>
         </div>
         <div className="service-chip-row">
@@ -265,6 +265,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
 
       <article className="service-brief-card">
         <p className="service-card-label">Fast review surfaces</p>
+        <p className="service-support-note">Keep governance and deployment evidence visible in the same reviewer path.</p>
         <div className="review-pack-action-list">
           {fastReviewSurfaces.map(([label, surface]) => (
             <div key={`${label}-${surface}`} className="review-pack-action-card">

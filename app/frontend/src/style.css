@@ -3,11 +3,11 @@
 :root {
   --bg: #f6f8fc;
   --bg-2: #eef2f9;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface: rgba(255, 255, 255, 0.84);
+  --surface-strong: rgba(255, 255, 255, 0.95);
   --text: #0b1220;
-  --muted: #475467;
-  --muted-2: #667085;
+  --muted: #344054;
+  --muted-2: #475467;
   --border: rgba(15, 23, 42, 0.12);
   --border-2: rgba(15, 23, 42, 0.18);
   --shadow-soft: 0 18px 48px rgba(15, 23, 42, 0.08);
@@ -107,7 +107,7 @@ h5 {
   padding: 12px 14px;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow-soft);
   display: flex;
@@ -233,7 +233,7 @@ h5 {
 .cta-light {
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--text);
   font-weight: 700;
   padding: 10px 14px;
@@ -396,7 +396,7 @@ h5 {
   min-height: 460px;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(10px);
   padding: clamp(22px, 3.2vw, 34px);
   box-shadow: var(--shadow-soft);
@@ -431,8 +431,9 @@ h5 {
 .lead {
   margin: 16px 0 0;
   color: var(--muted);
-  line-height: 1.78;
+  line-height: 1.72;
   max-width: 68ch;
+  font-size: 1.02rem;
 }
 
 .hero-actions {
@@ -440,6 +441,42 @@ h5 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.hero-proof-strip {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hero-proof-card {
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 248, 255, 0.92) 100%);
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.hero-proof-card span {
+  color: var(--muted-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hero-proof-card strong {
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.hero-proof-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 .cta-primary {
@@ -544,7 +581,7 @@ h5 {
   height: 100%;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.78);
   box-shadow: var(--shadow-soft);
 }
 
@@ -968,7 +1005,7 @@ h5 {
   height: 100%;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   padding: var(--card-pad);
   display: grid;
   gap: 8px;
@@ -1083,7 +1120,7 @@ h5 {
   border-radius: 10px;
   border: 1px solid var(--border);
   color: rgba(11, 18, 32, 0.86);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   word-break: break-all;
 }
 
@@ -1343,7 +1380,7 @@ textarea {
 .history-item {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   padding: 10px 12px;
 }
 
@@ -1712,7 +1749,7 @@ textarea {
 .service-metric-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: var(--shadow-card);
 }
 
@@ -1807,6 +1844,13 @@ textarea {
   color: var(--muted);
 }
 
+.service-support-note {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
 .service-brief-list li {
   display: grid;
   gap: 4px;
@@ -1817,8 +1861,9 @@ textarea {
   width: fit-content;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.78rem;
-  color: var(--muted);
-  background: rgba(15, 23, 42, 0.04);
+  color: #1d2939;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.12);
   border-radius: 10px;
   padding: 4px 8px;
   overflow-wrap: anywhere;
@@ -1896,7 +1941,7 @@ textarea {
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.9);
-  color: var(--ink);
+  color: var(--text);
   padding: 0 14px;
   font-weight: 700;
   cursor: pointer;
@@ -1933,7 +1978,7 @@ textarea {
 .review-pack-track-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   padding: 14px;
   display: grid;
   gap: 6px;
@@ -1943,7 +1988,7 @@ textarea {
 .review-pack-asset-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.94);
   padding: 14px;
   display: grid;
   gap: 6px;
@@ -2042,6 +2087,10 @@ textarea {
 @media (max-width: 1220px) {
   .capability-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-proof-strip {
+    grid-template-columns: 1fr;
   }
 }
 

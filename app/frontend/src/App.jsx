@@ -1021,17 +1021,21 @@ function levelBadgeClass(value) {
   return "pill pill-info";
 }
 
-function Reveal({ children, className = "", delay = 0 }) {
+function Reveal({ children, className = "", delay = 0, eager = false }) {
   const ref = useRef(null);
+  const [visible, setVisible] = useState(eager);
 
   useEffect(() => {
     const node = ref.current;
-    if (!node) {
+    if (!node || eager) {
+      if (eager) {
+        setVisible(true);
+      }
       return undefined;
     }
 
     const fallbackTimer = window.setTimeout(() => {
-      node.classList.add("is-visible");
+      setVisible(true);
     }, 220);
 
     if (typeof IntersectionObserver !== "function") {
@@ -1043,7 +1047,7 @@ function Reveal({ children, className = "", delay = 0 }) {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             window.clearTimeout(fallbackTimer);
-            node.classList.add("is-visible");
+            setVisible(true);
             observer.unobserve(node);
           }
         });
@@ -1057,10 +1061,14 @@ function Reveal({ children, className = "", delay = 0 }) {
       window.clearTimeout(fallbackTimer);
       observer.disconnect();
     };
-  }, []);
+  }, [eager]);
 
   return (
-    <div ref={ref} className={`reveal ${className}`} style={{ "--delay": `${delay}ms` }}>
+    <div
+      ref={ref}
+      className={`reveal${visible ? " is-visible" : ""}${className ? ` ${className}` : ""}`}
+      style={{ "--delay": `${delay}ms` }}
+    >
       {children}
     </div>
   );
@@ -3132,6 +3140,30 @@ export default function App() {
     setStatus("Scenario report exported");
   }
 
+  const deploymentArtifacts =
+    serviceBrief.stages?.find((stage) => stage.key === "deployment")?.highlights?.map((item) => item.label) || [];
+  const reviewerEndpointCount = Array.isArray(reviewPack?.proof_bundle?.review_endpoints)
+    ? reviewPack.proof_bundle.review_endpoints.length
+    : 0;
+  const reviewAssetCount = reviewPack?.proof_bundle?.review_assets_count || reviewPack?.proof_bundle?.review_assets?.length || 0;
+  const heroCredibilityCards = [
+    {
+      title: "Governance signal",
+      value: `${health.status === "ok" ? "live" : "static"} control tower`,
+      detail: `Audit, metrics, and service brief surfaces stay reviewer-visible${healthCheckedAt ? ` · ${healthCheckedAt}` : ""}.`,
+    },
+    {
+      title: "Deployment fit",
+      value: `${serviceBrief.run_modes?.length || 0} rollout modes`,
+      detail: deploymentArtifacts.slice(0, 2).join(" · ") || "Deployment options and reference architecture stay in-view.",
+    },
+    {
+      title: "Reviewer handoff",
+      value: `${reviewerEndpointCount} endpoints · ${reviewAssetCount} proof assets`,
+      detail: "Solution architects can move from runtime posture to buyer thesis without leaving the product surface.",
+    },
+  ];
+
   return (
     <div className="site-shell">
       <header className="top-nav">
@@ -3210,7 +3242,7 @@ export default function App() {
         {page === "home" && (
           <div className="page-view">
             <section className="hero-grid">
-              <Reveal className="hero-copy">
+              <Reveal className="hero-copy" eager>
                 <p className="eyebrow">Discovery → Governance → Rollout</p>
                 <h1>Answer what ships first before the architecture review drifts into theory.</h1>
                 <p className="lead">
@@ -3228,6 +3260,15 @@ export default function App() {
                   <button className="cta-ghost" onClick={() => void copyReviewerBundle()}>
                     Copy Executive Brief
                   </button>
+                </div>
+                <div className="hero-proof-strip" aria-label="Front-door credibility signals">
+                  {heroCredibilityCards.map((card) => (
+                    <article key={card.title} className="hero-proof-card">
+                      <span>{card.title}</span>
+                      <strong>{card.value}</strong>
+                      <p>{card.detail}</p>
+                    </article>
+                  ))}
                 </div>
                 <div className="kpi-grid">
                   <article className="kpi-item">
@@ -3252,7 +3293,7 @@ export default function App() {
                 </div>
               </Reveal>
 
-              <Reveal className="hero-media" delay={120}>
+              <Reveal className="hero-media" delay={120} eager>
                 <div className="media-frame media-proof-board">
                   <div className="media-proof-head">
                     <div>
@@ -3334,7 +3375,7 @@ export default function App() {
                 </div>
                 <div className="quick-path-grid">
                   {homeLenses[homeLens].cards.map(([title, body]) => (
-                    <article key={`${homeLens}-${title}`} className="quick-path-item">
+                      <article key={`${homeLens}-${title}`} className="quick-path-item">
                       <strong>{title}</strong>
                       <span>{body}</span>
                     </article>
