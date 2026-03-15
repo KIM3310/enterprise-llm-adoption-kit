@@ -39,6 +39,8 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
   const audiences = Array.isArray(brief.audiences) ? brief.audiences : [];
   const runModes = Array.isArray(brief.run_modes) ? brief.run_modes : [];
   const platformTargets = Array.isArray(brief.platform_targets) ? brief.platform_targets : [];
+  const rolePaths = Array.isArray(brief.role_paths) ? brief.role_paths : [];
+  const proofMap = typeof brief.links?.proof_map === "string" ? brief.links.proof_map : "";
   const requiredFields = Array.isArray(schema?.required_fields) ? schema.required_fields.length : 0;
   const compact = variant === "compact";
 
@@ -177,6 +179,30 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
           </ul>
         </div>
       </div>
+
+      {rolePaths.length > 0 && (
+        <article className="service-brief-card">
+          <p className="service-card-label">Role-ready paths</p>
+          {proofMap ? <code className="service-path">Proof map: {proofMap}</code> : null}
+          <div className="review-pack-action-list" style={{ marginTop: 14 }}>
+            {rolePaths.map((path) => (
+              <div key={path.role} className="review-pack-action-card">
+                <strong>{path.role}</strong>
+                <p>{path.goal}</p>
+                <code className="service-path">Entry: {path.first_surface}</code>
+                <code className="service-path">Follow-up: {path.follow_up}</code>
+                <div className="service-chip-row">
+                  {(Array.isArray(path.proof_assets) ? path.proof_assets : []).map((asset) => (
+                    <span key={`${path.role}-${asset}`} className="tag">
+                      {asset}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      )}
 
       {!compact && reviewFlow.length > 0 && (
         <div className="service-brief-flow">

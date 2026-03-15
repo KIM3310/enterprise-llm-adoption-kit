@@ -37,6 +37,7 @@ Korean version: `README.ko.md`
 - Reviewer API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
 - Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
+- Reviewer map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
 
 ## 2-Minute Proof Path
 - `GET /ops/service-brief` -> confirm runtime posture and evidence counts.
@@ -44,11 +45,19 @@ Korean version: `README.ko.md`
 - `GET /audit/summary` + `GET /metrics` -> show governance and LLMOps signals.
 - `docs/architecture/llm_deployment_options.md` + `docs/blueprint/09_customer_journey.md` -> connect evidence to rollout path.
 
+## Reviewer Front Door
+- **Recruiter / hiring manager:** start with [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), then open `GET /ops/service-brief`.
+- **AI engineer:** use `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
+- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/review-pack`.
+- **Operator / platform reviewer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`.
+
 ![Enterprise review pack](docs/review-pack.svg)
 
 ## Further Reading
 
+- Reviewer proof map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
 - Reading guide: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
+- Application bundle README: [`docs/application/README.md`](docs/application/README.md)
 
 ## Monetization and analytics posture
 
@@ -115,6 +124,7 @@ Korean version: `README.ko.md`
 
 Quick verify:
 ```bash
+make portfolio-check
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60

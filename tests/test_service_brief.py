@@ -17,6 +17,9 @@ async def test_ops_service_brief_contract() -> None:
     assert body["runtime"]["llm_provider"] == "stub"
     assert body["evidence"]["test_files"] >= 20
     assert "aws" in body["platform_targets"]
+    assert len(body["role_paths"]) >= 3
+    assert any(item["role"] == "Recruiter" for item in body["role_paths"])
+    assert body["links"]["proof_map"] == "docs/application/reviewer_proof_map.md"
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
@@ -37,7 +40,9 @@ async def test_ops_service_brief_schema_contract() -> None:
     body = response.json()
     assert body["schema"] == "enterprise-adoption-service-brief-v1"
     assert "runtime" in body["required_fields"]
+    assert "role_paths" in body["required_fields"]
     assert "llm_provider" in body["runtime_required_fields"]
+    assert "proof_assets" in body["role_path_required_fields"]
     assert "deployment" in body["stage_keys"]
 
 
@@ -53,6 +58,8 @@ async def test_ops_review_pack_contract() -> None:
     assert body["runtime_summary"]["llm_provider"] == "stub"
     assert body["proof_bundle"]["tests"] >= 20
     assert body["proof_bundle"]["review_assets_count"] >= 4
+    assert len(body["role_paths"]) >= 3
+    assert any(item["role"] == "Solution Architect" for item in body["role_paths"])
     assert "/ops/rollout-board" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/rollout-drill" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
@@ -69,6 +76,7 @@ async def test_ops_review_pack_contract() -> None:
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
+    assert body["links"]["proof_map"] == "docs/application/reviewer_proof_map.md"
 
 
 @pytest.mark.anyio
@@ -100,9 +108,11 @@ async def test_ops_review_pack_schema_contract() -> None:
     assert body["schema"] == "enterprise-adoption-review-pack-v1"
     assert "review_actions" in body["required_fields"]
     assert "two_minute_review" in body["required_fields"]
+    assert "role_paths" in body["required_fields"]
     assert "review_assets" in body["proof_bundle_required_fields"]
     assert "surface" in body["review_action_required_fields"]
     assert "step" in body["two_minute_review_required_fields"]
+    assert "proof_assets" in body["role_path_required_fields"]
 
 
 @pytest.mark.anyio

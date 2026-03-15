@@ -143,6 +143,41 @@ def build_service_brief(
         "Control Tower logic aligns to AWS, Databricks, Snowflake, Palantir, and MariaDB decision paths.",
         "Public-facing UI stays reviewer-friendly even when the backend is offline via static readiness fallback.",
     ]
+    role_paths = [
+        {
+            "role": "Recruiter",
+            "goal": "Validate flagship portfolio depth quickly without starting from the code tree.",
+            "first_surface": "/ops/service-brief",
+            "follow_up": "/ops/review-pack",
+            "proof_assets": [
+                "docs/application/reviewer_proof_map.md",
+                "docs/application/portfolio_one_pager_en.md",
+                "docs/verification_report.md",
+            ],
+        },
+        {
+            "role": "Solution Architect",
+            "goal": "Check platform fit, trust boundary, and rollout tradeoffs before implementation details.",
+            "first_surface": "docs/architecture/llm_deployment_options.md",
+            "follow_up": "/ops/review-pack",
+            "proof_assets": [
+                "docs/architecture/reference_architectures.md",
+                "docs/blueprint/03_security_threat_model.md",
+                "docs/blueprint/09_customer_journey.md",
+            ],
+        },
+        {
+            "role": "Operator",
+            "goal": "Verify the control loop from login to governance signals in one runnable path.",
+            "first_surface": "/auth/login -> /uc1/architecture -> /uc2/log-intel",
+            "follow_up": "/audit/summary -> /ops/runtime -> /metrics",
+            "proof_assets": [
+                "docs/application/reviewer_proof_map.md",
+                "docs/sales/demo_script_exec.md",
+                "docs/sales/exec_value_dashboard/latest.md",
+            ],
+        },
+    ]
 
     return {
         "service": settings.app_name,
@@ -189,6 +224,7 @@ def build_service_brief(
         ),
         "strengths": strengths,
         "watchouts": watchouts,
+        "role_paths": role_paths,
         "stages": [
             {
                 "key": "discovery",
@@ -274,6 +310,7 @@ def build_service_brief(
             "control_tower_spec": "/v1/control-tower/spec",
             "customer_journey": "docs/blueprint/09_customer_journey.md",
             "role_alignment": "docs/application/role_alignment.md",
+            "proof_map": "docs/application/reviewer_proof_map.md",
         },
     }
 
@@ -291,6 +328,7 @@ def build_service_review_pack(
     evidence = brief.get("evidence", {})
     platform_targets = [str(item) for item in brief.get("platform_targets", [])]
     review_flow = brief.get("review_flow", [])
+    role_paths = [item for item in brief.get("role_paths", []) if isinstance(item, dict)]
     stage_labels = [
         str(stage.get("label", stage.get("key", "")))
         for stage in brief.get("stages", [])
@@ -429,6 +467,7 @@ def build_service_review_pack(
         },
         "review_actions": review_actions,
         "two_minute_review": two_minute_review,
+        "role_paths": role_paths,
         "rollout_tracks": [
             {
                 "track": "api-first validation",
@@ -472,6 +511,7 @@ def build_service_review_pack(
             "deployment_options": "docs/architecture/llm_deployment_options.md",
             "exec_summary_template": "docs/sales/executive_summary_template.md",
             "qbr_template": "docs/sales/qbr_template.md",
+            "proof_map": "docs/application/reviewer_proof_map.md",
         },
     }
 
@@ -867,6 +907,7 @@ def build_service_review_pack_schema() -> Dict[str, object]:
             "proof_bundle",
             "review_actions",
             "two_minute_review",
+            "role_paths",
             "rollout_tracks",
             "platform_dialogues",
             "review_sequence",
@@ -909,6 +950,13 @@ def build_service_review_pack_schema() -> Dict[str, object]:
             "surface",
             "proof",
         ],
+        "role_path_required_fields": [
+            "role",
+            "goal",
+            "first_surface",
+            "follow_up",
+            "proof_assets",
+        ],
         "links": {
             "readme": "README.md",
             "review_pack": "/ops/review-pack",
@@ -930,6 +978,7 @@ def build_service_brief_schema() -> Dict[str, object]:
             "evidence",
             "run_modes",
             "platform_targets",
+            "role_paths",
             "stages",
             "review_flow",
             "links",
@@ -972,6 +1021,13 @@ def build_service_brief_schema() -> Dict[str, object]:
             "title",
             "endpoint",
             "persona",
+        ],
+        "role_path_required_fields": [
+            "role",
+            "goal",
+            "first_surface",
+            "follow_up",
+            "proof_assets",
         ],
         "links": {
             "readme": "README.md",

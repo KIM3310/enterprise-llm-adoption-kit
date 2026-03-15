@@ -299,6 +299,14 @@ class ServiceBriefEvidence(BaseModel):
     application_artifacts: int = Field(ge=0)
 
 
+class ServiceBriefRolePath(BaseModel):
+    role: str
+    goal: str
+    first_surface: str
+    follow_up: str
+    proof_assets: List[str] = Field(default_factory=list)
+
+
 class ServiceBriefResponse(BaseModel):
     service: str
     contract_version: str
@@ -311,6 +319,7 @@ class ServiceBriefResponse(BaseModel):
     platform_targets: List[str] = Field(default_factory=list)
     strengths: List[str] = Field(default_factory=list)
     watchouts: List[str] = Field(default_factory=list)
+    role_paths: List[ServiceBriefRolePath] = Field(default_factory=list)
     stages: List[ServiceBriefStage] = Field(default_factory=list)
     review_flow: List[ServiceBriefReviewStep] = Field(default_factory=list)
     links: Dict[str, str] = Field(default_factory=dict)

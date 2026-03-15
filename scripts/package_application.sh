@@ -19,8 +19,12 @@ copy_if_exists() {
 
 # Core docs
 copy_if_exists "$ROOT_DIR/README.md" "$OUT_DIR/README.md"
+copy_if_exists "$ROOT_DIR/CONTRIBUTING.md" "$OUT_DIR/CONTRIBUTING.md"
+copy_if_exists "$ROOT_DIR/SECURITY.md" "$OUT_DIR/SECURITY.md"
+copy_if_exists "$ROOT_DIR/LICENSE" "$OUT_DIR/LICENSE"
 copy_if_exists "$ROOT_DIR/docs/modules/README.md" "$OUT_DIR/modules_README.md"
 copy_if_exists "$ROOT_DIR/docs/application" "$OUT_DIR/docs_application"
+copy_if_exists "$ROOT_DIR/docs/application/reviewer_proof_map.md" "$OUT_DIR/reviewer_proof_map.md"
 copy_if_exists "$ROOT_DIR/docs/blueprint/09_customer_journey.md" "$OUT_DIR/customer_journey.md"
 copy_if_exists "$ROOT_DIR/docs/architecture/llm_deployment_options.md" "$OUT_DIR/llm_deployment_options.md"
 copy_if_exists "$ROOT_DIR/docs/architecture/integration_patterns.md" "$OUT_DIR/integration_patterns.md"
