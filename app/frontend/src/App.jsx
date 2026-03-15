@@ -260,6 +260,41 @@ function buildStaticServiceBrief() {
       "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live reviewer demos.",
       "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
     ],
+    role_paths: [
+      {
+        role: "Recruiter",
+        goal: "Validate flagship portfolio depth quickly without starting from the code tree.",
+        first_surface: "/ops/service-brief",
+        follow_up: "/ops/review-pack",
+        proof_assets: [
+          "docs/application/reviewer_proof_map.md",
+          "docs/application/portfolio_one_pager_en.md",
+          "docs/verification_report.md",
+        ],
+      },
+      {
+        role: "Solution Architect",
+        goal: "Check platform fit, trust boundary, and rollout tradeoffs before implementation details.",
+        first_surface: "docs/architecture/llm_deployment_options.md",
+        follow_up: "/ops/review-pack",
+        proof_assets: [
+          "docs/architecture/reference_architectures.md",
+          "docs/blueprint/03_security_threat_model.md",
+          "docs/blueprint/09_customer_journey.md",
+        ],
+      },
+      {
+        role: "Operator",
+        goal: "Verify the control loop from login to governance signals in one runnable path.",
+        first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
+        follow_up: "/audit/summary -> /ops/runtime -> /metrics",
+        proof_assets: [
+          "docs/application/reviewer_proof_map.md",
+          "docs/sales/demo_script_exec.md",
+          "docs/sales/exec_value_dashboard/latest.md",
+        ],
+      },
+    ],
     stages: [
       {
         key: "discovery",
@@ -440,6 +475,7 @@ function buildStaticServiceBrief() {
       control_tower_spec: "/v1/control-tower/spec",
       customer_journey: "docs/blueprint/09_customer_journey.md",
       role_alignment: "docs/application/role_alignment.md",
+      proof_map: "docs/application/reviewer_proof_map.md",
     },
   };
 }
@@ -457,6 +493,7 @@ function buildStaticServiceBriefSchema() {
       "evidence",
       "run_modes",
       "platform_targets",
+      "role_paths",
       "stages",
       "review_flow",
       "links",
@@ -482,6 +519,7 @@ function buildStaticServiceBriefSchema() {
       "eval_reports",
       "application_artifacts",
     ],
+    role_path_required_fields: ["role", "goal", "first_surface", "follow_up", "proof_assets"],
     stage_keys: ["discovery", "security", "evals", "deployment", "operations"],
   };
 }
@@ -606,6 +644,41 @@ function buildStaticReviewPack() {
         proof: "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
       },
     ],
+    role_paths: [
+      {
+        role: "Recruiter",
+        goal: "Validate flagship portfolio depth quickly without starting from the code tree.",
+        first_surface: "/ops/service-brief",
+        follow_up: "/ops/review-pack",
+        proof_assets: [
+          "docs/application/reviewer_proof_map.md",
+          "docs/application/portfolio_one_pager_en.md",
+          "docs/verification_report.md",
+        ],
+      },
+      {
+        role: "Solution Architect",
+        goal: "Check platform fit, trust boundary, and rollout tradeoffs before implementation details.",
+        first_surface: "docs/architecture/llm_deployment_options.md",
+        follow_up: "/ops/review-pack",
+        proof_assets: [
+          "docs/architecture/reference_architectures.md",
+          "docs/blueprint/03_security_threat_model.md",
+          "docs/blueprint/09_customer_journey.md",
+        ],
+      },
+      {
+        role: "Operator",
+        goal: "Verify the control loop from login to governance signals in one runnable path.",
+        first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
+        follow_up: "/audit/summary -> /ops/runtime -> /metrics",
+        proof_assets: [
+          "docs/application/reviewer_proof_map.md",
+          "docs/sales/demo_script_exec.md",
+          "docs/sales/exec_value_dashboard/latest.md",
+        ],
+      },
+    ],
     rollout_tracks: [
       {
         track: "api-first validation",
@@ -661,6 +734,7 @@ function buildStaticReviewPack() {
       deployment_options: "docs/architecture/llm_deployment_options.md",
       exec_summary_template: "docs/sales/executive_summary_template.md",
       qbr_template: "docs/sales/qbr_template.md",
+      proof_map: "docs/application/reviewer_proof_map.md",
     },
   };
 }

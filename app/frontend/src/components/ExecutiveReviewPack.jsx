@@ -45,6 +45,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const watchouts = Array.isArray(reviewPack.watchouts) ? reviewPack.watchouts : [];
   const reviewActions = Array.isArray(reviewPack.review_actions) ? reviewPack.review_actions : [];
   const twoMinuteReview = Array.isArray(reviewPack.two_minute_review) ? reviewPack.two_minute_review : [];
+  const rolePaths = Array.isArray(reviewPack.role_paths) ? reviewPack.role_paths : [];
   const reviewGate = reviewPack.review_gate || {};
   const proofBundle = reviewPack.proof_bundle || {};
   const reviewAssets = Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets : [];
@@ -76,6 +77,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
     deployment_options: "Map API-first, workspace-first, and hybrid rollout options.",
     exec_summary_template: "Keep the narrative anchored in buyer language.",
     qbr_template: "Show how proof rolls forward into executive cadence.",
+    proof_map: "Open the role-based proof map when the reviewer needs the shortest evidence path.",
   };
   const fastReviewRouteText = [
     "Enterprise review routes",
@@ -306,6 +308,22 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           ))}
         </div>
       </article>
+
+      {rolePaths.length > 0 && (
+        <article className="service-brief-card">
+          <p className="service-card-label">Reviewer lanes</p>
+          <div className="review-pack-action-list">
+            {rolePaths.map((path) => (
+              <div key={path.role} className="review-pack-action-card">
+                <strong>{path.role}</strong>
+                <p>{path.goal}</p>
+                <code className="service-path">Entry: {path.first_surface}</code>
+                <code className="service-path">Follow-up: {path.follow_up}</code>
+              </div>
+            ))}
+          </div>
+        </article>
+      )}
 
       <div className="review-pack-columns">
         <article className="service-brief-card">

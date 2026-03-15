@@ -8,6 +8,8 @@ def test_ui_includes_service_brief_board():
     assert "Executive Readiness Board" in content
     assert "Service contract" in content
     assert "Platform targets" in content
+    assert "Role-ready paths" in content
+    assert "Proof map:" in content
 
 
 def test_ui_includes_executive_review_pack():
@@ -18,5 +20,6 @@ def test_ui_includes_executive_review_pack():
     assert "Buyer promises" in content
     assert "Rollout tracks" in content
     assert "Review actions" in content
+    assert "Reviewer lanes" in content
     assert "Proof assets" in content
     assert "Copy Rollout Decision Brief" in content

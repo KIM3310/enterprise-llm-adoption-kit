@@ -1,6 +1,6 @@
 # Role-Ready Paths
 
-This repo already contains a large amount of pre-sales, architecture, eval, and rollout material. Use the paths below depending on the target role.
+This repo already contains a large amount of pre-sales, architecture, eval, and rollout material. Start with `docs/application/reviewer_proof_map.md` if you want the shortest reviewer route, then use the paths below depending on the target role.
 
 ## AI Engineer
 
