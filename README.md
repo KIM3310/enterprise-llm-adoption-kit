@@ -30,6 +30,11 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 - **This repo's role:** flagship enterprise decision lab and buyer-facing systems proof repo.
 - **Related repos:** `Upstage-DocuAgent`, `secure-xl2hwp-local`, `beaver-study-orchestrator`
 
+## Big-Tech Elevation Track
+
+- Canonical execution plan: [`docs/BIGTECH_ELEVATION_PLAN.md`](docs/BIGTECH_ELEVATION_PLAN.md)
+- Goal: turn this repo into an enterprise AI delivery simulator with sharper rollout, rollback, and governance proof.
+
 ## Best target-team fit
 
 | Team lens | What should stand out fast | Start here |
