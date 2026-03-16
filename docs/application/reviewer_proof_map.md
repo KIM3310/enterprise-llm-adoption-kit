@@ -1,6 +1,6 @@
 # Reviewer Proof Map
 
-A fast route through the repo for enterprise AI / governed delivery / junior solutions architect screening, while keeping the broader portfolio's `stage-pilot`-first AI-engineer hierarchy intact.
+A fast route through the repo for enterprise AI, governed delivery, and solutions-architecture screening, while keeping the broader portfolio's `stage-pilot`-first AI-engineer hierarchy intact.
 
 ## 90-second front door
 1. Open `README.md` for the portfolio thesis and note that this repo is the enterprise/governed-delivery support flagship after `stage-pilot`.

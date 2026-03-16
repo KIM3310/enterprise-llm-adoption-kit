@@ -13,7 +13,7 @@ This repo is strongest when read as a runnable enterprise decision lab:
 - buyer-facing architecture discussion can be backed by code, metrics, and proof surfaces
 
 For the broader portfolio, this is the repo that best supports `Snowflake`, `Databricks`, `Palantir`, and enterprise solution-architecture conversations.
-Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-engineer flagship and use this repo as the enterprise/governed-delivery support flagship for junior solutions-architect conversations.
+Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-engineer flagship and use this repo as the enterprise/governed-delivery support flagship for solutions-architecture conversations.
 
 ## Portfolio posture
 - Read this repo like an enterprise decision lab you can actually run, not like a sales deck wearing a UI.
@@ -23,7 +23,7 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 
 ## Role signals
 - **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are runnable here, but this repo is best read as the enterprise support branch behind the primary `stage-pilot` flagship.
-- **Junior solution / cloud architect:** this is the best portfolio repo for Snowflake, Databricks, governed enterprise AI, and rollout/rollback conversations backed by working proof.
+- **Solutions architect / cloud architect:** this is the best portfolio repo for Snowflake, Databricks, governed enterprise AI, and rollout and rollback conversations backed by working proof.
 - **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough without hiding the technical surfaces.
 
 
@@ -40,7 +40,7 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 ## Recruiter fit in the broader portfolio
 
 - **Primary portfolio hierarchy:** lead with `stage-pilot` for AI-engineer screening, then use this repo as the strongest enterprise/governed-delivery support proof.
-- **Best recruiter handoff:** use this repo when the role mentions junior solutions architect, Snowflake, Databricks, governance, rollout planning, or enterprise AI adoption.
+- **Best recruiter handoff:** use this repo when the role mentions solutions architecture, Snowflake, Databricks, governance, rollout planning, or enterprise AI adoption.
 - **What should feel different here:** the value is not raw model novelty; it is reviewable rollout design, audit posture, platform mapping, and decision-ready enterprise packaging.
 
 ## Best target-team fit
