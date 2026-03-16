@@ -1,4 +1,6 @@
 import logging
+import json
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -7,6 +9,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Dict, List, Optional
 
+import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -96,6 +99,7 @@ from .runtime_scorecard import (
 )
 from .safety import REFUSAL_MESSAGE, should_refuse
 from .service_brief import (
+    build_openai_live_contract,
     build_service_customer_architecture_pack,
     build_service_customer_architecture_pack_schema,
     build_service_brief,
@@ -129,10 +133,36 @@ logger = logging.getLogger("service")
 rag_store = RAGStore()
 rate_limiter = RateLimiter(settings.rate_limit_capacity, settings.rate_limit_refill_per_sec)
 login_attempt_limiter = RateLimiter(settings.login_attempt_capacity, settings.login_attempt_refill_per_sec)
+public_live_limiter = RateLimiter(6, 6 / 60.0)
 control_tower_service = ControlTowerService()
 LLM_MAX_RETRIES = 3
 APP_STARTED_AT = int(time.time())
 ROLE_PRIORITY = {"Employee": 1, "Ops": 2, "Admin": 3}
+LIVE_WORKSHOP_PREVIEW_SCHEMA = "enterprise-adoption-live-workshop-preview-v1"
+LIVE_WORKSHOP_SCENARIOS = {
+    "snowflake-discovery": {
+        "platform": "snowflake",
+        "scenario_id": "snowflake-discovery",
+        "title": "Snowflake governed analytics workshop",
+        "next_review_path": "/ops/customer-architecture-pack?platform=snowflake",
+        "estimated_cost_usd": 0.012,
+        "prompt": (
+            "A Snowflake-oriented buyer workshop needs a crisp rollout stance, architecture path, "
+            "and next-step pack without exposing arbitrary customer text input."
+        ),
+    },
+    "databricks-control-tower": {
+        "platform": "databricks",
+        "scenario_id": "databricks-control-tower",
+        "title": "Databricks hybrid control-tower workshop",
+        "next_review_path": "/ops/workshop-readout-pack?platform=databricks",
+        "estimated_cost_usd": 0.013,
+        "prompt": (
+            "A Databricks-oriented field review wants to know if the pilot should proceed, what rollout gates matter, "
+            "and how the customer architecture should be framed."
+        ),
+    },
+}
 SECURITY_HEADERS = {
     "x-content-type-options": "nosniff",
     "x-frame-options": "DENY",
@@ -156,6 +186,7 @@ LLM_CIRCUIT_LOCK = Lock()
 LLM_CIRCUIT_CONSECUTIVE_FAILURES = 0
 LLM_CIRCUIT_OPEN_UNTIL = 0.0
 LLM_CIRCUIT_LAST_ERROR = ""
+LIVE_WORKSHOP_LAST_RUN_AT: Optional[str] = None
 
 
 def _rate_limit_key(user_id: str, role: str, use_case: str) -> str:
@@ -189,6 +220,71 @@ def _apply_standard_headers(response, request_id: str) -> None:
     response.headers.setdefault("cache-control", "no-store")
     for header_name, header_value in SECURITY_HEADERS.items():
         response.headers.setdefault(header_name, header_value)
+
+
+def _public_live_rate_key(request: Request, scenario_id: str) -> str:
+    host = str(request.client.host if request.client else "unknown")
+    return f"{host}:{scenario_id}"
+
+
+def _ensure_public_live_rate_limit(request: Request, scenario_id: str) -> None:
+    if not public_live_limiter.check(_public_live_rate_key(request, scenario_id)):
+        raise HTTPException(status_code=429, detail="public live workshop preview rate limit exceeded")
+
+
+async def _call_openai_moderation(api_key: str, payload: str) -> None:
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        response = await client.post(
+            "https://api.openai.com/v1/moderations",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={"model": "omni-moderation-latest", "input": payload},
+        )
+    response.raise_for_status()
+    if response.json().get("results", [{}])[0].get("flagged"):
+        raise HTTPException(status_code=400, detail="workshop preview blocked by moderation")
+
+
+async def _call_openai_workshop_preview(api_key: str, model: str, payload: Dict[str, object]) -> Dict[str, object]:
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        response = await client.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": model,
+                "temperature": 0.2,
+                "response_format": {"type": "json_object"},
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a field architecture reviewer. Return JSON with keys "
+                            "rolloutStance, executiveSummary, architectureSummary, nextAction, proofAssets."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": str(payload),
+                    },
+                ],
+            },
+        )
+    response.raise_for_status()
+    content = str(response.json().get("choices", [{}])[0].get("message", {}).get("content", "")).strip()
+    if not content:
+        raise HTTPException(status_code=502, detail="OpenAI workshop preview returned empty content")
+    try:
+        parsed = json.loads(content)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=502, detail="OpenAI workshop preview returned invalid JSON") from exc
+    if not isinstance(parsed, dict):
+        raise HTTPException(status_code=502, detail="OpenAI workshop preview returned non-object JSON")
+    return parsed
 
 
 def _error_response(status_code: int, detail: object, request_id: str) -> JSONResponse:
@@ -813,6 +909,7 @@ def health(request: Request) -> Dict[str, object]:
     # Non-sensitive runtime metadata to make preflight/debugging easier in demos.
     runtime = get_llm_runtime_settings()
     circuit = _llm_circuit_snapshot()
+    openai_live = build_openai_live_contract()
     return {
         "status": status,
         "service": settings.app_name,
@@ -830,6 +927,7 @@ def health(request: Request) -> Dict[str, object]:
         "llm_provider": runtime.get("provider", "stub"),
         "llm_model": runtime.get("model", "stub-llm"),
         "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
+        "openai_live": openai_live,
         "uptime_seconds": max(0, int(time.time()) - APP_STARTED_AT),
         "request_id": getattr(request.state, "request_id", ""),
         "diagnostics": diagnostics,
@@ -846,6 +944,7 @@ def health(request: Request) -> Dict[str, object]:
             "service-brief-readiness",
             "customer-architecture-pack",
             "workshop-readout-pack",
+            "live-workshop-preview",
             "rollout-board-readiness",
             "rollout-gate-readiness",
             "executive-review-pack",
@@ -862,6 +961,7 @@ def health(request: Request) -> Dict[str, object]:
             "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "workshop_readout_pack": "/ops/workshop-readout-pack",
             "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
+            "live_workshop_preview": "/ops/live-workshop-preview",
             "review_pack": "/ops/review-pack",
             "review_pack_schema": "/ops/review-pack/schema",
             "rollout_board": "/ops/rollout-board",
@@ -915,6 +1015,78 @@ def ops_workshop_readout_pack(platform: str | None = None) -> Dict[str, object]:
         )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/ops/live-workshop-preview")
+async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
+    global LIVE_WORKSHOP_LAST_RUN_AT
+
+    request_id = getattr(request.state, "request_id", f"req-{uuid.uuid4().hex[:12]}")
+    runtime = build_openai_live_contract()
+    api_key = str(os.getenv("OPENAI_API_KEY", "")).strip()
+    if not runtime["publicLiveApi"]:
+        raise HTTPException(
+            status_code=503,
+            detail="public OpenAI live workshop preview is unavailable; configure OPENAI_API_KEY and keep budgets above zero",
+        )
+
+    body = await request.json()
+    scenario_id = str(body.get("scenario_id", "")).strip().lower()
+    scenario = LIVE_WORKSHOP_SCENARIOS.get(scenario_id)
+    if scenario is None:
+        raise HTTPException(
+            status_code=400,
+            detail="scenario_id must be one of snowflake-discovery or databricks-control-tower",
+        )
+
+    _ensure_public_live_rate_limit(request, scenario_id)
+    review_pack = build_service_workshop_readout_pack(
+        platform=scenario["platform"],
+        startup_report=getattr(app.state, "startup_report", None),
+        circuit_snapshot=_llm_circuit_snapshot(),
+    )
+    customer_pack = build_service_customer_architecture_pack(
+        platform=scenario["platform"],
+        startup_report=getattr(app.state, "startup_report", None),
+        circuit_snapshot=_llm_circuit_snapshot(),
+    )
+    prompt_payload = {
+        "scenario": scenario,
+        "review_pack_summary": review_pack["summary"],
+        "customer_pack_summary": customer_pack["summary"],
+        "runtime": {
+            "llm_provider": str(get_llm_runtime_settings().get("provider", "stub")),
+            "deploymentMode": runtime["deploymentMode"],
+        },
+    }
+    if runtime["moderationEnabled"]:
+        await _call_openai_moderation(api_key, json.dumps(prompt_payload))
+    live_summary = await _call_openai_workshop_preview(
+        api_key,
+        str(runtime["liveModel"]),
+        prompt_payload,
+    )
+    LIVE_WORKSHOP_LAST_RUN_AT = datetime.now(timezone.utc).isoformat()
+    return {
+        "status": "ok",
+        "service": settings.app_name,
+        "schema": LIVE_WORKSHOP_PREVIEW_SCHEMA,
+        "mode": runtime["deploymentMode"],
+        "model": runtime["liveModel"],
+        "scenarioId": scenario["scenario_id"],
+        "moderated": True,
+        "capped": True,
+        "traceId": request_id,
+        "estimatedCostUsd": scenario["estimated_cost_usd"],
+        "nextReviewPath": scenario["next_review_path"],
+        "result": {
+            "title": scenario["title"],
+            "platform": scenario["platform"],
+            "rolloutGates": review_pack["summary"],
+            "customerArchitecture": customer_pack["summary"],
+            **live_summary,
+        },
+    }
 
 
 @app.get("/ops/workshop-readout-pack/schema")

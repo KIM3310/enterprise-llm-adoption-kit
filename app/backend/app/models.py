@@ -288,6 +288,15 @@ class ServiceBriefRuntime(BaseModel):
     startup_status: str
     startup_ready: bool
     llm_circuit_state: str
+    deploymentMode: str = Field(
+        pattern="^(public-capped-live|review-only-live|artifact-refresh-only)$"
+    )
+    publicLiveApi: bool
+    liveModel: str
+    dailyBudgetUsd: float = Field(ge=0.0)
+    monthlyBudgetUsd: float = Field(ge=0.0)
+    killSwitch: bool
+    moderationEnabled: bool
 
 
 class ServiceBriefEvidence(BaseModel):
