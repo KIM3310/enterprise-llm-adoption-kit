@@ -4,6 +4,15 @@ Portfolio note: all customers, data, and rollout scenarios in this repo are synt
 
 Korean version: `README.ko.md`
 
+## Why this repo matters
+
+This repo is strongest when read as a runnable enterprise decision lab:
+
+- discovery artifacts map into system design instead of stopping at strategy slides
+- governance, evals, audit, and rollout posture stay visible through working routes
+- buyer-facing architecture discussion can be backed by code, metrics, and proof surfaces
+
+For the broader portfolio, this is the repo that best supports `Snowflake`, `Databricks`, `Palantir`, and enterprise solution-architecture conversations.
 
 ## Portfolio posture
 - Read this repo like an enterprise decision lab you can actually run, not like a sales deck wearing a UI.
@@ -20,6 +29,15 @@ Korean version: `README.ko.md`
 - **Portfolio family:** applied document and workflow systems
 - **This repo's role:** flagship enterprise decision lab and buyer-facing systems proof repo.
 - **Related repos:** `Upstage-DocuAgent`, `secure-xl2hwp-local`, `beaver-study-orchestrator`
+
+## Best target-team fit
+
+| Team lens | What should stand out fast | Start here |
+|---|---|---|
+| Snowflake | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /audit/summary` |
+| Databricks | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
+| Palantir / enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-drill` |
+| Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), `GET /ops/review-pack`, `/metrics` |
 
 ## Repository surfaces
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
