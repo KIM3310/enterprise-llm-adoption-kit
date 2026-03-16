@@ -63,6 +63,7 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 - Reviewer API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
 - Workshop closeout surface: `GET /ops/workshop-readout-pack`, `GET /ops/workshop-readout-pack/schema`
 - Rollout decision surfaces: `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill`
+- Bounded public live lane: `POST /ops/live-workshop-preview`
 - Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
 - Reviewer map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)

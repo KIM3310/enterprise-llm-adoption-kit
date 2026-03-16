@@ -15,6 +15,7 @@ async def test_ops_service_brief_contract() -> None:
     assert body["contract_version"] == "enterprise-adoption-service-brief-v1"
     assert body["runtime"]["auth_mode"] == "local_jwt"
     assert body["runtime"]["llm_provider"] == "stub"
+    assert body["runtime"]["deploymentMode"] == "review-only-live"
     assert body["evidence"]["test_files"] >= 20
     assert "aws" in body["platform_targets"]
     assert len(body["role_paths"]) >= 3
@@ -30,6 +31,7 @@ async def test_ops_service_brief_contract() -> None:
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
     assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
     assert body["links"]["workshop_readout_pack_schema"] == "/ops/workshop-readout-pack/schema"
+    assert body["links"]["live_workshop_preview"] == "/ops/live-workshop-preview"
     assert any(stage["key"] == "operations" for stage in body["stages"])
     assert any(step["endpoint"] == "/auth/login" for step in body["review_flow"])
 
@@ -135,6 +137,49 @@ async def test_ops_workshop_readout_pack_contract() -> None:
     assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
     assert body["links"]["workshop_visual"] == "docs/sales/demo_screenshots/15_workshop_readout.svg"
+
+
+@pytest.mark.anyio
+async def test_ops_live_workshop_preview_contract(monkeypatch) -> None:
+    import app.main as main_module
+
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-enterprise-live")
+
+    async def _fake_moderation(api_key: str, payload: str) -> None:
+        assert api_key == "sk-enterprise-live"
+        assert "snowflake-discovery" in payload
+
+    async def _fake_preview(api_key: str, model: str, payload: dict) -> dict:
+        assert api_key == "sk-enterprise-live"
+        assert model == "gpt-4.1-mini"
+        assert payload["scenario"]["platform"] == "snowflake"
+        return {
+            "rolloutStance": "pilot-now",
+            "executiveSummary": "Governed Snowflake workshop is ready for a bounded pilot.",
+            "architectureSummary": "Keep rollout gates and review pack visible during buyer handoff.",
+            "nextAction": "open customer architecture pack",
+            "proofAssets": ["/ops/workshop-readout-pack", "/ops/customer-architecture-pack"],
+        }
+
+    monkeypatch.setattr(main_module, "_call_openai_moderation", _fake_moderation)
+    monkeypatch.setattr(main_module, "_call_openai_workshop_preview", _fake_preview)
+
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.post(
+            "/ops/live-workshop-preview",
+            json={"scenario_id": "snowflake-discovery"},
+        )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-live-workshop-preview-v1"
+    assert body["mode"] == "public-capped-live"
+    assert body["model"] == "gpt-4.1-mini"
+    assert body["scenarioId"] == "snowflake-discovery"
+    assert body["nextReviewPath"] == "/ops/customer-architecture-pack?platform=snowflake"
+    assert body["result"]["platform"] == "snowflake"
+    assert body["result"]["rolloutStance"] == "pilot-now"
 
 
 @pytest.mark.anyio

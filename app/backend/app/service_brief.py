@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -7,6 +8,45 @@ from .control_tower import get_control_tower_spec_snapshot
 from .llm_adapter import get_llm_runtime_settings
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def _read_bool_env(name: str, fallback: bool) -> bool:
+    raw = str(os.getenv(name, "")).strip().lower()
+    if not raw:
+        return fallback
+    if raw in {"1", "true", "yes", "y", "on"}:
+        return True
+    if raw in {"0", "false", "no", "n", "off"}:
+        return False
+    return fallback
+
+
+def _read_usd_env(name: str, fallback: float) -> float:
+    raw = str(os.getenv(name, "")).strip()
+    if not raw:
+        return fallback
+    try:
+        return round(max(0.0, float(raw)), 2)
+    except ValueError:
+        return fallback
+
+
+def build_openai_live_contract() -> Dict[str, object]:
+    api_key = str(os.getenv("OPENAI_API_KEY", "")).strip()
+    kill_switch = _read_bool_env("OPENAI_KILL_SWITCH", False)
+    daily_budget = _read_usd_env("OPENAI_PUBLIC_DAILY_BUDGET_USD", 4.0)
+    monthly_budget = _read_usd_env("OPENAI_PUBLIC_MONTHLY_BUDGET_USD", 120.0)
+    public_live = bool(api_key) and not kill_switch and daily_budget > 0 and monthly_budget > 0
+    return {
+        "deploymentMode": "public-capped-live" if public_live else "review-only-live",
+        "publicLiveApi": public_live,
+        "liveModel": str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip() or "gpt-4.1-mini",
+        "refreshModel": str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip() or "gpt-5.2",
+        "dailyBudgetUsd": daily_budget,
+        "monthlyBudgetUsd": monthly_budget,
+        "killSwitch": kill_switch,
+        "moderationEnabled": _read_bool_env("OPENAI_MODERATION_ENABLED", True),
+    }
 
 
 def _artifact(label: str, path: str, kind: str) -> Optional[Dict[str, str]]:
@@ -66,6 +106,7 @@ def build_service_brief(
     circuit_snapshot: Dict[str, object],
 ) -> Dict[str, object]:
     runtime = get_llm_runtime_settings()
+    openai_live = build_openai_live_contract()
     control_tower_spec, validation_ok, validation_error = get_control_tower_spec_snapshot()
     startup_payload = startup_report if isinstance(startup_report, dict) else {}
     startup_ready = bool(startup_payload.get("startup_ready", False))
@@ -207,6 +248,13 @@ def build_service_brief(
             "llm_provider": str(runtime.get("provider", "stub")),
             "llm_model": str(runtime.get("model", "stub-llm")),
             "openai_api_key_configured": bool(runtime.get("openai_api_key_configured", False)),
+            "deploymentMode": openai_live["deploymentMode"],
+            "publicLiveApi": openai_live["publicLiveApi"],
+            "liveModel": openai_live["liveModel"],
+            "dailyBudgetUsd": openai_live["dailyBudgetUsd"],
+            "monthlyBudgetUsd": openai_live["monthlyBudgetUsd"],
+            "killSwitch": openai_live["killSwitch"],
+            "moderationEnabled": openai_live["moderationEnabled"],
             "login_code_required": bool(settings.demo_login_code),
             "integrations_require_auth": settings.integrations_require_auth,
             "startup_status": startup_status,
@@ -312,6 +360,7 @@ def build_service_brief(
             "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "workshop_readout_pack": "/ops/workshop-readout-pack",
             "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
+            "live_workshop_preview": "/ops/live-workshop-preview",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
