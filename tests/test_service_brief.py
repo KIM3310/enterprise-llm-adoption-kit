@@ -23,6 +23,7 @@ async def test_ops_service_brief_contract() -> None:
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
+    assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
@@ -62,6 +63,7 @@ async def test_ops_review_pack_contract() -> None:
     assert any(item["role"] == "Solution Architect" for item in body["role_paths"])
     assert "/ops/rollout-board" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/rollout-drill" in body["proof_bundle"]["runtime_surfaces"]
+    assert "/ops/rollout-gates" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/runtime/scorecard" in body["proof_bundle"]["runtime_surfaces"]
     assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
@@ -73,6 +75,7 @@ async def test_ops_review_pack_contract() -> None:
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
+    assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
@@ -197,6 +200,42 @@ async def test_ops_rollout_drill_schema_contract() -> None:
 
 
 @pytest.mark.anyio
+async def test_ops_rollout_gates_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-gates?track=hybrid%20control%20tower")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "enterprise-adoption-rollout-gates-v1"
+    assert body["filters"]["track"] == "hybrid control tower"
+    assert body["summary"]["visible_tracks"] == 1
+    assert body["summary"]["total_gates"] == 4
+    assert body["summary"]["release_recommendation"] in {"proceed", "hold"}
+    assert body["tracks"][0]["track"] == "hybrid control tower"
+    assert len(body["gates"]) == 4
+    assert any(item["gate"] == "runtime-readiness" for item in body["gates"])
+    assert any(item["gate"] == "rollback-drill" for item in body["gates"])
+    assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
+    assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_gates_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-gates/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-rollout-gates-v1"
+    assert "summary" in body["required_fields"]
+    assert "gates" in body["required_fields"]
+    assert "gate_label" in body["gate_required_fields"]
+    assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
+
+
+@pytest.mark.anyio
 async def test_ops_review_summary_schema_contract() -> None:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
@@ -229,6 +268,16 @@ async def test_ops_rollout_board_rejects_invalid_track_filter() -> None:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
         response = await client.get("/ops/rollout-board?track=bad-track")
+
+    assert response.status_code == 400, response.text
+    assert "invalid stage filter" in response.json()["detail"]
+
+
+@pytest.mark.anyio
+async def test_ops_rollout_gates_rejects_invalid_track_filter() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/rollout-gates?track=bad-track")
 
     assert response.status_code == 400, response.text
     assert "invalid stage filter" in response.json()["detail"]

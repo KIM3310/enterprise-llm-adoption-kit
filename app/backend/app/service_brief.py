@@ -302,6 +302,7 @@ def build_service_brief(
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
             "review_summary": "/ops/review-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
@@ -448,6 +449,7 @@ def build_service_review_pack(
                 "/ops/review-pack",
                 "/ops/rollout-board",
                 "/ops/rollout-drill",
+                "/ops/rollout-gates",
                 "/ops/review-summary",
                 "/ops/review-pack/schema",
                 "/ops/runtime/scorecard",
@@ -458,6 +460,7 @@ def build_service_review_pack(
                 "/health",
                 "/ops/service-brief",
                 "/ops/review-pack",
+                "/ops/rollout-gates",
                 "/ops/review-summary",
                 "/ops/review-pack/schema",
                 "/ops/runtime/scorecard",
@@ -502,6 +505,7 @@ def build_service_review_pack(
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
             "review_summary": "/ops/review-summary",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "review_pack_schema": "/ops/review-pack/schema",
@@ -599,6 +603,7 @@ def build_service_rollout_board(
             "review_summary": "/ops/review-summary",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "deployment_options": "docs/architecture/llm_deployment_options.md",
         },
@@ -634,6 +639,7 @@ def build_service_rollout_board_schema() -> Dict[str, object]:
         "links": {
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
@@ -700,6 +706,7 @@ def build_service_rollout_drill(
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
         },
     }
@@ -735,6 +742,206 @@ def build_service_rollout_drill_schema() -> Dict[str, object]:
         "links": {
             "rollout_drill": "/ops/rollout-drill",
             "rollout_board": "/ops/rollout-board",
+            "rollout_gates": "/ops/rollout-gates",
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+        },
+    }
+
+
+def build_service_rollout_gates(
+    *,
+    track: Optional[str] = None,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    brief = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    review_pack = build_service_review_pack(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    rollout_board = build_service_rollout_board(
+        track=track,
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    rollout_drill = build_service_rollout_drill(
+        track=track,
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    runtime = brief.get("runtime", {})
+    evidence = brief.get("evidence", {})
+    stages = {
+        str(stage.get("key", "")): stage
+        for stage in brief.get("stages", [])
+        if isinstance(stage, dict)
+    }
+    drill_by_track = {
+        str(item.get("track", "")): item
+        for item in rollout_drill.get("items", [])
+        if isinstance(item, dict)
+    }
+    startup_ready = bool(runtime.get("startup_ready", False))
+    circuit_closed = str(runtime.get("llm_circuit_state", "closed")) == "closed"
+    security_ready = str(stages.get("security", {}).get("readiness", "attention")) == "ready"
+    eval_ready = int(evidence.get("eval_reports", 0)) >= 1
+    review_gate_status = str(review_pack.get("review_gate", {}).get("status", "attention"))
+
+    gates: List[Dict[str, object]] = []
+    for item in rollout_board.get("items", []):
+        if not isinstance(item, dict):
+            continue
+        track_name = str(item.get("track", ""))
+        track_readiness = str(item.get("readiness", "attention"))
+        drill = drill_by_track.get(track_name, {})
+        rollback_eta_minutes = int(drill.get("rollback_eta_minutes", 45))
+
+        gates.extend(
+            [
+                {
+                    "track": track_name,
+                    "gate": "runtime-readiness",
+                    "gate_label": "Runtime readiness",
+                    "status": "ready" if startup_ready and circuit_closed else "attention",
+                    "owner": "platform-oncall",
+                    "decision_rule": "startup diagnostics must be ready and the LLM circuit must be closed",
+                    "proof_surfaces": ["/health", "/ops/service-brief", "/ops/runtime/scorecard"],
+                    "next_action": (
+                        "Open /ops/runtime/scorecard and confirm the runtime can support a live walkthrough."
+                        if startup_ready and circuit_closed
+                        else "Hold rollout and recover startup diagnostics or the LLM circuit before continuing."
+                    ),
+                },
+                {
+                    "track": track_name,
+                    "gate": "governance-proof",
+                    "gate_label": "Governance proof",
+                    "status": "ready" if security_ready and review_gate_status == "ready" else "attention",
+                    "owner": "security-review",
+                    "decision_rule": "security stage artifacts and executive review posture must both be ready",
+                    "proof_surfaces": ["/ops/review-pack", "/audit/summary", "/metrics"],
+                    "next_action": (
+                        "Use the review pack and audit summary as the buyer-facing trust boundary."
+                        if security_ready and review_gate_status == "ready"
+                        else "Keep the rollout in review mode until governance evidence and review posture are both ready."
+                    ),
+                },
+                {
+                    "track": track_name,
+                    "gate": "evaluation-floor",
+                    "gate_label": "Evaluation floor",
+                    "status": "ready" if eval_ready and track_readiness == "ready" else "attention",
+                    "owner": "evaluation-owner",
+                    "decision_rule": "the selected track must be ready and at least one eval report must exist",
+                    "proof_surfaces": ["/ops/review-summary", "/ops/review-pack", "evals/reports/latest_report.md"],
+                    "next_action": (
+                        "Use the review summary to show the evaluation floor behind the selected rollout track."
+                        if eval_ready and track_readiness == "ready"
+                        else "Do not claim go-live readiness until the selected track and evaluation floor are both visible."
+                    ),
+                },
+                {
+                    "track": track_name,
+                    "gate": "rollback-drill",
+                    "gate_label": "Rollback drill",
+                    "status": "ready" if circuit_closed and rollback_eta_minutes <= 15 else "attention",
+                    "owner": "ops-oncall",
+                    "decision_rule": "kill switch posture must be closed and rollback ETA must stay within 15 minutes",
+                    "proof_surfaces": ["/ops/rollout-drill", "/ops/rollout-board", "/ops/runtime/scorecard"],
+                    "next_action": (
+                        "Keep the rollback drill in the executive review so the kill-switch posture is explicit."
+                        if circuit_closed and rollback_eta_minutes <= 15
+                        else "Tune the rollback path before approving a customer-facing rollout."
+                    ),
+                },
+            ]
+        )
+
+    ready_gates = [item for item in gates if str(item.get("status", "")) == "ready"]
+    attention_gates = [item for item in gates if str(item.get("status", "")) != "ready"]
+
+    return {
+        "service": brief["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-rollout-gates-v1",
+        "headline": "Go/no-go gate surface for proving runtime, governance, evaluation, and rollback posture before a rollout decision.",
+        "filters": rollout_board.get("filters", {}),
+        "summary": {
+            "visible_tracks": int(rollout_board.get("summary", {}).get("visible_tracks", 0)),
+            "total_gates": len(gates),
+            "ready_gates": len(ready_gates),
+            "attention_gates": len(attention_gates),
+            "release_recommendation": "proceed" if len(attention_gates) == 0 else "hold",
+            "review_gate_status": review_gate_status,
+            "llm_provider": str(runtime.get("llm_provider", "")),
+        },
+        "tracks": rollout_board.get("items", []),
+        "gates": gates,
+        "review_actions": [
+            "Use the rollout board to choose the candidate lane before reading any gate status.",
+            "Keep runtime, governance, evaluation, and rollback gates visible in the same buyer review.",
+            "Treat a hold recommendation as the default until every required gate is explicit.",
+        ],
+        "links": {
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
+            "review_summary": "/ops/review-summary",
+            "ops_runtime_scorecard": "/ops/runtime/scorecard",
+        },
+    }
+
+
+def build_service_rollout_gates_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-rollout-gates-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "summary",
+            "tracks",
+            "gates",
+            "review_actions",
+            "links",
+        ],
+        "summary_required_fields": [
+            "visible_tracks",
+            "total_gates",
+            "ready_gates",
+            "attention_gates",
+            "release_recommendation",
+            "review_gate_status",
+            "llm_provider",
+        ],
+        "track_required_fields": [
+            "track",
+            "readiness",
+            "fit_for",
+            "evidence",
+            "why_now",
+        ],
+        "gate_required_fields": [
+            "track",
+            "gate",
+            "gate_label",
+            "status",
+            "owner",
+            "decision_rule",
+            "proof_surfaces",
+            "next_action",
+        ],
+        "links": {
+            "rollout_board": "/ops/rollout-board",
+            "rollout_drill": "/ops/rollout-drill",
+            "rollout_gates": "/ops/rollout-gates",
+            "rollout_gates_schema": "/ops/rollout-gates/schema",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
         },
@@ -828,6 +1035,7 @@ def build_service_review_summary(
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
+            "rollout_gates": "/ops/rollout-gates",
             "review_summary": "/ops/review-summary",
             "audit_summary": "/audit/summary",
             "metrics": "/metrics",
@@ -890,6 +1098,7 @@ def build_service_review_summary_schema() -> Dict[str, object]:
             "review_pack": "/ops/review-pack",
             "review_summary": "/ops/review-summary",
             "review_summary_schema": "/ops/review-summary/schema",
+            "rollout_gates": "/ops/rollout-gates",
         },
     }
 
@@ -961,6 +1170,7 @@ def build_service_review_pack_schema() -> Dict[str, object]:
             "readme": "README.md",
             "review_pack": "/ops/review-pack",
             "review_pack_schema": "/ops/review-pack/schema",
+            "rollout_gates": "/ops/rollout-gates",
         },
     }
 
@@ -1032,5 +1242,6 @@ def build_service_brief_schema() -> Dict[str, object]:
         "links": {
             "readme": "README.md",
             "service_brief": "/ops/service-brief",
+            "rollout_gates": "/ops/rollout-gates",
         },
     }
