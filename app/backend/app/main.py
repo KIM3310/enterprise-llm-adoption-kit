@@ -96,6 +96,8 @@ from .runtime_scorecard import (
 )
 from .safety import REFUSAL_MESSAGE, should_refuse
 from .service_brief import (
+    build_service_customer_architecture_pack,
+    build_service_customer_architecture_pack_schema,
     build_service_brief,
     build_service_brief_schema,
     build_service_rollout_board,
@@ -840,6 +842,7 @@ def health(request: Request) -> Dict[str, object]:
             "control-tower-decisioning",
             "audit-and-cost-tracking",
             "service-brief-readiness",
+            "customer-architecture-pack",
             "rollout-board-readiness",
             "rollout-gate-readiness",
             "executive-review-pack",
@@ -852,6 +855,8 @@ def health(request: Request) -> Dict[str, object]:
             "control_tower_spec": "/v1/control-tower/spec",
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
+            "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "review_pack": "/ops/review-pack",
             "review_pack_schema": "/ops/review-pack/schema",
             "rollout_board": "/ops/rollout-board",
@@ -876,6 +881,23 @@ def ops_service_brief() -> ServiceBriefResponse:
 @app.get("/ops/service-brief/schema")
 def ops_service_brief_schema() -> Dict[str, object]:
     return build_service_brief_schema()
+
+
+@app.get("/ops/customer-architecture-pack")
+def ops_customer_architecture_pack(platform: str | None = None) -> Dict[str, object]:
+    try:
+        return build_service_customer_architecture_pack(
+            platform=platform,
+            startup_report=getattr(app.state, "startup_report", None),
+            circuit_snapshot=_llm_circuit_snapshot(),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/ops/customer-architecture-pack/schema")
+def ops_customer_architecture_pack_schema() -> Dict[str, object]:
+    return build_service_customer_architecture_pack_schema()
 
 
 @app.get("/ops/review-pack")
