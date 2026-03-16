@@ -20,6 +20,7 @@ async def test_ops_service_brief_contract() -> None:
     assert len(body["role_paths"]) >= 3
     assert any(item["role"] == "Recruiter" for item in body["role_paths"])
     assert body["links"]["proof_map"] == "docs/application/reviewer_proof_map.md"
+    assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
     assert body["links"]["review_pack"] == "/ops/review-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
@@ -73,6 +74,7 @@ async def test_ops_review_pack_contract() -> None:
     assert body["review_gate"]["next_step"]
     assert any("snowflake" in item for item in body["platform_dialogues"])
     assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
     assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
@@ -80,6 +82,38 @@ async def test_ops_review_pack_contract() -> None:
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
     assert body["links"]["proof_map"] == "docs/application/reviewer_proof_map.md"
+
+
+@pytest.mark.anyio
+async def test_ops_customer_architecture_pack_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/customer-architecture-pack?platform=snowflake")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "enterprise-adoption-customer-architecture-pack-v1"
+    assert body["filters"]["platform"] == "snowflake"
+    assert body["summary"]["visible_platforms"] == 1
+    assert body["platform_cards"][0]["platform"] == "snowflake"
+    assert len(body["architecture_stages"]) == 5
+    assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
+    assert body["links"]["review_pack"] == "/ops/review-pack"
+
+
+@pytest.mark.anyio
+async def test_ops_customer_architecture_pack_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/customer-architecture-pack/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-customer-architecture-pack-v1"
+    assert "summary" in body["required_fields"]
+    assert "platform_cards" in body["required_fields"]
+    assert "platform" in body["platform_card_required_fields"]
+    assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
 
 
 @pytest.mark.anyio

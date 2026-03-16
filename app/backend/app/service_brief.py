@@ -51,6 +51,15 @@ def _normalize_stage_filter(value: Optional[str], allowed: List[str]) -> Optiona
     return normalized
 
 
+def _normalize_platform_filter(value: Optional[str], allowed: List[str]) -> Optional[str]:
+    normalized = str(value or "").strip().lower()
+    if not normalized:
+        return None
+    if normalized not in allowed:
+        raise ValueError(f"invalid platform filter: {value}")
+    return normalized
+
+
 def build_service_brief(
     *,
     startup_report: Optional[Dict[str, object]],
@@ -299,6 +308,8 @@ def build_service_brief(
             "health": "/health",
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
+            "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
@@ -502,6 +513,7 @@ def build_service_review_pack(
         "links": {
             "health": "/health",
             "service_brief": "/ops/service-brief",
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
@@ -942,6 +954,197 @@ def build_service_rollout_gates_schema() -> Dict[str, object]:
             "rollout_drill": "/ops/rollout-drill",
             "rollout_gates": "/ops/rollout-gates",
             "rollout_gates_schema": "/ops/rollout-gates/schema",
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+        },
+    }
+
+
+def build_service_customer_architecture_pack(
+    *,
+    platform: Optional[str] = None,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    brief = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    review_pack = build_service_review_pack(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    rollout_gates = build_service_rollout_gates(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    platform_targets = [
+        str(item).strip().lower()
+        for item in brief.get("platform_targets", [])
+        if str(item).strip()
+    ]
+    platform_filter = _normalize_platform_filter(platform, platform_targets)
+    visible_platforms = [
+        item for item in platform_targets if platform_filter is None or item == platform_filter
+    ]
+    review_gate = review_pack.get("review_gate", {}) if isinstance(review_pack, dict) else {}
+    architecture_notes = {
+        "aws": {
+            "fit": "Strong fit for secure reference-architecture and deployment-boundary conversations.",
+            "primary_surface": "docs/architecture/aws_openai_reference_architecture.md",
+            "watchout": "Keep governance and eval posture visible so the discussion does not collapse into raw cloud topology.",
+        },
+        "snowflake": {
+            "fit": "Good fit for governed analytics, semantic layers, and enterprise data-handling posture.",
+            "primary_surface": "docs/architecture/reference_architectures.md",
+            "watchout": "Map buyer language to warehouse governance and rollout safety, not only model choice.",
+        },
+        "databricks": {
+            "fit": "Good fit for data-engineering-led rollout, eval assets, and control-tower delivery planning.",
+            "primary_surface": "docs/architecture/reference_architectures.md",
+            "watchout": "Keep lakehouse and operational governance decisions explicit before promising agent automation.",
+        },
+        "palantir": {
+            "fit": "Strong fit for workflow software, governed approvals, and high-trust operational loops.",
+            "primary_surface": "docs/blueprint/09_customer_journey.md",
+            "watchout": "Lead with decision flow, approvals, and handoff boundaries rather than generic LLM capability.",
+        },
+    }
+    platform_cards = []
+    for platform_name in visible_platforms:
+        note = architecture_notes.get(
+            platform_name,
+            {
+                "fit": "Platform-specific architecture story is available through the review pack and rollout gates.",
+                "primary_surface": "docs/architecture/reference_architectures.md",
+                "watchout": "Keep the proof path tied to discovery, governance, and runtime posture.",
+            },
+        )
+        platform_cards.append(
+            {
+                "platform": platform_name,
+                "fit": note["fit"],
+                "primary_surface": note["primary_surface"],
+                "pilot_path": "/ops/review-pack -> /ops/rollout-board -> /ops/rollout-gates",
+                "proof_surfaces": [
+                    "/ops/service-brief",
+                    "/ops/review-pack",
+                    "/ops/rollout-gates",
+                    "/ops/runtime/scorecard",
+                ],
+                "watchout": note["watchout"],
+            }
+        )
+
+    architecture_stages = [
+        {
+            "stage": "discovery",
+            "goal": "Translate buyer ambiguity into platform, governance, and rollout constraints.",
+            "surface": "docs/blueprint/09_customer_journey.md",
+            "exit_criteria": "Discovery outputs can be mapped into a target-platform story without losing trust boundaries.",
+        },
+        {
+            "stage": "trust-boundary",
+            "goal": "Make auth, data handling, audit, and integration posture explicit before implementation promises.",
+            "surface": "/ops/service-brief",
+            "exit_criteria": "The customer can see where security, data handling, and runtime assumptions live.",
+        },
+        {
+            "stage": "pilot-path",
+            "goal": "Choose the right delivery lane for the customer motion.",
+            "surface": "/ops/review-pack -> /ops/rollout-board",
+            "exit_criteria": "A visible pilot lane exists with buyer fit and why-now logic.",
+        },
+        {
+            "stage": "go-live-gates",
+            "goal": "Show the gates that block unsafe rollout claims.",
+            "surface": "/ops/rollout-gates",
+            "exit_criteria": "Runtime, governance, and rollback decisions are visible before go-live.",
+        },
+        {
+            "stage": "handoff",
+            "goal": "Turn the architecture review into an operator-ready system handoff.",
+            "surface": "/ops/runtime/scorecard -> /audit/summary -> /metrics",
+            "exit_criteria": "Runtime posture and audit evidence are explicit enough for delivery ownership.",
+        },
+    ]
+
+    return {
+        "service": brief["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-customer-architecture-pack-v1",
+        "headline": "Customer architecture pack that turns discovery, platform fit, rollout gates, and handoff proof into one solution-architect review surface.",
+        "filters": {
+            "platform": platform_filter,
+        },
+        "summary": {
+            "visible_platforms": len(platform_cards),
+            "startup_ready": bool(brief.get("runtime", {}).get("startup_ready", False)),
+            "review_gate_status": str(review_gate.get("status", "attention")),
+            "release_recommendation": str(
+                rollout_gates.get("summary", {}).get("release_recommendation", "hold")
+            ),
+            "platform_targets": len(platform_targets),
+        },
+        "architecture_stages": architecture_stages,
+        "platform_cards": platform_cards,
+        "review_actions": [
+            "Start here for customer-facing architecture review before diving into runtime endpoints.",
+            "Use the review pack to keep buyer promises and proof assets on the same path.",
+            "Use rollout gates to block hand-wavy go-live claims until runtime and rollback posture are visible.",
+        ],
+        "links": {
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
+            "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
+            "service_brief": "/ops/service-brief",
+            "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
+            "rollout_gates": "/ops/rollout-gates",
+            "ops_runtime_scorecard": "/ops/runtime/scorecard",
+            "customer_journey": "docs/blueprint/09_customer_journey.md",
+            "deployment_options": "docs/architecture/llm_deployment_options.md",
+        },
+    }
+
+
+def build_service_customer_architecture_pack_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-customer-architecture-pack-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "headline",
+            "summary",
+            "architecture_stages",
+            "platform_cards",
+            "review_actions",
+            "links",
+        ],
+        "summary_required_fields": [
+            "visible_platforms",
+            "startup_ready",
+            "review_gate_status",
+            "release_recommendation",
+            "platform_targets",
+        ],
+        "architecture_stage_required_fields": [
+            "stage",
+            "goal",
+            "surface",
+            "exit_criteria",
+        ],
+        "platform_card_required_fields": [
+            "platform",
+            "fit",
+            "primary_surface",
+            "pilot_path",
+            "proof_surfaces",
+            "watchout",
+        ],
+        "links": {
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
+            "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "service_brief": "/ops/service-brief",
             "review_pack": "/ops/review-pack",
         },
