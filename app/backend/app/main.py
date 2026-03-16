@@ -110,6 +110,8 @@ from .service_brief import (
     build_service_review_pack_schema,
     build_service_review_summary,
     build_service_review_summary_schema,
+    build_service_workshop_readout_pack,
+    build_service_workshop_readout_pack_schema,
 )
 from .storage import (
     add_cost,
@@ -843,6 +845,7 @@ def health(request: Request) -> Dict[str, object]:
             "audit-and-cost-tracking",
             "service-brief-readiness",
             "customer-architecture-pack",
+            "workshop-readout-pack",
             "rollout-board-readiness",
             "rollout-gate-readiness",
             "executive-review-pack",
@@ -857,6 +860,8 @@ def health(request: Request) -> Dict[str, object]:
             "service_brief_schema": "/ops/service-brief/schema",
             "customer_architecture_pack": "/ops/customer-architecture-pack",
             "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
+            "workshop_readout_pack": "/ops/workshop-readout-pack",
+            "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
             "review_pack": "/ops/review-pack",
             "review_pack_schema": "/ops/review-pack/schema",
             "rollout_board": "/ops/rollout-board",
@@ -898,6 +903,23 @@ def ops_customer_architecture_pack(platform: str | None = None) -> Dict[str, obj
 @app.get("/ops/customer-architecture-pack/schema")
 def ops_customer_architecture_pack_schema() -> Dict[str, object]:
     return build_service_customer_architecture_pack_schema()
+
+
+@app.get("/ops/workshop-readout-pack")
+def ops_workshop_readout_pack(platform: str | None = None) -> Dict[str, object]:
+    try:
+        return build_service_workshop_readout_pack(
+            platform=platform,
+            startup_report=getattr(app.state, "startup_report", None),
+            circuit_snapshot=_llm_circuit_snapshot(),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/ops/workshop-readout-pack/schema")
+def ops_workshop_readout_pack_schema() -> Dict[str, object]:
+    return build_service_workshop_readout_pack_schema()
 
 
 @app.get("/ops/review-pack")

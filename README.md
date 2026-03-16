@@ -42,7 +42,7 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 | Snowflake | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /audit/summary` |
 | Databricks | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
 | Palantir / enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
-| Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), `GET /ops/review-pack`, `/metrics` |
+| Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), `GET /ops/workshop-readout-pack`, `GET /ops/review-pack`, `/metrics` |
 
 ## Repository surfaces
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
@@ -56,8 +56,12 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 ## Snapshot
 ![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
 
+## Workshop evidence
+![Workshop readout board](docs/sales/demo_screenshots/15_workshop_readout.svg)
+
 ## Review Pack At A Glance
 - Reviewer API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
+- Workshop closeout surface: `GET /ops/workshop-readout-pack`, `GET /ops/workshop-readout-pack/schema`
 - Rollout decision surfaces: `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill`
 - Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
@@ -65,6 +69,7 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 
 ## 2-Minute Proof Path
 - `GET /ops/service-brief` -> confirm runtime posture and evidence counts.
+- `GET /ops/workshop-readout-pack` -> inspect discovery output, pilot recommendation, visual evidence, and handoff assets.
 - `GET /ops/review-pack` -> inspect buyer promises, rollout tracks, and proof assets.
 - `GET /ops/rollout-gates` -> inspect go/no-go owners, blockers, rollback posture, and release recommendation.
 - `GET /audit/summary` + `GET /metrics` -> show governance and LLMOps signals.
@@ -73,7 +78,7 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 ## Reviewer Front Door
 - **Recruiter / hiring manager:** start with [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), then open `GET /ops/service-brief`.
 - **AI engineer:** use `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
-- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/review-pack` -> `GET /ops/rollout-gates`.
+- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/workshop-readout-pack` -> `GET /ops/review-pack` -> `GET /ops/rollout-gates`.
 - **Operator / platform reviewer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /ops/rollout-gates` -> `GET /metrics`.
 
 ![Enterprise review pack](docs/review-pack.svg)
@@ -161,6 +166,7 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 
 ## Runtime Surfaces
 - `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and reviewers
+- `GET /ops/workshop-readout-pack`: field-ready workshop closeout pack tying discovery, pilot lane, rollout gates, and visual evidence together
 - `GET /ops/review-pack`: executive-facing review surface with rollout tracks, platform dialogue, and review sequence
 - `GET /ops/rollout-board`: compact rollout decision board for matching buyer fit, runtime posture, and delivery lane
 - `GET /ops/rollout-gates`: go/no-go gate surface for runtime, governance, eval, and rollback decisions
