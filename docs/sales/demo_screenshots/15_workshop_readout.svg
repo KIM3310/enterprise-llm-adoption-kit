@@ -1,0 +1,58 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Enterprise workshop readout board</title>
+  <desc id="desc">Visual evidence board showing discovery, platform fit, rollout gates, and handoff artifacts for the enterprise LLM adoption kit.</desc>
+  <rect width="1440" height="900" fill="#0B1020"/>
+  <rect x="40" y="40" width="1360" height="820" rx="28" fill="#111833" stroke="#334155"/>
+  <text x="80" y="110" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="34" font-weight="700">Workshop Readout Pack</text>
+  <text x="80" y="150" fill="#94A3B8" font-family="Arial, sans-serif" font-size="18">Discovery - Platform fit - Pilot lane - Go/No-Go gates - Handoff artifacts</text>
+
+  <rect x="80" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#3B82F6"/>
+  <text x="108" y="232" fill="#93C5FD" font-family="Arial, sans-serif" font-size="14" font-weight="700">DISCOVERY</text>
+  <text x="108" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Questionnaire + buyer map</text>
+  <text x="108" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">docs/sales/discovery_questionnaire.md</text>
+
+  <rect x="390" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#14B8A6"/>
+  <text x="418" y="232" fill="#99F6E4" font-family="Arial, sans-serif" font-size="14" font-weight="700">PLATFORM FIT</text>
+  <text x="418" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Snowflake / Databricks / Palantir</text>
+  <text x="418" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">/ops/customer-architecture-pack</text>
+
+  <rect x="700" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#F59E0B"/>
+  <text x="728" y="232" fill="#FCD34D" font-family="Arial, sans-serif" font-size="14" font-weight="700">PILOT LANE</text>
+  <text x="728" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Hybrid control tower</text>
+  <text x="728" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">/ops/rollout-board</text>
+
+  <rect x="1010" y="190" width="310" height="130" rx="20" fill="#172036" stroke="#EF4444"/>
+  <text x="1038" y="232" fill="#FCA5A5" font-family="Arial, sans-serif" font-size="14" font-weight="700">GO / NO-GO</text>
+  <text x="1038" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Runtime - Governance - Rollback</text>
+  <text x="1038" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">/ops/rollout-gates + /ops/rollout-drill</text>
+
+  <rect x="80" y="370" width="1240" height="200" rx="24" fill="#0F172A" stroke="#475569"/>
+  <text x="112" y="416" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="24" font-weight="700">Field-ready recommendation</text>
+  <text x="112" y="454" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="18">Proceed only when startup posture is ready, governance proof is visible, evaluation floor exists, and rollback ETA stays within the drill budget.</text>
+  <text x="112" y="494" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="18">Use this board to end the workshop with a concrete pilot path, explicit blockers, and named owners instead of a generic “next steps” slide.</text>
+
+  <rect x="112" y="522" width="250" height="24" rx="12" fill="#1D4ED8"/>
+  <text x="374" y="540" fill="#93C5FD" font-family="Arial, sans-serif" font-size="16">Startup diagnostics visible</text>
+  <rect x="640" y="522" width="220" height="24" rx="12" fill="#059669"/>
+  <text x="872" y="540" fill="#99F6E4" font-family="Arial, sans-serif" font-size="16">Governance proof linked</text>
+  <rect x="1080" y="522" width="170" height="24" rx="12" fill="#D97706"/>
+  <text x="1262" y="540" fill="#FCD34D" font-family="Arial, sans-serif" font-size="16">Rollback drill attached</text>
+
+  <rect x="80" y="620" width="400" height="180" rx="20" fill="#172036" stroke="#334155"/>
+  <text x="108" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Visual evidence</text>
+  <text x="108" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- exec value dashboard snapshot</text>
+  <text x="108" y="732" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- workshop readout board</text>
+  <text x="108" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- review pack diagram</text>
+
+  <rect x="520" y="620" width="380" height="180" rx="20" fill="#172036" stroke="#334155"/>
+  <text x="548" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Primary proof routes</text>
+  <text x="548" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">/ops/service-brief</text>
+  <text x="548" y="732" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">/ops/customer-architecture-pack</text>
+  <text x="548" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">/ops/workshop-readout-pack</text>
+
+  <rect x="940" y="620" width="380" height="180" rx="20" fill="#172036" stroke="#334155"/>
+  <text x="968" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Outcome</text>
+  <text x="968" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">A buyer workshop can now end with a</text>
+  <text x="968" y="732" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">pilot path, go/no-go logic, and shareable</text>
+  <text x="968" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">visual evidence instead of narrative alone.</text>
+</svg>

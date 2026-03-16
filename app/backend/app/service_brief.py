@@ -310,6 +310,8 @@ def build_service_brief(
             "service_brief_schema": "/ops/service-brief/schema",
             "customer_architecture_pack": "/ops/customer-architecture-pack",
             "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
+            "workshop_readout_pack": "/ops/workshop-readout-pack",
+            "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
             "review_pack": "/ops/review-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
@@ -1151,6 +1153,178 @@ def build_service_customer_architecture_pack_schema() -> Dict[str, object]:
     }
 
 
+def build_service_workshop_readout_pack(
+    *,
+    platform: Optional[str] = None,
+    startup_report: Optional[Dict[str, object]],
+    circuit_snapshot: Dict[str, object],
+) -> Dict[str, object]:
+    brief = build_service_brief(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    customer_pack = build_service_customer_architecture_pack(
+        platform=platform,
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    rollout_gates = build_service_rollout_gates(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    review_pack = build_service_review_pack(
+        startup_report=startup_report,
+        circuit_snapshot=circuit_snapshot,
+    )
+    platform_filter = customer_pack.get("filters", {}).get("platform")
+
+    workshop_artifacts = _artifacts(
+        [
+            ("Workshop facilitator guide", "docs/sales/workshop_facilitator_guide.md", "doc"),
+            ("Discovery questionnaire", "docs/sales/discovery_questionnaire.md", "doc"),
+            ("Technical deep dive outline", "docs/sales/technical_deep_dive_outline.md", "doc"),
+            ("Security compliance packet", "docs/sales/security_compliance_packet.md", "doc"),
+            ("Executive dashboard snapshot", "docs/sales/exec_value_dashboard/snapshot.svg", "image"),
+            ("Workshop readout board", "docs/sales/demo_screenshots/15_workshop_readout.svg", "image"),
+        ]
+    )
+    visual_evidence = [
+        {
+            "label": item["label"],
+            "path": item["path"],
+            "kind": item["kind"],
+        }
+        for item in workshop_artifacts
+        if item["kind"] == "image"
+    ]
+
+    tracks = [
+        item
+        for item in rollout_gates.get("tracks", [])
+        if isinstance(item, dict)
+    ]
+    ready_tracks = [item for item in tracks if str(item.get("readiness", "")) == "ready"]
+    attention_tracks = [item for item in tracks if str(item.get("readiness", "")) != "ready"]
+
+    decision_log = [
+        {
+            "stage": "discovery-readout",
+            "goal": "Translate stakeholder ambiguity into explicit architecture and trust-boundary questions.",
+            "surface": "docs/sales/discovery_questionnaire.md",
+            "evidence": "docs/blueprint/09_customer_journey.md",
+        },
+        {
+            "stage": "platform-fit-review",
+            "goal": "Choose the right buyer-facing platform story before implementation detail takes over.",
+            "surface": "/ops/customer-architecture-pack",
+            "evidence": "docs/architecture/reference_architectures.md",
+        },
+        {
+            "stage": "pilot-lane-selection",
+            "goal": "Make the workshop end with a specific pilot path instead of vague next steps.",
+            "surface": "/ops/rollout-board",
+            "evidence": "/ops/review-pack",
+        },
+        {
+            "stage": "go-live-gating",
+            "goal": "Keep runtime, governance, evaluation, and rollback blockers visible before the customer hears 'ready'.",
+            "surface": "/ops/rollout-gates",
+            "evidence": "/ops/rollout-drill",
+        },
+        {
+            "stage": "handoff-assets",
+            "goal": "Leave the workshop with artifacts that support the next technical or executive review.",
+            "surface": "docs/sales/demo_screenshots/15_workshop_readout.svg",
+            "evidence": "docs/sales/exec_value_dashboard/snapshot.svg",
+        },
+    ]
+
+    return {
+        "service": brief["service"],
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "contract_version": "enterprise-adoption-workshop-readout-pack-v1",
+        "headline": "Workshop readout pack that turns discovery, pilot selection, rollout gates, and visual evidence into one field-ready handoff surface.",
+        "filters": {
+            "platform": platform_filter,
+        },
+        "summary": {
+            "visible_platforms": int(customer_pack.get("summary", {}).get("visible_platforms", 0)),
+            "decision_stage_count": len(decision_log),
+            "ready_track_count": len(ready_tracks),
+            "attention_track_count": len(attention_tracks),
+            "visual_evidence_count": len(visual_evidence),
+            "release_recommendation": str(
+                rollout_gates.get("summary", {}).get("release_recommendation", "hold")
+            ),
+        },
+        "decision_log": decision_log,
+        "tracks": tracks,
+        "workshop_artifacts": workshop_artifacts,
+        "visual_evidence": visual_evidence,
+        "review_actions": [
+            "Use this pack when the audience is a workshop or pilot closeout, not just a technical review.",
+            "Keep customer architecture and rollout gates on the same path so next steps stay concrete.",
+            "Show the visual evidence boards before summarizing the recommendation out loud.",
+        ],
+        "links": {
+            "workshop_readout_pack": "/ops/workshop-readout-pack",
+            "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
+            "service_brief": "/ops/service-brief",
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
+            "review_pack": "/ops/review-pack",
+            "rollout_board": "/ops/rollout-board",
+            "rollout_gates": "/ops/rollout-gates",
+            "rollout_drill": "/ops/rollout-drill",
+            "exec_dashboard_snapshot": "docs/sales/exec_value_dashboard/snapshot.svg",
+            "workshop_visual": "docs/sales/demo_screenshots/15_workshop_readout.svg",
+        },
+    }
+
+
+def build_service_workshop_readout_pack_schema() -> Dict[str, object]:
+    return {
+        "schema": "enterprise-adoption-workshop-readout-pack-v1",
+        "required_fields": [
+            "service",
+            "generated_at",
+            "contract_version",
+            "headline",
+            "summary",
+            "decision_log",
+            "tracks",
+            "workshop_artifacts",
+            "visual_evidence",
+            "review_actions",
+            "links",
+        ],
+        "summary_required_fields": [
+            "visible_platforms",
+            "decision_stage_count",
+            "ready_track_count",
+            "attention_track_count",
+            "visual_evidence_count",
+            "release_recommendation",
+        ],
+        "decision_log_required_fields": [
+            "stage",
+            "goal",
+            "surface",
+            "evidence",
+        ],
+        "artifact_required_fields": [
+            "label",
+            "path",
+            "kind",
+        ],
+        "links": {
+            "workshop_readout_pack": "/ops/workshop-readout-pack",
+            "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
+            "customer_architecture_pack": "/ops/customer-architecture-pack",
+            "rollout_gates": "/ops/rollout-gates",
+        },
+    }
+
+
 def build_service_review_summary(
     *,
     stage: Optional[str] = None,
@@ -1445,6 +1619,7 @@ def build_service_brief_schema() -> Dict[str, object]:
         "links": {
             "readme": "README.md",
             "service_brief": "/ops/service-brief",
+            "workshop_readout_pack": "/ops/workshop-readout-pack",
             "rollout_gates": "/ops/rollout-gates",
         },
     }

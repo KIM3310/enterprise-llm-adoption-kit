@@ -28,6 +28,8 @@ async def test_ops_service_brief_contract() -> None:
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
+    assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
+    assert body["links"]["workshop_readout_pack_schema"] == "/ops/workshop-readout-pack/schema"
     assert any(stage["key"] == "operations" for stage in body["stages"])
     assert any(step["endpoint"] == "/auth/login" for step in body["review_flow"])
 
@@ -114,6 +116,41 @@ async def test_ops_customer_architecture_pack_schema_contract() -> None:
     assert "platform_cards" in body["required_fields"]
     assert "platform" in body["platform_card_required_fields"]
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
+
+
+@pytest.mark.anyio
+async def test_ops_workshop_readout_pack_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/workshop-readout-pack?platform=snowflake")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["contract_version"] == "enterprise-adoption-workshop-readout-pack-v1"
+    assert body["filters"]["platform"] == "snowflake"
+    assert body["summary"]["decision_stage_count"] == 5
+    assert body["summary"]["visual_evidence_count"] >= 2
+    assert len(body["decision_log"]) == 5
+    assert any(item["kind"] == "image" for item in body["visual_evidence"])
+    assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
+    assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
+    assert body["links"]["workshop_visual"] == "docs/sales/demo_screenshots/15_workshop_readout.svg"
+
+
+@pytest.mark.anyio
+async def test_ops_workshop_readout_pack_schema_contract() -> None:
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        response = await client.get("/ops/workshop-readout-pack/schema")
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["schema"] == "enterprise-adoption-workshop-readout-pack-v1"
+    assert "decision_log" in body["required_fields"]
+    assert "visual_evidence" in body["required_fields"]
+    assert "decision_stage_count" in body["summary_required_fields"]
+    assert "stage" in body["decision_log_required_fields"]
+    assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
 
 
 @pytest.mark.anyio
