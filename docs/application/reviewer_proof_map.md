@@ -1,9 +1,9 @@
 # Reviewer Proof Map
 
-A fast route through the repo for Big Tech / frontier LLM / AI engineer / solutions architect screening.
+A fast route through the repo for enterprise AI / governed delivery / junior solutions architect screening, while keeping the broader portfolio's `stage-pilot`-first AI-engineer hierarchy intact.
 
 ## 90-second front door
-1. Open `README.md` for the portfolio thesis and runnable surfaces.
+1. Open `README.md` for the portfolio thesis and note that this repo is the enterprise/governed-delivery support flagship after `stage-pilot`.
 2. Check `/ops/service-brief` for runtime posture + proof inventory.
 3. Check `/ops/review-pack` for buyer thesis, rollout tracks, and executive-ready evidence.
 4. Use the role path below that matches the interviewer.
@@ -14,7 +14,8 @@ A fast route through the repo for Big Tech / frontier LLM / AI engineer / soluti
 | --- | --- | --- | --- | --- |
 | Recruiter / Hiring manager | `README.md` | `/ops/service-brief` → `/ops/review-pack` | `docs/application/portfolio_one_pager_en.md`, `docs/verification_report.md` | Clear flagship scope, portfolio maturity, and reviewer-friendly storytelling |
 | AI Engineer | `/ops/service-brief` | `/auth/login` → `/uc1/architecture` → `/uc2/log-intel` | `docs/blueprint/04_evals_plan.md`, `evals/reports/latest_report.md`, `tests/test_service_brief.py` | Runnable product surface, eval posture, and low-risk operational depth |
-| Solutions Architect | `docs/architecture/llm_deployment_options.md` | `/ops/review-pack` → `docs/architecture/reference_architectures.md` | `docs/blueprint/03_security_threat_model.md`, `docs/blueprint/09_customer_journey.md` | Platform fit, governance boundary, rollout sequencing, and enterprise framing |
+| Junior Solutions Architect / Solutions Architect | `docs/architecture/llm_deployment_options.md` | `/ops/workshop-readout-pack` → `/ops/review-pack` → `docs/architecture/reference_architectures.md` | `docs/blueprint/03_security_threat_model.md`, `docs/blueprint/09_customer_journey.md`, `docs/application/role_ready_paths.md` | Snowflake/Databricks platform fit, governance boundary, rollout sequencing, and enterprise-ready framing |
+| Snowflake / Databricks reviewer | `README.md` | `/ops/service-brief` → `GET /metrics` → `docs/architecture/llm_deployment_options.md` | `docs/blueprint/09_customer_journey.md`, `docs/application/portfolio_one_pager_en.md` | Warehouse-adjacent delivery posture, platform mapping, and governed AI rollout judgment |
 | Operator / Platform lead | `/auth/login` | `/audit/summary` → `/ops/runtime` → `/metrics` | `docs/sales/demo_script_exec.md`, `docs/sales/exec_value_dashboard/latest.md` | Control loop visibility, diagnostics, and governance/ops evidence |
 
 ## Best live demo path

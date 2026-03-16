@@ -1,6 +1,6 @@
 # Role-Ready Paths
 
-This repo already contains a large amount of pre-sales, architecture, eval, and rollout material. Start with `docs/application/reviewer_proof_map.md` if you want the shortest reviewer route, then use the paths below depending on the target role.
+This repo already contains a large amount of pre-sales, architecture, eval, and rollout material. Start with `docs/application/reviewer_proof_map.md` if you want the shortest reviewer route, then use the paths below depending on the target role. In the broader portfolio, keep `stage-pilot` as the primary AI-engineer lead and use this repo as the enterprise/governed-delivery support branch.
 
 ## AI Engineer
 
@@ -11,14 +11,25 @@ This repo already contains a large amount of pre-sales, architecture, eval, and 
 - `GET /ops/service-brief`
 - `GET /ops/review-pack`
 
-## Solutions Architect
+## Junior Solutions Architect / Solutions Architect
 
-- `docs/architecture/reference_architectures.md`
 - `docs/architecture/llm_deployment_options.md`
+- `docs/architecture/reference_architectures.md`
 - `docs/architecture/security_governance.md`
 - `docs/blueprint/02_architecture.md`
 - `docs/blueprint/03_security_threat_model.md`
 - `docs/blueprint/09_customer_journey.md`
+- `GET /ops/workshop-readout-pack`
+- `GET /ops/review-pack`
+
+## Snowflake / Databricks
+
+- `README.md`
+- `GET /ops/service-brief`
+- `GET /metrics`
+- `docs/architecture/llm_deployment_options.md`
+- `docs/blueprint/09_customer_journey.md`
+- `docs/application/portfolio_one_pager_en.md`
 
 ## Sales / Solution Consultant
 

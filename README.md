@@ -13,16 +13,18 @@ This repo is strongest when read as a runnable enterprise decision lab:
 - buyer-facing architecture discussion can be backed by code, metrics, and proof surfaces
 
 For the broader portfolio, this is the repo that best supports `Snowflake`, `Databricks`, `Palantir`, and enterprise solution-architecture conversations.
+Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-engineer flagship and use this repo as the enterprise/governed-delivery support flagship for junior solutions-architect conversations.
 
 ## Portfolio posture
 - Read this repo like an enterprise decision lab you can actually run, not like a sales deck wearing a UI.
+- In the overall portfolio story, this repo is the governed-enterprise branch that supports the primary `stage-pilot` AI-engineer narrative rather than replacing it.
 - The strongest proof is still service brief -> executive review pack -> audit/metrics -> checked-in eval artifacts.
 - Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
 ## Role signals
-- **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are all runnable, not just described.
-- **Solution / cloud architect:** deployment options, security posture, and platform mapping are documented alongside the working demo.
-- **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough.
+- **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are runnable here, but this repo is best read as the enterprise support branch behind the primary `stage-pilot` flagship.
+- **Junior solution / cloud architect:** this is the best portfolio repo for Snowflake, Databricks, governed enterprise AI, and rollout/rollback conversations backed by working proof.
+- **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough without hiding the technical surfaces.
 
 
 ## Portfolio context
@@ -34,6 +36,12 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 
 - Canonical execution plan: [`docs/BIGTECH_ELEVATION_PLAN.md`](docs/BIGTECH_ELEVATION_PLAN.md)
 - Goal: turn this repo into an enterprise AI delivery simulator with sharper rollout, rollback, and governance proof.
+
+## Recruiter fit in the broader portfolio
+
+- **Primary portfolio hierarchy:** lead with `stage-pilot` for AI-engineer screening, then use this repo as the strongest enterprise/governed-delivery support proof.
+- **Best recruiter handoff:** use this repo when the role mentions junior solutions architect, Snowflake, Databricks, governance, rollout planning, or enterprise AI adoption.
+- **What should feel different here:** the value is not raw model novelty; it is reviewable rollout design, audit posture, platform mapping, and decision-ready enterprise packaging.
 
 ## Best target-team fit
 
