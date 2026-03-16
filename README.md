@@ -41,7 +41,7 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 |---|---|---|
 | Snowflake | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /audit/summary` |
 | Databricks | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
-| Palantir / enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-drill` |
+| Palantir / enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
 | Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), `GET /ops/review-pack`, `/metrics` |
 
 ## Repository surfaces
@@ -58,6 +58,7 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 
 ## Review Pack At A Glance
 - Reviewer API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
+- Rollout decision surfaces: `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill`
 - Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
 - Reviewer map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
@@ -65,14 +66,15 @@ For the broader portfolio, this is the repo that best supports `Snowflake`, `Dat
 ## 2-Minute Proof Path
 - `GET /ops/service-brief` -> confirm runtime posture and evidence counts.
 - `GET /ops/review-pack` -> inspect buyer promises, rollout tracks, and proof assets.
+- `GET /ops/rollout-gates` -> inspect go/no-go owners, blockers, rollback posture, and release recommendation.
 - `GET /audit/summary` + `GET /metrics` -> show governance and LLMOps signals.
 - `docs/architecture/llm_deployment_options.md` + `docs/blueprint/09_customer_journey.md` -> connect evidence to rollout path.
 
 ## Reviewer Front Door
 - **Recruiter / hiring manager:** start with [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), then open `GET /ops/service-brief`.
 - **AI engineer:** use `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
-- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/review-pack`.
-- **Operator / platform reviewer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`.
+- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/review-pack` -> `GET /ops/rollout-gates`.
+- **Operator / platform reviewer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /ops/rollout-gates` -> `GET /metrics`.
 
 ![Enterprise review pack](docs/review-pack.svg)
 
@@ -152,6 +154,7 @@ ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/review-pack | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/rollout-gates | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | head -n 40
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
@@ -160,6 +163,7 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 - `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and reviewers
 - `GET /ops/review-pack`: executive-facing review surface with rollout tracks, platform dialogue, and review sequence
 - `GET /ops/rollout-board`: compact rollout decision board for matching buyer fit, runtime posture, and delivery lane
+- `GET /ops/rollout-gates`: go/no-go gate surface for runtime, governance, eval, and rollback decisions
 - `GET /ops/rollout-drill`: rollback drill surface for guardrail trip points, kill-switch posture, and rollout recovery
 - `GET /ops/review-pack/schema`: explicit contract surface for review actions, proof assets, and runtime surfaces
 - `GET /ops/service-brief/schema`: explicit contract surface for the service brief payload
