@@ -12,7 +12,7 @@ This repo is strongest when read as a runnable enterprise decision lab:
 - governance, evals, audit, and rollout posture stay visible through working routes
 - buyer-facing architecture discussion can be backed by code, metrics, and proof surfaces
 
-For the broader portfolio, this is the repo that best supports `Snowflake`, `Databricks`, `Palantir`, and enterprise solution-architecture conversations.
+For the broader portfolio, this is the repo that best supports governed analytics, lakehouse delivery, high-trust workflow, and enterprise solution-architecture conversations.
 Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-engineer flagship and use this repo as the enterprise/governed-delivery support flagship for solutions-architecture conversations.
 
 ## Portfolio posture
@@ -23,14 +23,14 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 
 ## Role signals
 - **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are runnable here, but this repo is best read as the enterprise support branch behind the primary `stage-pilot` flagship.
-- **Solutions architect / cloud architect:** this is the best portfolio repo for Snowflake, Databricks, governed enterprise AI, and rollout and rollback conversations backed by working proof.
+- **Solutions architect / cloud architect:** this is the best portfolio repo for governed enterprise AI, rollout and rollback conversations, and platform-mapping discussions backed by working proof.
 - **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough without hiding the technical surfaces.
 
 
 ## Portfolio context
 - **Portfolio family:** applied document and workflow systems
 - **This repo's role:** flagship enterprise decision lab and buyer-facing systems proof repo.
-- **Related repos:** `Upstage-DocuAgent`, `secure-xl2hwp-local`, `beaver-study-orchestrator`
+- **Related repos:** `DocFlow Agent`, `secure-xl2hwp-local`, `beaver-study-orchestrator`
 
 ## Big-Tech Elevation Track
 
@@ -40,16 +40,16 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 ## Recruiter fit in the broader portfolio
 
 - **Primary portfolio hierarchy:** lead with `stage-pilot` for AI-engineer screening, then use this repo as the strongest enterprise/governed-delivery support proof.
-- **Best recruiter handoff:** use this repo when the role mentions solutions architecture, Snowflake, Databricks, governance, rollout planning, or enterprise AI adoption.
+- **Best recruiter handoff:** use this repo when the role mentions solutions architecture, governance, rollout planning, platform delivery, or enterprise AI adoption.
 - **What should feel different here:** the value is not raw model novelty; it is reviewable rollout design, audit posture, platform mapping, and decision-ready enterprise packaging.
 
 ## Best target-team fit
 
 | Team lens | What should stand out fast | Start here |
 |---|---|---|
-| Snowflake | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /audit/summary` |
-| Databricks | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
-| Palantir / enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
+| Governed analytics | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /audit/summary` |
+| Lakehouse delivery | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
+| High-trust enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
 | Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), `GET /ops/workshop-readout-pack`, `GET /ops/review-pack`, `/metrics` |
 
 ## Repository surfaces
@@ -73,7 +73,7 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 - Rollout decision surfaces: `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill`
 - Bounded public live lane: `POST /ops/live-workshop-preview`
 - Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
-- Platform dialogue: AWS, Databricks, Snowflake, Palantir, MariaDB rollout mapping in one pack
+- Platform dialogue: AWS, warehouse, lakehouse, high-trust delivery, and MariaDB rollout mapping in one pack
 - Reviewer map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
 
 ## 2-Minute Proof Path
