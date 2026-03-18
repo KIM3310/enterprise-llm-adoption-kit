@@ -40,8 +40,8 @@ def build_openai_live_contract() -> Dict[str, object]:
     return {
         "deploymentMode": "public-capped-live" if public_live else "review-only-live",
         "publicLiveApi": public_live,
-        "liveModel": str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip() or "gpt-4.1-mini",
-        "refreshModel": str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip() or "gpt-5.2",
+        "liveModel": str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip() or "gpt-4o-mini",
+        "refreshModel": str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip() or "gpt-4o",
         "dailyBudgetUsd": daily_budget,
         "monthlyBudgetUsd": monthly_budget,
         "killSwitch": kill_switch,
