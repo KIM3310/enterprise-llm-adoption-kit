@@ -151,7 +151,7 @@ async def test_ops_live_workshop_preview_contract(monkeypatch) -> None:
 
     async def _fake_preview(api_key: str, model: str, payload: dict) -> dict:
         assert api_key == "sk-enterprise-live"
-        assert model == "gpt-4.1-mini"
+        assert model == "gpt-4o-mini"
         assert payload["scenario"]["platform"] == "snowflake"
         return {
             "rolloutStance": "pilot-now",
@@ -175,7 +175,7 @@ async def test_ops_live_workshop_preview_contract(monkeypatch) -> None:
     body = response.json()
     assert body["schema"] == "enterprise-adoption-live-workshop-preview-v1"
     assert body["mode"] == "public-capped-live"
-    assert body["model"] == "gpt-4.1-mini"
+    assert body["model"] == "gpt-4o-mini"
     assert body["scenarioId"] == "snowflake-discovery"
     assert body["nextReviewPath"] == "/ops/customer-architecture-pack?platform=snowflake"
     assert body["result"]["platform"] == "snowflake"
