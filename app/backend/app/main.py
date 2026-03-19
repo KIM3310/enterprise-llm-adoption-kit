@@ -748,8 +748,23 @@ def _run_startup(app: FastAPI) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # --- OpenTelemetry (opt-in) ---
+    from .telemetry import init_telemetry, shutdown_telemetry, is_otel_enabled
+
+    init_telemetry()
+
+    if is_otel_enabled():
+        try:
+            from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
+            FastAPIInstrumentor.instrument_app(app)
+        except Exception:
+            logger.warning("FastAPI OTEL auto-instrumentation unavailable; skipping")
+
     _run_startup(app)
     yield
+
+    shutdown_telemetry()
 
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)

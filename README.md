@@ -413,6 +413,28 @@ python -m pytest -q tests app/backend/tests
 (cd app/frontend && npm run build)
 ```
 
+## OpenTelemetry (opt-in)
+
+Telemetry is **opt-in** and only activates when the `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable is set.
+
+```bash
+# Point at any OTLP-compatible collector (e.g. Jaeger, Grafana Tempo, Datadog)
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4317"
+python3 -m app
+```
+
+When enabled the runtime will:
+- Initialize an OTLP trace exporter with service name `enterprise-llm-adoption-kit`.
+- Auto-instrument FastAPI routes via `opentelemetry-instrumentation-fastapi`.
+- Provide context-manager span helpers for LLM calls, safety checks, RBAC evaluation, and RAG retrieval.
+- Record OpenTelemetry metrics: `llm_requests_total` (counter), `llm_request_duration_seconds` (histogram), `safety_blocks_total` (counter), `rbac_denials_total` (counter), and `rag_retrieval_duration_seconds` (histogram).
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTLP collector URL (gRPC) | _(unset = telemetry off)_ |
+
+The existing Prometheus metrics at `GET /metrics` remain unchanged.
+
 ## Repository Hygiene
 - Keep runtime artifacts out of commits (`.codex_runs/`, cache folders, temporary venvs).
 - Prefer running verification commands above before opening a PR.
