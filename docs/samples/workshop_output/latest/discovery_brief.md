@@ -1,6 +1,6 @@
 # Discovery Brief (Sample Output)
 
-Note: This is a synthetic, portfolio-only output. No real customer data is included.
+Note: This is a synthetic, synthetic output. No real customer data is included.
 
 - Company: Hypothetical Enterprise
 - Use case: Support deflection + incident triage

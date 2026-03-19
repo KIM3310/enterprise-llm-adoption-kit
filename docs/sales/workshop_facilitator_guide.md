@@ -1,6 +1,6 @@
 # Workshop Facilitator Guide (3 hours)
 
-Goal: align business outcomes with a safe, measurable LLM adoption plan. This is a hypothetical workshop template for portfolio use.
+Goal: align business outcomes with a safe, measurable LLM adoption plan. This is a hypothetical workshop template for reference.
 
 ## Pre-work (1-2 days before)
 - Collect stakeholders and roles

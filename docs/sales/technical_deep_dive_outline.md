@@ -1,6 +1,6 @@
 # Technical Deep Dive Outline (Engineering Audience)
 
-This is a hypothetical outline for portfolio use (no real customer engagement).
+This is a hypothetical outline for reference (no real customer engagement).
 
 ## 1) Architecture overview
 - Components and data flow

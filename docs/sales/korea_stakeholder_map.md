@@ -1,6 +1,6 @@
 # Korea Enterprise Stakeholder Map (Sample Template)
 
-This is a hypothetical template for portfolio use (no real customer).
+This is a hypothetical template for reference (no real customer).
 
 ## Executive Sponsor
 - Title:

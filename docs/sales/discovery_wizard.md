@@ -1,7 +1,7 @@
 # Discovery Wizard
 
 ## Purpose
-Generate a structured discovery brief for enterprise PoC scoping (synthetic, portfolio-only).
+Generate a structured discovery brief for enterprise PoC scoping (synthetic, synthetic).
 
 ## Usage
 ```

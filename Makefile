@@ -1,5 +1,5 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local frontend-build portfolio-check bundle-application quality-backend sanitize
+.PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local frontend-build quality-check bundle-application quality-backend sanitize
 
 COMPOSE := docker compose -f infra/docker-compose.yml
 
@@ -53,7 +53,7 @@ scenario-demo-ollama-local:
 frontend-build:
 	@cd app/frontend && npm run build
 
-portfolio-check:
+quality-check:
 	@cd app/backend && ./scripts/quality_gate.sh
 	@$(MAKE) frontend-build
 

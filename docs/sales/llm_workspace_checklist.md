@@ -1,6 +1,6 @@
 # LLM Workspace Adoption Checklist
 
-This is a hypothetical checklist for portfolio use.
+This is a hypothetical checklist for reference.
 
 ## Identity & access
 - [ ] SSO/SAML configured

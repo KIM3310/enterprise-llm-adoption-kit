@@ -1,6 +1,6 @@
 # Customer Success RACI (Pre-Sales -> Deployment)
 
-This RACI is a hypothetical template for portfolio use.
+This RACI is a hypothetical template for reference.
 
 Legend: R=Responsible, A=Accountable, C=Consulted, I=Informed
 

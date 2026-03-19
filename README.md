@@ -1,56 +1,17 @@
 # Enterprise LLM Adoption Kit
 Tagline: Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
-Portfolio note: all customers, data, and rollout scenarios in this repo are synthetic. The goal is a reviewable enterprise-style validation kit, not a fictional production claim.
+
+All customers, data, and rollout scenarios in this repo are synthetic. The goal is a reviewable enterprise-style validation kit, not a fictional production claim.
 
 Korean version: `README.ko.md`
 
 ## Why this repo matters
 
-This repo is strongest when read as a runnable enterprise decision lab:
+A runnable enterprise decision lab:
 
 - discovery artifacts map into system design instead of stopping at strategy slides
 - governance, evals, audit, and rollout posture stay visible through working routes
-- buyer-facing architecture discussion can be backed by code, metrics, and evidence surfaces
-
-For the broader portfolio, this is the repo that best supports governed analytics, lakehouse delivery, high-trust workflow, and enterprise solution-architecture conversations.
-Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-engineer flagship and use this repo as the enterprise/governed-delivery support flagship for solutions-architecture conversations.
-
-## Portfolio posture
-- Read this repo like an enterprise decision lab you can actually run, not like a sales deck wearing a UI.
-- In the overall portfolio story, this repo is the governed-enterprise branch that supports the primary `stage-pilot` AI-engineer narrative rather than replacing it.
-- The strongest proof is still service brief -> executive summary pack -> audit/metrics -> checked-in eval artifacts.
-- Fast review path: Summary Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
-
-## Role signals
-- **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are runnable here, but this repo is best read as the enterprise support branch behind the primary `stage-pilot` flagship.
-- **Solutions architect / cloud architect:** this is the best portfolio repo for governed enterprise AI, rollout and rollback conversations, and platform-mapping discussions backed by working proof.
-- **Field / solutions engineer:** executive summary pack, rollout tracks, and test assets support a buyer-facing walkthrough without hiding the technical surfaces.
-
-
-## Portfolio context
-- **Portfolio family:** applied document and workflow systems
-- **This repo's role:** flagship enterprise decision lab and buyer-facing systems proof repo.
-- **Related repos:** `DocFlow Agent`, `secure-xl2hwp-local`, `beaver-study-orchestrator`
-
-## Big-Tech Elevation Track
-
-- Canonical execution plan: [`docs/BIGTECH_ELEVATION_PLAN.md`](docs/BIGTECH_ELEVATION_PLAN.md)
-- Goal: turn this repo into an enterprise AI delivery simulator with sharper rollout, rollback, and governance proof.
-
-## Recruiter fit in the broader portfolio
-
-- **Primary portfolio hierarchy:** lead with `stage-pilot` for AI-engineer screening, then use this repo as the strongest enterprise/governed-delivery support proof.
-- **Best recruiter handoff:** use this repo when the role mentions solutions architecture, governance, rollout planning, platform delivery, or enterprise AI adoption.
-- **What should feel different here:** the value is not raw model novelty; it is reviewable rollout design, audit posture, platform mapping, and decision-ready enterprise packaging.
-
-## Best target-team fit
-
-| Team lens | What should stand out fast | Start here |
-|---|---|---|
-| Governed analytics | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /audit/summary` |
-| Lakehouse delivery | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
-| High-trust enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/summary-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
-| Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/evidence_map.md`](docs/application/evidence_map.md), `GET /ops/workshop-readout-pack`, `GET /ops/summary-pack`, `/metrics` |
+- architecture discussion can be backed by code, metrics, and evidence surfaces
 
 ## Repository surfaces
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
@@ -74,7 +35,6 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 - Bounded public live lane: `POST /ops/live-workshop-preview`
 - Evidence summary: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - Platform dialogue: AWS, warehouse, lakehouse, reliable delivery, and MariaDB rollout mapping in one pack
-- Reviewer map: [`docs/application/evidence_map.md`](docs/application/evidence_map.md)
 
 ## 2-Minute Proof Path
 - `GET /ops/service-brief` -> confirm runtime posture and evidence counts.
@@ -85,18 +45,16 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 - `docs/architecture/llm_deployment_options.md` + `docs/blueprint/09_customer_journey.md` -> connect evidence to rollout path.
 
 ## Quick Start
-- **Recruiter / hiring manager:** start with [`docs/application/evidence_map.md`](docs/application/evidence_map.md), then open `GET /ops/service-brief`.
-- **AI engineer:** use `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
-- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/workshop-readout-pack` -> `GET /ops/summary-pack` -> `GET /ops/rollout-gates`.
-- **Operator / platform engineer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /ops/rollout-gates` -> `GET /metrics`.
+- `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
+- Or: [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/workshop-readout-pack` -> `GET /ops/summary-pack` -> `GET /ops/rollout-gates`.
+- Or: `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /ops/rollout-gates` -> `GET /metrics`.
 
 ![Enterprise summary pack](docs/summary-pack.svg)
 
 ## Further Reading
 
-- Validation data map: [`docs/application/evidence_map.md`](docs/application/evidence_map.md)
-- Reading guide: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
-- Application bundle README: [`docs/application/README.md`](docs/application/README.md)
+- Architecture: [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md)
+- Blueprint: [`docs/blueprint/`](docs/blueprint/)
 
 ## Monetization and analytics posture
 
@@ -107,7 +65,7 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 ## Project summary (implementation-focused)
 - Built an end-to-end adoption kit to show how enterprise LLM discovery turns into a secure, testable, and observable PoC.
 - Implemented a working backend + frontend demo so anyone can run it locally and verify behavior.
-- Kept the scope realistic: stub LLM adapter, synthetic data, and explicit limitations so the portfolio stays honest.
+- Kept the scope realistic: stub LLM adapter, synthetic data, and explicit limitations so the project stays honest.
 
 ## My role & scope
 - Solo implementation of backend API, frontend UI, eval harness, and pre-sales artifacts.
@@ -132,8 +90,8 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 - Chroma for retrieval store (local persistence)
 - SQLite for daily cost rollups
 
-## Canonical runtime + artifact map
-- Canonical runtime: `app/backend` FastAPI plus the `app/frontend` React/Vite operator UI.
+## Runtime + artifact map
+- Runtime: `app/backend` FastAPI plus the `app/frontend` React/Vite operator UI.
 - `docs/` is the editable source for the architecture, sales, and eval collateral referenced by the review APIs.
 - `scripts/package_application.sh` assembles timestamped review/export snapshots from `docs/` into `dist/application_bundle_*` when you need a handoff bundle.
 - `app/frontend/dist/` is the static publish output for the operator shell, while `dist/scenario_runs/` is generated Scenario Runner output.
@@ -163,7 +121,7 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 
 Quick verify:
 ```bash
-make portfolio-check
+make quality-check
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60

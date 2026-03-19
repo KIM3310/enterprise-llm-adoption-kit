@@ -203,13 +203,13 @@ def build_service_brief(
     ]
     role_paths = [
         {
-            "role": "Recruiter",
-            "goal": "Validate flagship portfolio depth quickly without starting from the code tree.",
+            "role": "Operator",
+            "goal": "Validate project depth quickly without starting from the code tree.",
             "first_surface": "/ops/service-brief",
             "follow_up": "/ops/summary-pack",
             "proof_assets": [
-                "docs/application/evidence_map.md",
-                "docs/application/portfolio_one_pager_en.md",
+                "docs/architecture/llm_deployment_options.md",
+                "docs/application/project_one_pager_en.md",
                 "docs/verification_report.md",
             ],
         },
@@ -230,7 +230,7 @@ def build_service_brief(
             "first_surface": "/auth/login -> /uc1/architecture -> /uc2/log-intel",
             "follow_up": "/audit/summary -> /ops/runtime -> /metrics",
             "proof_assets": [
-                "docs/application/evidence_map.md",
+                "docs/architecture/llm_deployment_options.md",
                 "docs/sales/demo_script_exec.md",
                 "docs/sales/exec_value_dashboard/latest.md",
             ],
@@ -381,7 +381,7 @@ def build_service_brief(
             "control_tower_spec": "/v1/control-tower/spec",
             "customer_journey": "docs/blueprint/09_customer_journey.md",
             "role_alignment": "docs/application/role_alignment.md",
-            "proof_map": "docs/application/evidence_map.md",
+            "proof_map": "docs/architecture/llm_deployment_options.md",
         },
     }
 
@@ -587,7 +587,7 @@ def build_service_summary_pack(
             "deployment_options": "docs/architecture/llm_deployment_options.md",
             "exec_summary_template": "docs/sales/executive_summary_template.md",
             "qbr_template": "docs/sales/qbr_template.md",
-            "proof_map": "docs/application/evidence_map.md",
+            "proof_map": "docs/architecture/llm_deployment_options.md",
         },
     }
 

@@ -3,7 +3,7 @@ This document is a **reference architecture** for running the Enterprise LLM Ado
 
 Note:
 - This repo **implements** only the local demo architecture (FastAPI + Vite + Chroma + SQLite).
-- The AWS design below is **conceptual** and provided for portfolio / interview discussion.
+- The AWS design below is **conceptual** and provided for project / interview discussion.
 - All datasets and scenarios remain synthetic/hypothetical.
 
 ## Goals

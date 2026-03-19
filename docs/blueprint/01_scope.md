@@ -1,7 +1,7 @@
 # Scope
 
 ## Mission
-Deliver a flagship, enterprise-style reference implementation for **Applied AI (Pre-Sales Architect, Korea)** as a personal portfolio project (no real customers; synthetic data only) that proves:
+Deliver an enterprise-style reference implementation for **Applied AI (Pre-Sales Architect, Korea)** as a personal personal project (no real customers; synthetic data only) that proves:
 - Enterprise discovery translated into architecture decisions
 - Safe enterprise LLM integration (RBAC/SSO concept, audit, PII redaction, injection defense, tool allowlist)
 - Evaluation harness (golden set, rubric, regression, report + baseline diff)
@@ -16,7 +16,7 @@ Deliver a flagship, enterprise-style reference implementation for **Applied AI (
 ## In-Scope Use Cases (Only 2)
 1) **HoneyPot Handover Copilot (RAG)**
    - RAG over ~70 handover docs (synthetic placeholders)
-   - Normalize docs into canonical JSON schema before embedding
+   - Normalize docs into primary JSON schema before embedding
    - Output citations (doc_id + JSON field path)
    - Support **citation-only mode** for sensitive prompts
 

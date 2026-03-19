@@ -90,7 +90,7 @@
 | Test | Status |
 |------|--------|
 | test_readme_and_application_docs_reference_proof_map | PASSED |
-| test_makefile_includes_portfolio_review_targets | PASSED |
+| test_makefile_includes_project_review_targets | PASSED |
 
 ## Performance
 

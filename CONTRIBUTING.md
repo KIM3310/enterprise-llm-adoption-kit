@@ -1,6 +1,6 @@
 # Contributing
 
-This repo is a flagship portfolio project, so changes should improve documentation clarity, test quality, or runtime credibility without adding unnecessary noise.
+This repo is a primary personal project, so changes should improve documentation clarity, test quality, or runtime credibility without adding unnecessary noise.
 
 ## Working rules
 - Keep diffs small, additive, and reviewable.
@@ -11,7 +11,7 @@ This repo is a flagship portfolio project, so changes should improve documentati
 
 ## Local verification
 ```bash
-make portfolio-check
+make quality-check
 ```
 
 Useful focused commands:
@@ -25,12 +25,12 @@ bash scripts/package_application.sh
 - `app/backend/` — FastAPI backend, contracts, tests, runtime diagnostics
 - `app/frontend/` — user-facing control-tower UI
 - `docs/application/` — job-application bundle and evidence map
-- `docs/architecture/`, `docs/blueprint/`, `docs/sales/` — portfolio depth by audience
+- `docs/architecture/`, `docs/blueprint/`, `docs/sales/` — project depth by audience
 - `tests/` — contract and regression protection
 
 ## Pull request bar
 A good change should answer at least one of these:
 - Does it make the best proof easier to find?
 - Does it improve the quality of user-facing evidence?
-- Does it improve repo hygiene for public portfolio review?
+- Does it improve repo hygiene for public project review?
 - Does it strengthen low-risk runtime or verification ergonomics?

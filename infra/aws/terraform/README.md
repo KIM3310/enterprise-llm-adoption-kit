@@ -1,9 +1,9 @@
-# Terraform (AWS) - Draft IaC for Portfolio
+# Terraform (AWS) - Draft IaC Reference
 This folder contains a **draft** Terraform configuration that matches the conceptual design in:
 - `docs/architecture/aws_openai_reference_architecture.md`
 
 Notes:
-- This is **not** a production module. It is a portfolio-quality scaffold for operators.
+- This is **not** a production module. It is a reference scaffold for operators.
 - Defaults are conservative and avoid embedding secrets in code.
 - You should use remote state (S3 + DynamoDB) for any real environment.
 

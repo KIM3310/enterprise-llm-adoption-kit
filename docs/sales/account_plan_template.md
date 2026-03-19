@@ -1,6 +1,6 @@
 # Account Plan Template (Pre-Sales)
 
-Use this template to align on goals, stakeholders, and delivery plan. This is a hypothetical template for portfolio use.
+Use this template to align on goals, stakeholders, and delivery plan. This is a hypothetical template for reference.
 
 ## 1) Account overview
 - Company / industry:

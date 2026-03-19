@@ -14,10 +14,8 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - 리뷰어 API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
 - 증거 번들: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - 플랫폼 대화: AWS, Databricks, Snowflake, Palantir, MariaDB 롤아웃 매핑을 한 팩에 압축
-- 리뷰어 맵: [`docs/application/evidence_map.md`](docs/application/evidence_map.md)
 
 ## Quick Start
-- **채용 담당자 / hiring manager:** [`docs/application/evidence_map.md`](docs/application/evidence_map.md) -> `GET /ops/service-brief`
 - **AI engineer 면접관:** `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`
 - **솔루션 아키텍트 면접관:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/summary-pack`
 - **운영 / 플랫폼 리뷰어:** `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`
@@ -77,7 +75,7 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 
 빠른 검증:
 ```bash
-make portfolio-check
+make quality-check
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60

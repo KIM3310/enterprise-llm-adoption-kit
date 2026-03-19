@@ -1,5 +1,5 @@
 # Workshops
-Note: Outputs are synthetic, portfolio-only artifacts (no real customer data).
+Note: Outputs are synthetic, synthetic artifacts (no real customer data).
 
 ## Quick start
 ```bash

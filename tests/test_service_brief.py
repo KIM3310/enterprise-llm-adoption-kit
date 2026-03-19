@@ -19,8 +19,8 @@ async def test_ops_service_brief_contract() -> None:
     assert body["evidence"]["test_files"] >= 20
     assert "aws" in body["platform_targets"]
     assert len(body["role_paths"]) >= 3
-    assert any(item["role"] == "Recruiter" for item in body["role_paths"])
-    assert body["links"]["proof_map"] == "docs/application/evidence_map.md"
+    assert any(item["role"] == "Operator" for item in body["role_paths"])
+    assert body["links"]["proof_map"] == "docs/architecture/llm_deployment_options.md"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
     assert body["links"]["summary_pack"] == "/ops/summary-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
@@ -85,7 +85,7 @@ async def test_ops_summary_pack_contract() -> None:
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["summary_pack_schema"] == "/ops/summary-pack/schema"
-    assert body["links"]["proof_map"] == "docs/application/evidence_map.md"
+    assert body["links"]["proof_map"] == "docs/architecture/llm_deployment_options.md"
 
 
 @pytest.mark.anyio

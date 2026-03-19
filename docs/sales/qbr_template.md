@@ -1,6 +1,6 @@
 # QBR Template (Quarterly Business Review)
 
-This is a hypothetical template for portfolio use (no real customer data).
+This is a hypothetical template for reference (no real customer data).
 
 ## 1) Executive summary
 - Outcomes delivered:

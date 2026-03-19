@@ -107,9 +107,9 @@ const scenarioSteps = [
 ];
 
 const homeLenses = {
-  recruiter: {
-    label: "Recruiter",
-    eyebrow: "Recruiter quick path",
+  operator: {
+    label: "Operator",
+    eyebrow: "Operator quick path",
     headline: "See the proof in three moves",
     description:
       "Start with the readiness board, jump to the scenario runner, then copy a compact export summary when the story is clear.",
@@ -235,7 +235,7 @@ function buildStaticServiceBrief() {
       openai_api_key_configured: false,
       login_code_required: false,
       integrations_require_auth: true,
-      startup_status: "portfolio-static",
+      startup_status: "static",
       startup_ready: true,
       llm_circuit_state: "closed",
     },
@@ -251,24 +251,24 @@ function buildStaticServiceBrief() {
     platform_targets: ["aws", "databricks", "mariadb", "palantir", "snowflake"],
     strengths: [
       "One repo ties discovery, governance, evals, runtime diagnostics, and executive review together.",
-      "Scenario Runner and ops surfaces make the portfolio feel like a working service instead of a static deck.",
+      "Scenario Runner and ops surfaces make the project feel like a working service instead of a static deck.",
       "Platform mapping speaks directly to AWS, Snowflake, and Palantir-flavored deployment conversations.",
       "Static fallback keeps the review surface readable even when the backend is not running.",
     ],
     watchouts: [
       "Static mode is active until the backend serves /ops/service-brief.",
-      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live bounded demos.",
+      "Default project runtime stays in stub mode; switch to Ollama or OpenAI for live bounded demos.",
       "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
     ],
     role_paths: [
       {
-        role: "Recruiter",
-        goal: "Validate flagship portfolio depth quickly without starting from the code tree.",
+        role: "Operator",
+        goal: "Validate project depth quickly without starting from the code tree.",
         first_surface: "/ops/service-brief",
         follow_up: "/ops/summary-pack",
         proof_assets: [
           "docs/application/evidence_map.md",
-          "docs/application/portfolio_one_pager_en.md",
+          "docs/application/project_one_pager_en.md",
           "docs/verification_report.md",
         ],
       },
@@ -540,7 +540,7 @@ function buildStaticSummaryPack() {
       auth_mode: "local_jwt",
       llm_provider: "stub",
       llm_model: "stub-llm",
-      startup_status: "portfolio-static",
+      startup_status: "static",
       startup_ready: true,
       llm_circuit_state: "closed",
     },
@@ -646,13 +646,13 @@ function buildStaticSummaryPack() {
     ],
     role_paths: [
       {
-        role: "Recruiter",
-        goal: "Validate flagship portfolio depth quickly without starting from the code tree.",
+        role: "Operator",
+        goal: "Validate project depth quickly without starting from the code tree.",
         first_surface: "/ops/service-brief",
         follow_up: "/ops/summary-pack",
         proof_assets: [
           "docs/application/evidence_map.md",
-          "docs/application/portfolio_one_pager_en.md",
+          "docs/application/project_one_pager_en.md",
           "docs/verification_report.md",
         ],
       },
@@ -718,7 +718,7 @@ function buildStaticSummaryPack() {
     ],
     watchouts: [
       "Static mode is active until the backend serves /ops/summary-pack.",
-      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live bounded demos.",
+      "Default project runtime stays in stub mode; switch to Ollama or OpenAI for live bounded demos.",
       "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
     ],
     links: {
@@ -1292,7 +1292,7 @@ export default function App() {
   const [communityMessage, setCommunityMessage] = useState("");
   const [communitySubmitStatus, setCommunitySubmitStatus] = useState("idle");
   const [communityNotice, setCommunityNotice] = useState("");
-  const [homeLens, setHomeLens] = useState("recruiter");
+  const [homeLens, setHomeLens] = useState("operator");
   const disqusLoadedRef = useRef(false);
   const giscusContainerRef = useRef(null);
   const homeFrontDoor = useMemo(() => {

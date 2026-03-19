@@ -1,6 +1,6 @@
 # Customer Eval Report Template
 
-This is a hypothetical template for portfolio use (no real customer data).
+This is a hypothetical template for reference (no real customer data).
 
 ## Summary
 - Use case:

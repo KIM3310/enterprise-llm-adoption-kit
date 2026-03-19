@@ -1,6 +1,6 @@
 # Executive Summary Template (1 page)
 
-This is a hypothetical template for portfolio use (no real customers).
+This is a hypothetical template for reference (no real customers).
 
 ## 1) Why this matters now
 - Business pressure or opportunity:

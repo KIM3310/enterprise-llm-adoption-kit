@@ -31,7 +31,7 @@ NORM_DOCS_PATH = str(DATA_DIR / "handover_normalized.jsonl")
 COLLECTION_NAME = "handover_docs"
 
 
-CANONICAL_SCHEMA = {
+DEFAULT_SCHEMA = {
     "doc_id": "",
     "title": "",
     "system": "",
@@ -313,8 +313,8 @@ def _normalize_owner(value: object) -> Dict[str, str]:
 
 
 def normalize_doc(raw: Dict) -> Dict:
-    """Normalize a raw document dict into the canonical schema with cleaned fields."""
-    doc = json.loads(json.dumps(CANONICAL_SCHEMA))
+    """Normalize a raw document dict into the primary schema with cleaned fields."""
+    doc = json.loads(json.dumps(DEFAULT_SCHEMA))
     for key in doc.keys():
         if key in raw:
             doc[key] = raw[key]

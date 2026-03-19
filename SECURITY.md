@@ -1,7 +1,7 @@
 # Security Policy
 
 ## Scope
-This repository is a personal portfolio / demo system for enterprise LLM adoption work.
+This repository is a personal project / demo system for enterprise LLM adoption work.
 It uses synthetic or demo-safe artifacts and should not be treated as a production customer environment.
 
 ## Reporting
