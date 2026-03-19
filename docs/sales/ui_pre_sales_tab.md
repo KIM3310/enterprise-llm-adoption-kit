@@ -1,7 +1,7 @@
 # Pre-Sales UI Tab
 
 ## Scenario Runner + Console
-The UI provides two reviewer-friendly surfaces:
+The UI provides two user-friendly surfaces:
 - **Scenario Runner**: runs an end-to-end validation flow (JWT -> UC1 -> UC2 -> governance/ops checks) and exports a Markdown report.
 - **Console**: interactively calls UC1/UC2, loads `/audit/summary` and `/ops/runtime` (role-gated), and surfaces governance signals.
 

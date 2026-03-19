@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import heroTower from "./assets/hero-tower.svg";
-import ExecutiveReviewPack from "./components/ExecutiveReviewPack.jsx";
+import ExecutiveSummaryPack from "./components/ExecutiveSummaryPack.jsx";
 import ServiceBriefBoard from "./components/ServiceBriefBoard.jsx";
 import {
   buildReviewerShareUrl,
@@ -40,7 +40,7 @@ const capabilityCards = [
   },
   {
     title: "RAG Retrieval with Citations",
-    body: "Return grounded answers with field-level citations so reviewers can verify provenance fast."
+    body: "Return grounded answers with field-level citations so operators can verify provenance fast."
   },
   {
     title: "Architecture Risk Diagnosis",
@@ -112,7 +112,7 @@ const homeLenses = {
     eyebrow: "Recruiter quick path",
     headline: "See the proof in three moves",
     description:
-      "Start with the readiness board, jump to the scenario runner, then copy a compact reviewer bundle when the story is clear.",
+      "Start with the readiness board, jump to the scenario runner, then copy a compact export summary when the story is clear.",
     nextStep: {
       label: "Open Readiness",
       reason: "Start on the readiness board so runtime posture, proof inventory, and rollout stage are visible before the walkthrough branches.",
@@ -125,12 +125,12 @@ const homeLenses = {
     cards: [
       ["01 · Service brief", "Runtime posture, proof inventory, and rollout stages in one board."],
       ["02 · Scenario runner", "Show identity, architecture, and ops flow without leaving the product surface."],
-      ["03 · Reviewer bundle", "Send one compact handoff instead of narrating the whole repo live."],
+      ["03 · Export summary", "Send one compact handoff instead of narrating the whole repo live."],
     ],
     actions: [
       { label: "Open Readiness", type: "page", value: "validation" },
       { label: "Open Scenario Runner", type: "page", value: "scenario" },
-      { label: "Copy Reviewer Bundle", type: "bundle" },
+      { label: "Copy Export Summary", type: "bundle" },
     ],
   },
   architect: {
@@ -138,7 +138,7 @@ const homeLenses = {
     eyebrow: "Solution architect lens",
     headline: "Map trust boundary before platform talk",
     description:
-      "Use this lens when the reviewer cares more about deployment posture, governance boundaries, and why the control tower is safe enough to scale.",
+      "Use this lens when the evaluator cares more about deployment posture, governance boundaries, and why the control tower is safe enough to scale.",
     nextStep: {
       label: "Open Capabilities",
       reason: "Lead with platform fit and trust boundary so the architecture conversation stays grounded in what the product can already prove.",
@@ -151,7 +151,7 @@ const homeLenses = {
     cards: [
       ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
       ["02 · Platform fit", "Capabilities and rollout tracks show how the same stack maps to platform conversations."],
-      ["03 · Review routes", "A shareable review link keeps the architecture discussion grounded in real proof surfaces."],
+      ["03 · Review routes", "A shareable review link keeps the architecture discussion grounded in real evidence surfaces."],
     ],
     actions: [
       { label: "Open Capabilities", type: "page", value: "capabilities" },
@@ -190,25 +190,25 @@ const homeLenses = {
     eyebrow: "Executive lens",
     headline: "Tie buyer promises to rollout decisions",
     description:
-      "Use this when the audience wants rollout confidence, proof assets, and a fast answer to what ships first versus what waits for deeper validation.",
+      "Use this when the audience wants rollout confidence, test assets, and a fast answer to what ships first versus what waits for deeper validation.",
     nextStep: {
       label: "Open Readiness",
       reason: "Anchor the conversation in rollout stage and proof depth before you jump to bundles or console details.",
-      followUp: "Then copy the reviewer bundle once the rollout decision reads cleanly.",
+      followUp: "Then copy the export summary once the rollout decision reads cleanly.",
     },
     confidenceCheck:
-      "If the rollout stage is still pre-production or demo-safe, keep the conversation on decision support and proof assets instead of live-runtime promises.",
+      "If the rollout stage is still pre-production or demo-safe, keep the conversation on decision support and test assets instead of live-runtime promises.",
     decisionRule:
-      "Copy the reviewer bundle only after the readiness board makes the shipping posture feel like an explicit executive call.",
+      "Copy the export summary only after the readiness board makes the shipping posture feel like an explicit executive call.",
     cards: [
       ["01 · Readiness board", "Explain maturity stage, evidence depth, and what is still demo-safe."],
-      ["02 · Review pack", "Turn technical proof into buyer promises, rollout tracks, and trust boundaries."],
-      ["03 · Decision brief", "End with the reviewer bundle so the next step feels like a deliberate rollout call."],
+      ["02 · Summary pack", "Turn technical proof into buyer promises, rollout tracks, and trust boundaries."],
+      ["03 · Decision brief", "End with the export summary so the next step feels like a deliberate rollout call."],
     ],
     actions: [
       { label: "Open Readiness", type: "page", value: "validation" },
       { label: "Open Console", type: "page", value: "console" },
-      { label: "Copy Reviewer Bundle", type: "bundle" },
+      { label: "Copy Export Summary", type: "bundle" },
     ],
   },
 };
@@ -257,7 +257,7 @@ function buildStaticServiceBrief() {
     ],
     watchouts: [
       "Static mode is active until the backend serves /ops/service-brief.",
-      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live reviewer demos.",
+      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live bounded demos.",
       "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
     ],
     role_paths: [
@@ -265,9 +265,9 @@ function buildStaticServiceBrief() {
         role: "Recruiter",
         goal: "Validate flagship portfolio depth quickly without starting from the code tree.",
         first_surface: "/ops/service-brief",
-        follow_up: "/ops/review-pack",
+        follow_up: "/ops/summary-pack",
         proof_assets: [
-          "docs/application/reviewer_proof_map.md",
+          "docs/application/evidence_map.md",
           "docs/application/portfolio_one_pager_en.md",
           "docs/verification_report.md",
         ],
@@ -276,7 +276,7 @@ function buildStaticServiceBrief() {
         role: "Solution Architect",
         goal: "Check platform fit, trust boundary, and rollout tradeoffs before implementation details.",
         first_surface: "docs/architecture/llm_deployment_options.md",
-        follow_up: "/ops/review-pack",
+        follow_up: "/ops/summary-pack",
         proof_assets: [
           "docs/architecture/reference_architectures.md",
           "docs/blueprint/03_security_threat_model.md",
@@ -289,7 +289,7 @@ function buildStaticServiceBrief() {
         first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
-          "docs/application/reviewer_proof_map.md",
+          "docs/application/evidence_map.md",
           "docs/sales/demo_script_exec.md",
           "docs/sales/exec_value_dashboard/latest.md",
         ],
@@ -466,7 +466,7 @@ function buildStaticServiceBrief() {
       health: "/health",
       service_brief: "/ops/service-brief",
       service_brief_schema: "/ops/service-brief/schema",
-      review_pack: "/ops/review-pack",
+      summary_pack: "/ops/summary-pack",
       rollout_board: "/ops/rollout-board",
       rollout_drill: "/ops/rollout-drill",
       metrics: "/metrics",
@@ -475,7 +475,7 @@ function buildStaticServiceBrief() {
       control_tower_spec: "/v1/control-tower/spec",
       customer_journey: "docs/blueprint/09_customer_journey.md",
       role_alignment: "docs/application/role_alignment.md",
-      proof_map: "docs/application/reviewer_proof_map.md",
+      proof_map: "docs/application/evidence_map.md",
     },
   };
 }
@@ -524,13 +524,13 @@ function buildStaticServiceBriefSchema() {
   };
 }
 
-function buildStaticReviewPack() {
+function buildStaticSummaryPack() {
   return {
     service: "Enterprise LLM Adoption Kit (Korea)",
     generated_at: new Date().toISOString(),
-    contract_version: "enterprise-adoption-review-pack-v1",
+    contract_version: "enterprise-adoption-summary-pack-v1",
     headline:
-      "Executive review pack that ties buyer thesis, governance proof, and rollout tracks to one validation story.",
+      "Executive summary pack that ties buyer thesis, governance proof, and rollout tracks to one validation story.",
     buyer_promises: [
       "Show a secure adoption path before rollout by grounding every claim in tests, docs, or runtime endpoints.",
       "Keep the architecture conversation concrete across AWS, Snowflake, Palantir, Databricks, and MariaDB-flavored decisions.",
@@ -544,7 +544,7 @@ function buildStaticReviewPack() {
       startup_ready: true,
       llm_circuit_state: "closed",
     },
-    proof_bundle: {
+    evidence_bundle: {
       tests: 22,
       blueprints: 9,
       module_packs: 4,
@@ -582,20 +582,20 @@ function buildStaticReviewPack() {
       runtime_surfaces: [
         "/health",
         "/ops/service-brief",
-        "/ops/review-pack",
+        "/ops/summary-pack",
         "/ops/rollout-board",
         "/ops/rollout-drill",
-        "/ops/review-pack/schema",
+        "/ops/summary-pack/schema",
         "/ops/runtime",
         "/metrics",
       ],
       review_endpoints: [
         "/health",
         "/ops/service-brief",
-        "/ops/review-pack",
+        "/ops/summary-pack",
         "/ops/rollout-board",
         "/ops/rollout-drill",
-        "/ops/review-pack/schema",
+        "/ops/summary-pack/schema",
         "/audit/summary",
         "/metrics",
       ],
@@ -608,8 +608,8 @@ function buildStaticReviewPack() {
       },
       {
         label: "Inspect executive overview",
-        surface: "/ops/review-pack",
-        proof: "Use the review pack to walk buyer promises, rollout tracks, and platform dialogue.",
+        surface: "/ops/summary-pack",
+        proof: "Use the summary pack to walk buyer promises, rollout tracks, and platform dialogue.",
       },
       {
         label: "Verify governance signals",
@@ -630,8 +630,8 @@ function buildStaticReviewPack() {
       },
       {
         step: "2. Executive overview",
-        surface: "/ops/review-pack",
-        proof: "Use buyer promises, proof assets, and rollout tracks to frame the system in one pass.",
+        surface: "/ops/summary-pack",
+        proof: "Use buyer promises, test assets, and rollout tracks to frame the system in one pass.",
       },
       {
         step: "3. Governance path",
@@ -649,9 +649,9 @@ function buildStaticReviewPack() {
         role: "Recruiter",
         goal: "Validate flagship portfolio depth quickly without starting from the code tree.",
         first_surface: "/ops/service-brief",
-        follow_up: "/ops/review-pack",
+        follow_up: "/ops/summary-pack",
         proof_assets: [
-          "docs/application/reviewer_proof_map.md",
+          "docs/application/evidence_map.md",
           "docs/application/portfolio_one_pager_en.md",
           "docs/verification_report.md",
         ],
@@ -660,7 +660,7 @@ function buildStaticReviewPack() {
         role: "Solution Architect",
         goal: "Check platform fit, trust boundary, and rollout tradeoffs before implementation details.",
         first_surface: "docs/architecture/llm_deployment_options.md",
-        follow_up: "/ops/review-pack",
+        follow_up: "/ops/summary-pack",
         proof_assets: [
           "docs/architecture/reference_architectures.md",
           "docs/blueprint/03_security_threat_model.md",
@@ -673,7 +673,7 @@ function buildStaticReviewPack() {
         first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
-          "docs/application/reviewer_proof_map.md",
+          "docs/application/evidence_map.md",
           "docs/sales/demo_script_exec.md",
           "docs/sales/exec_value_dashboard/latest.md",
         ],
@@ -717,24 +717,24 @@ function buildStaticReviewPack() {
       "Operations and Executive Review",
     ],
     watchouts: [
-      "Static mode is active until the backend serves /ops/review-pack.",
-      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live reviewer demos.",
+      "Static mode is active until the backend serves /ops/summary-pack.",
+      "Default portfolio runtime stays in stub mode; switch to Ollama or OpenAI for live bounded demos.",
       "Enable enterprise data handling mode and a shared login code before regulated workshop sessions.",
     ],
     links: {
       health: "/health",
       service_brief: "/ops/service-brief",
-      review_pack: "/ops/review-pack",
+      summary_pack: "/ops/summary-pack",
       rollout_board: "/ops/rollout-board",
       rollout_drill: "/ops/rollout-drill",
-      review_pack_schema: "/ops/review-pack/schema",
+      summary_pack_schema: "/ops/summary-pack/schema",
       metrics: "/metrics",
       audit_summary: "/audit/summary",
       customer_journey: "docs/blueprint/09_customer_journey.md",
       deployment_options: "docs/architecture/llm_deployment_options.md",
       exec_summary_template: "docs/sales/executive_summary_template.md",
       qbr_template: "docs/sales/qbr_template.md",
-      proof_map: "docs/application/reviewer_proof_map.md",
+      proof_map: "docs/application/evidence_map.md",
     },
   };
 }
@@ -1193,7 +1193,7 @@ export default function App() {
   const [healthCheckedAt, setHealthCheckedAt] = useState("");
   const [serviceBrief, setServiceBrief] = useState(() => buildStaticServiceBrief());
   const [serviceBriefSchema, setServiceBriefSchema] = useState(() => buildStaticServiceBriefSchema());
-  const [reviewPack, setReviewPack] = useState(() => buildStaticReviewPack());
+  const [summaryPack, setSummaryPack] = useState(() => buildStaticSummaryPack());
   const [scenarioRun, setScenarioRun] = useState(null);
   const [scenarioHistory, setScenarioHistory] = useState(() => {
     const stored = readJsonStorage(STORAGE_KEYS.scenarioHistory, []);
@@ -1296,27 +1296,27 @@ export default function App() {
   const disqusLoadedRef = useRef(false);
   const giscusContainerRef = useRef(null);
   const homeFrontDoor = useMemo(() => {
-    const proofBundle = reviewPack?.proof_bundle || {};
+    const evidenceBundle = summaryPack?.evidence_bundle || {};
     const reviewAssets =
-      Number(proofBundle.review_assets_count || 0) ||
-      (Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets.length : 0) ||
-      (Array.isArray(reviewPack?.review_actions) ? reviewPack.review_actions.length : 0) ||
+      Number(evidenceBundle.review_assets_count || 0) ||
+      (Array.isArray(evidenceBundle.review_assets) ? evidenceBundle.review_assets.length : 0) ||
+      (Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.length : 0) ||
       5;
     const reviewRoutes =
-      (Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0) ||
-      (Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces.length : 0) ||
-      Object.values(reviewPack?.links || {}).filter((value) => String(value || "").startsWith("/")).length ||
+      (Array.isArray(evidenceBundle.review_endpoints) ? evidenceBundle.review_endpoints.length : 0) ||
+      (Array.isArray(evidenceBundle.runtime_surfaces) ? evidenceBundle.runtime_surfaces.length : 0) ||
+      Object.values(summaryPack?.links || {}).filter((value) => String(value || "").startsWith("/")).length ||
       8;
     return {
       readinessStages: Array.isArray(serviceBrief?.stages) ? serviceBrief.stages.length : 5,
       reviewAssets,
       reviewRoutes,
-      reviewActions: Array.isArray(reviewPack?.review_actions) ? reviewPack.review_actions.slice(0, 3) : [],
-      rolloutTracks: Array.isArray(reviewPack?.rollout_tracks) ? reviewPack.rollout_tracks.slice(0, 3) : [],
-      buyerPromises: Array.isArray(reviewPack?.buyer_promises) ? reviewPack.buyer_promises.slice(0, 2) : [],
+      reviewActions: Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.slice(0, 3) : [],
+      rolloutTracks: Array.isArray(summaryPack?.rollout_tracks) ? summaryPack.rollout_tracks.slice(0, 3) : [],
+      buyerPromises: Array.isArray(summaryPack?.buyer_promises) ? summaryPack.buyer_promises.slice(0, 2) : [],
       maturityStage: serviceBrief?.maturity_stage || "pre-production validation system",
     };
-  }, [reviewPack, serviceBrief]);
+  }, [summaryPack, serviceBrief]);
 
   useEffect(() => {
     const onHashChange = () => setPage(getPageFromHash());
@@ -1472,17 +1472,17 @@ export default function App() {
       }
 
       try {
-        const response = await fetchWithTimeout(`${API_BASE}/ops/review-pack`, { cache: "no-store" }, 8000);
+        const response = await fetchWithTimeout(`${API_BASE}/ops/summary-pack`, { cache: "no-store" }, 8000);
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(parseApiError(data, "Review pack request failed"));
+          throw new Error(parseApiError(data, "Summary pack request failed"));
         }
         if (!cancelled) {
-          setReviewPack(data);
+          setSummaryPack(data);
         }
       } catch (_error) {
         if (!cancelled) {
-          setReviewPack(buildStaticReviewPack());
+          setSummaryPack(buildStaticSummaryPack());
         }
       }
     }
@@ -1511,7 +1511,7 @@ export default function App() {
         title: "Start the runtime first",
         tone: "attention",
         summary:
-          "The backend is still offline, so the strongest first move is to bring the runtime up before you narrate any enterprise proof path.",
+          "The backend is still offline, so the strongest first move is to bring the runtime up before you narrate any enterprise evidence path.",
         checks: [
           `API base ${API_BASE || "(same origin)"} is not serving the scenario routes yet`,
           "Start the local demo runtime, then return once /health is reachable",
@@ -1529,7 +1529,7 @@ export default function App() {
         summary:
           "Issue a role-aware JWT first so UC1, UC2, and the governance snapshot feel like one controlled enterprise walkthrough instead of disconnected API calls.",
         checks: [
-          trimmedUserId ? `User ID ${trimmedUserId} is set` : "Add a reviewer-safe user ID",
+          trimmedUserId ? `User ID ${trimmedUserId} is set` : "Add a bounded user ID",
           loginCodeRequired
             ? trimmedLoginCode
               ? "Required login code is present"
@@ -1543,7 +1543,7 @@ export default function App() {
     }
 
     return {
-      title: "Run the strongest proof path now",
+      title: "Run the strongest evidence path now",
       tone: "go",
       summary:
         "Runtime and identity are ready, so the next best move is the full scenario run that ties architecture diagnosis, log-intel, and governance into one exportable story.",
@@ -1570,12 +1570,12 @@ export default function App() {
 
   async function copyReviewerBundle() {
     const reviewRoutes =
-      reviewPack?.review_routes?.length
-        ? reviewPack.review_routes
-        : reviewPack?.two_minute_review?.map((item) => item.surface || item).filter(Boolean) || [];
-    const proofAssets = Array.isArray(reviewPack?.proof_assets) ? reviewPack.proof_assets : [];
+      summaryPack?.review_routes?.length
+        ? summaryPack.review_routes
+        : summaryPack?.two_minute_review?.map((item) => item.surface || item).filter(Boolean) || [];
+    const proofAssets = Array.isArray(summaryPack?.proof_assets) ? summaryPack.proof_assets : [];
     const text = [
-      "LLM Adoption Atelier reviewer bundle",
+      "LLM Adoption Atelier export summary",
       `Page: ${page}`,
       `Role: ${role}`,
       `Console tab: ${activeTab}`,
@@ -1591,7 +1591,7 @@ export default function App() {
         : ["- Proof assets unavailable."]),
     ].join("\n");
     const ok = await copyTextToClipboard(text);
-    setStatus(ok ? "Reviewer bundle copied" : "Failed to copy reviewer bundle");
+    setStatus(ok ? "Export summary copied" : "Failed to copy export summary");
   }
 
   async function copyConsoleSnapshot() {
@@ -1714,7 +1714,7 @@ export default function App() {
 
     window.addEventListener("keydown", handleKeyboardShortcuts);
     return () => window.removeEventListener("keydown", handleKeyboardShortcuts);
-  }, [activeTab, page, role, reviewPack, health.status]);
+  }, [activeTab, page, role, summaryPack, health.status]);
 
   async function fetchJson(path, options = {}) {
     const { errorMessage = "Request failed", timeoutMs = 20000, ...fetchOptions } = options;
@@ -3142,15 +3142,15 @@ export default function App() {
 
   const deploymentArtifacts =
     serviceBrief.stages?.find((stage) => stage.key === "deployment")?.highlights?.map((item) => item.label) || [];
-  const reviewerEndpointCount = Array.isArray(reviewPack?.proof_bundle?.review_endpoints)
-    ? reviewPack.proof_bundle.review_endpoints.length
+  const reviewerEndpointCount = Array.isArray(summaryPack?.evidence_bundle?.review_endpoints)
+    ? summaryPack.evidence_bundle.review_endpoints.length
     : 0;
-  const reviewAssetCount = reviewPack?.proof_bundle?.review_assets_count || reviewPack?.proof_bundle?.review_assets?.length || 0;
+  const reviewAssetCount = summaryPack?.evidence_bundle?.review_assets_count || summaryPack?.evidence_bundle?.review_assets?.length || 0;
   const heroCredibilityCards = [
     {
       title: "Governance signal",
       value: `${health.status === "ok" ? "live" : "static"} control tower`,
-      detail: `Audit, metrics, and service brief surfaces stay reviewer-visible${healthCheckedAt ? ` · ${healthCheckedAt}` : ""}.`,
+      detail: `Audit, metrics, and service brief surfaces stay visible${healthCheckedAt ? ` · ${healthCheckedAt}` : ""}.`,
     },
     {
       title: "Deployment fit",
@@ -3159,7 +3159,7 @@ export default function App() {
     },
     {
       title: "Reviewer handoff",
-      value: `${reviewerEndpointCount} endpoints · ${reviewAssetCount} proof assets`,
+      value: `${reviewerEndpointCount} endpoints · ${reviewAssetCount} test assets`,
       detail: "Solution architects can move from runtime posture to buyer thesis without leaving the product surface.",
     },
   ];
@@ -3227,14 +3227,14 @@ export default function App() {
             {page === "console" ? `Tab: ${activeTab}` : `Page: ${page}`}
           </span>
           <button className="cta-light" onClick={() => void copyReviewerBundle()}>
-            Copy Reviewer Bundle
+            Copy Export Summary
           </button>
           <button className="cta-light" onClick={() => navigate("console")}>
             Open Console
           </button>
         </div>
         <p className="status-line" style={{ marginTop: "0.75rem" }}>
-          Shortcuts: 1-5 pages · G role · [ / ] console tabs · H/L prev-next page · ⇧L link · ⇧B reviewer bundle · ⇧S console snapshot
+          Shortcuts: 1-5 pages · G role · [ / ] console tabs · H/L prev-next page · ⇧L link · ⇧B export summary · ⇧S console snapshot
         </p>
       </header>
 
@@ -3246,7 +3246,7 @@ export default function App() {
                 <p className="eyebrow">Discovery → Governance → Rollout</p>
                 <h1>Answer what ships first before the architecture review drifts into theory.</h1>
                 <p className="lead">
-                  {APP_NAME} turns enterprise LLM adoption into one readable proof path: confirm runtime posture on
+                  {APP_NAME} turns enterprise LLM adoption into one readable evidence path: confirm runtime posture on
                   the readiness board, run one role-aware scenario, then hand over an executive bundle with rollout
                   tracks and governance evidence already aligned.
                 </p>
@@ -3397,7 +3397,7 @@ export default function App() {
 
             <section className="section-block">
               <Reveal delay={90}>
-                <ExecutiveReviewPack reviewPack={reviewPack} />
+                <ExecutiveSummaryPack summaryPack={summaryPack} />
               </Reveal>
             </section>
 
@@ -3585,7 +3585,7 @@ export default function App() {
               </Reveal>
 
               <Reveal delay={90}>
-                <ExecutiveReviewPack reviewPack={reviewPack} variant="compact" />
+                <ExecutiveSummaryPack summaryPack={summaryPack} variant="compact" />
               </Reveal>
 
               <div className="validation-layout">

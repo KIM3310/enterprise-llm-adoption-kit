@@ -43,9 +43,9 @@ def build_ops_runtime_scorecard(
             )
         ),
         "next_step": (
-            "Open /health, confirm the degraded startup checks, then refresh /ops/runtime before sharing reviewer proof."
+            "Open /health, confirm the degraded startup checks, then refresh /ops/runtime before sharing validation data."
             if failed_checks or startup_status in {"degraded", "critical"}
-            else "Use /ops/runtime/scorecard and /ops/review-pack together before executive review."
+            else "Use /ops/runtime/scorecard and /ops/summary-pack together before executive review."
         ),
     }
     return {
@@ -78,20 +78,20 @@ def build_ops_runtime_scorecard(
             "/health",
             "/ops/runtime/scorecard",
             "/ops/runtime",
-            "/ops/review-pack",
+            "/ops/summary-pack",
             "/metrics",
         ],
         "recommendations": [
-            "Refresh diagnostics if startup readiness is degraded before deeper reviewer walkthroughs.",
+            "Refresh diagnostics if startup readiness is degraded before deeper technical walkthroughs.",
             "Use ops runtime when the scorecard shows alerts, circuit pressure, or event spikes.",
-            "Keep audit summary, runtime scorecard, and review pack paired during architecture reviews.",
+            "Keep audit summary, runtime scorecard, and summary pack paired during architecture reviews.",
         ],
         "links": {
             "health": "/health",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "ops_runtime_scorecard_schema": "/ops/runtime/scorecard/schema",
             "ops_runtime": "/ops/runtime",
-            "review_pack": "/ops/review-pack",
+            "summary_pack": "/ops/summary-pack",
             "review_summary": "/ops/review-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
@@ -129,6 +129,6 @@ def build_ops_runtime_scorecard_schema() -> Dict[str, object]:
         "links": {
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "ops_runtime": "/ops/runtime",
-            "review_pack": "/ops/review-pack",
+            "summary_pack": "/ops/summary-pack",
         },
     }

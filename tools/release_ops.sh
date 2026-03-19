@@ -388,11 +388,11 @@ check_review() {
   show_cloudflare
 
   if [[ $fail -eq 0 ]]; then
-    log "PASS review gate"
+    log "PASS quality gate"
     return 0
   fi
 
-  log "FAIL review gate"
+  log "FAIL quality gate"
   return 1
 }
 

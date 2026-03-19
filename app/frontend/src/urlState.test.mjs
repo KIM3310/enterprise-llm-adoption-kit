@@ -7,7 +7,7 @@ import {
   parseReviewerUrlState,
 } from "./urlState.js";
 
-test("parse reviewer state from search and hash", () => {
+test("parse shared state from search and hash", () => {
   assert.deepEqual(
     parseReviewerUrlState("?tab=governance&role=Admin", "#console"),
     {
@@ -18,7 +18,7 @@ test("parse reviewer state from search and hash", () => {
   );
 });
 
-test("serialize reviewer state without default noise", () => {
+test("serialize shared state without default noise", () => {
   assert.equal(
     buildReviewerUrlSearch({ tab: "architecture", role: "Employee" }),
     ""
@@ -29,7 +29,7 @@ test("serialize reviewer state without default noise", () => {
   );
 });
 
-test("build absolute reviewer share url", () => {
+test("build absolute share url", () => {
   assert.equal(
     buildReviewerShareUrl(
       { page: "console", tab: "ops", role: "Ops" },

@@ -111,8 +111,8 @@ from .service_brief import (
     build_service_rollout_gates_schema,
     build_service_rollout_drill_schema,
     build_service_rollout_board_schema,
-    build_service_review_pack,
-    build_service_review_pack_schema,
+    build_service_summary_pack,
+    build_service_summary_pack_schema,
     build_service_review_summary,
     build_service_review_summary_schema,
     build_service_workshop_readout_pack,
@@ -264,7 +264,7 @@ async def _call_openai_workshop_preview(api_key: str, model: str, payload: Dict[
                     {
                         "role": "system",
                         "content": (
-                            "You are a field architecture reviewer. Return JSON with keys "
+                            "You are a field architecture evaluator. Return JSON with keys "
                             "rolloutStance, executiveSummary, architectureSummary, nextAction, proofAssets."
                         ),
                     },
@@ -906,7 +906,7 @@ def health(request: Request) -> Dict[str, object]:
         "failed_checks": [],
         "failed_warning_checks": [],
         "failed_critical_checks": [],
-        "next_action": "load /ops/review-pack, /ops/review-pack/schema, then /ops/runtime for diagnostics",
+        "next_action": "load /ops/summary-pack, /ops/summary-pack/schema, then /ops/runtime for diagnostics",
     }
     if isinstance(startup_report, dict):
         status = "ok" if startup_report.get("startup_ready", False) else "degraded"
@@ -969,7 +969,7 @@ def health(request: Request) -> Dict[str, object]:
             "live-workshop-preview",
             "rollout-board-readiness",
             "rollout-gate-readiness",
-            "executive-review-pack",
+            "executive-summary-pack",
         ],
         "links": {
             "metrics": "/metrics",
@@ -984,8 +984,8 @@ def health(request: Request) -> Dict[str, object]:
             "workshop_readout_pack": "/ops/workshop-readout-pack",
             "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
             "live_workshop_preview": "/ops/live-workshop-preview",
-            "review_pack": "/ops/review-pack",
-            "review_pack_schema": "/ops/review-pack/schema",
+            "summary_pack": "/ops/summary-pack",
+            "summary_pack_schema": "/ops/summary-pack/schema",
             "rollout_board": "/ops/rollout-board",
             "rollout_board_schema": "/ops/rollout-board/schema",
             "rollout_gates": "/ops/rollout-gates",
@@ -1062,7 +1062,7 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
         )
 
     _ensure_public_live_rate_limit(request, scenario_id)
-    review_pack = build_service_workshop_readout_pack(
+    summary_pack = build_service_workshop_readout_pack(
         platform=scenario["platform"],
         startup_report=getattr(app.state, "startup_report", None),
         circuit_snapshot=_llm_circuit_snapshot(),
@@ -1074,7 +1074,7 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
     )
     prompt_payload = {
         "scenario": scenario,
-        "review_pack_summary": review_pack["summary"],
+        "summary_pack_summary": summary_pack["summary"],
         "customer_pack_summary": customer_pack["summary"],
         "runtime": {
             "llm_provider": str(get_llm_runtime_settings().get("provider", "stub")),
@@ -1104,7 +1104,7 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
         "result": {
             "title": scenario["title"],
             "platform": scenario["platform"],
-            "rolloutGates": review_pack["summary"],
+            "rolloutGates": summary_pack["summary"],
             "customerArchitecture": customer_pack["summary"],
             **live_summary,
         },
@@ -1116,17 +1116,17 @@ def ops_workshop_readout_pack_schema() -> Dict[str, object]:
     return build_service_workshop_readout_pack_schema()
 
 
-@app.get("/ops/review-pack")
-def ops_review_pack() -> Dict[str, object]:
-    return build_service_review_pack(
+@app.get("/ops/summary-pack")
+def ops_summary_pack() -> Dict[str, object]:
+    return build_service_summary_pack(
         startup_report=getattr(app.state, "startup_report", None),
         circuit_snapshot=_llm_circuit_snapshot(),
     )
 
 
-@app.get("/ops/review-pack/schema")
-def ops_review_pack_schema() -> Dict[str, object]:
-    return build_service_review_pack_schema()
+@app.get("/ops/summary-pack/schema")
+def ops_summary_pack_schema() -> Dict[str, object]:
+    return build_service_summary_pack_schema()
 
 
 @app.get("/ops/rollout-board")

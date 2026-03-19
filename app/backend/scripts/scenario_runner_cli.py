@@ -226,7 +226,7 @@ def _rbac_validate(
 
 def _parse_prometheus_snapshot(text: str) -> Dict[str, Any]:
     """
-    Extract a small, reviewer-friendly snapshot from /metrics.
+    Extract a small, user-friendly snapshot from /metrics.
     """
     snapshot: Dict[str, Any] = {
         "requests_total": [],

@@ -13,7 +13,7 @@ These are common patterns used in enterprise adoption. This doc is guidance only
 - Gate tool calls by role
 
 ## 3) Human-in-the-loop
-- Route uncertain cases to reviewers
+- Route uncertain cases to operators
 - Record decisions for eval feedback
 
 ## 4) Workflow orchestration

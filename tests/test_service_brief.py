@@ -20,9 +20,9 @@ async def test_ops_service_brief_contract() -> None:
     assert "aws" in body["platform_targets"]
     assert len(body["role_paths"]) >= 3
     assert any(item["role"] == "Recruiter" for item in body["role_paths"])
-    assert body["links"]["proof_map"] == "docs/application/reviewer_proof_map.md"
+    assert body["links"]["proof_map"] == "docs/application/evidence_map.md"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
-    assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["summary_pack"] == "/ops/summary-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
     assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
@@ -53,39 +53,39 @@ async def test_ops_service_brief_schema_contract() -> None:
 
 
 @pytest.mark.anyio
-async def test_ops_review_pack_contract() -> None:
+async def test_ops_summary_pack_contract() -> None:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-        response = await client.get("/ops/review-pack")
+        response = await client.get("/ops/summary-pack")
 
     assert response.status_code == 200, response.text
     body = response.json()
-    assert body["contract_version"] == "enterprise-adoption-review-pack-v1"
+    assert body["contract_version"] == "enterprise-adoption-summary-pack-v1"
     assert body["runtime_summary"]["llm_provider"] == "stub"
-    assert body["proof_bundle"]["tests"] >= 20
-    assert body["proof_bundle"]["review_assets_count"] >= 4
+    assert body["evidence_bundle"]["tests"] >= 20
+    assert body["evidence_bundle"]["review_assets_count"] >= 4
     assert len(body["role_paths"]) >= 3
     assert any(item["role"] == "Solution Architect" for item in body["role_paths"])
-    assert "/ops/rollout-board" in body["proof_bundle"]["runtime_surfaces"]
-    assert "/ops/rollout-drill" in body["proof_bundle"]["runtime_surfaces"]
-    assert "/ops/rollout-gates" in body["proof_bundle"]["runtime_surfaces"]
-    assert "/ops/review-summary" in body["proof_bundle"]["runtime_surfaces"]
-    assert "/ops/runtime/scorecard" in body["proof_bundle"]["runtime_surfaces"]
-    assert "/ops/review-pack/schema" in body["proof_bundle"]["runtime_surfaces"]
+    assert "/ops/rollout-board" in body["evidence_bundle"]["runtime_surfaces"]
+    assert "/ops/rollout-drill" in body["evidence_bundle"]["runtime_surfaces"]
+    assert "/ops/rollout-gates" in body["evidence_bundle"]["runtime_surfaces"]
+    assert "/ops/review-summary" in body["evidence_bundle"]["runtime_surfaces"]
+    assert "/ops/runtime/scorecard" in body["evidence_bundle"]["runtime_surfaces"]
+    assert "/ops/summary-pack/schema" in body["evidence_bundle"]["runtime_surfaces"]
     assert any(item["label"] == "Inspect executive overview" for item in body["review_actions"])
     assert len(body["two_minute_review"]) == 4
     assert body["review_gate"]["status"] in {"ready", "attention"}
     assert body["review_gate"]["next_step"]
     assert any("snowflake" in item for item in body["platform_dialogues"])
-    assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["summary_pack"] == "/ops/summary-pack"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"
     assert body["links"]["rollout_gates"] == "/ops/rollout-gates"
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
-    assert body["links"]["review_pack_schema"] == "/ops/review-pack/schema"
-    assert body["links"]["proof_map"] == "docs/application/reviewer_proof_map.md"
+    assert body["links"]["summary_pack_schema"] == "/ops/summary-pack/schema"
+    assert body["links"]["proof_map"] == "docs/application/evidence_map.md"
 
 
 @pytest.mark.anyio
@@ -102,7 +102,7 @@ async def test_ops_customer_architecture_pack_contract() -> None:
     assert body["platform_cards"][0]["platform"] == "snowflake"
     assert len(body["architecture_stages"]) == 5
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
-    assert body["links"]["review_pack"] == "/ops/review-pack"
+    assert body["links"]["summary_pack"] == "/ops/summary-pack"
 
 
 @pytest.mark.anyio
@@ -156,7 +156,7 @@ async def test_ops_live_workshop_preview_contract(monkeypatch) -> None:
         return {
             "rolloutStance": "pilot-now",
             "executiveSummary": "Governed Snowflake workshop is ready for a bounded pilot.",
-            "architectureSummary": "Keep rollout gates and review pack visible during buyer handoff.",
+            "architectureSummary": "Keep rollout gates and summary pack visible during buyer handoff.",
             "nextAction": "open customer architecture pack",
             "proofAssets": ["/ops/workshop-readout-pack", "/ops/customer-architecture-pack"],
         }
@@ -199,7 +199,7 @@ async def test_ops_workshop_readout_pack_schema_contract() -> None:
 
 
 @pytest.mark.anyio
-async def test_ops_review_pack_flags_degraded_runtime_posture(monkeypatch) -> None:
+async def test_ops_summary_pack_flags_degraded_runtime_posture(monkeypatch) -> None:
     import app.main as main_module
 
     monkeypatch.setattr(main_module.settings, "startup_status", "degraded", raising=False)
@@ -207,7 +207,7 @@ async def test_ops_review_pack_flags_degraded_runtime_posture(monkeypatch) -> No
 
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-        response = await client.get("/ops/review-pack")
+        response = await client.get("/ops/summary-pack")
 
     assert response.status_code == 200, response.text
     body = response.json()
@@ -217,18 +217,18 @@ async def test_ops_review_pack_flags_degraded_runtime_posture(monkeypatch) -> No
 
 
 @pytest.mark.anyio
-async def test_ops_review_pack_schema_contract() -> None:
+async def test_ops_summary_pack_schema_contract() -> None:
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
-        response = await client.get("/ops/review-pack/schema")
+        response = await client.get("/ops/summary-pack/schema")
 
     assert response.status_code == 200, response.text
     body = response.json()
-    assert body["schema"] == "enterprise-adoption-review-pack-v1"
+    assert body["schema"] == "enterprise-adoption-summary-pack-v1"
     assert "review_actions" in body["required_fields"]
     assert "two_minute_review" in body["required_fields"]
     assert "role_paths" in body["required_fields"]
-    assert "review_assets" in body["proof_bundle_required_fields"]
+    assert "review_assets" in body["evidence_bundle_required_fields"]
     assert "surface" in body["review_action_required_fields"]
     assert "step" in body["two_minute_review_required_fields"]
     assert "proof_assets" in body["role_path_required_fields"]

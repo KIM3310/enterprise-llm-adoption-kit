@@ -1912,7 +1912,7 @@ textarea {
   display: none;
 }
 
-.executive-review-pack {
+.executive-summary-pack {
   display: grid;
   gap: 16px;
   padding: var(--panel-pad);
@@ -1923,20 +1923,20 @@ textarea {
   box-shadow: var(--shadow-soft);
 }
 
-.review-pack-metrics {
+.summary-pack-metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   gap: 12px;
 }
 
-.review-pack-toolbar {
+.summary-pack-toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
 }
 
-.review-pack-toolbar button {
+.summary-pack-toolbar button {
   min-height: 38px;
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -1947,35 +1947,35 @@ textarea {
   cursor: pointer;
 }
 
-.review-pack-toolbar button:hover {
+.summary-pack-toolbar button:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.review-pack-toolbar-status {
+.summary-pack-toolbar-status {
   font-size: 0.82rem;
   color: var(--muted);
 }
 
-.review-pack-grid,
-.review-pack-columns {
+.summary-pack-grid,
+.summary-pack-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
-.review-pack-track-list {
+.summary-pack-track-list {
   display: grid;
   gap: 10px;
 }
 
-.review-pack-action-list,
-.review-pack-asset-list {
+.summary-pack-action-list,
+.summary-pack-asset-list {
   display: grid;
   gap: 10px;
 }
 
-.review-pack-track-card {
+.summary-pack-track-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.94);
@@ -1984,8 +1984,8 @@ textarea {
   gap: 6px;
 }
 
-.review-pack-action-card,
-.review-pack-asset-card {
+.summary-pack-action-card,
+.summary-pack-asset-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.94);
@@ -1994,22 +1994,22 @@ textarea {
   gap: 6px;
 }
 
-.review-pack-track-card p {
+.summary-pack-track-card p {
   margin: 0;
   color: var(--muted);
 }
 
-.review-pack-action-card p,
-.review-pack-asset-card p {
+.summary-pack-action-card p,
+.summary-pack-asset-card p {
   margin: 0;
   color: var(--muted);
 }
 
-.executive-review-pack.compact .review-pack-columns {
+.executive-summary-pack.compact .summary-pack-columns {
   grid-template-columns: 1fr;
 }
 
-.executive-review-pack.compact .service-chip-row {
+.executive-summary-pack.compact .service-chip-row {
   width: 100%;
 }
 
@@ -2109,8 +2109,8 @@ textarea {
   .service-brief-meta,
   .service-brief-columns,
   .service-brief-flow,
-  .review-pack-grid,
-  .review-pack-columns {
+  .summary-pack-grid,
+  .summary-pack-columns {
     grid-template-columns: 1fr;
   }
 

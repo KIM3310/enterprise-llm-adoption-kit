@@ -110,5 +110,5 @@ An IaC draft for this architecture is included at:
 
 It is intentionally conservative:
 - Secure defaults, placeholder secrets, and no production claims.
-- Designed for reviewers to inspect, not for a “one click prod deploy.”
+- Designed for operators to inspect, not for a “one click prod deploy.”
 

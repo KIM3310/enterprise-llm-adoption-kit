@@ -17,5 +17,5 @@ JSONL with fields:
 
 ## Reports
 - JSON for metrics and raw outputs
-- Markdown summary for reviewers
+- Markdown summary for operators
 - Baseline diff to catch regressions

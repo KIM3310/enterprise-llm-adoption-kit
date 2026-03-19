@@ -10,7 +10,7 @@ This repo is strongest when read as a runnable enterprise decision lab:
 
 - discovery artifacts map into system design instead of stopping at strategy slides
 - governance, evals, audit, and rollout posture stay visible through working routes
-- buyer-facing architecture discussion can be backed by code, metrics, and proof surfaces
+- buyer-facing architecture discussion can be backed by code, metrics, and evidence surfaces
 
 For the broader portfolio, this is the repo that best supports governed analytics, lakehouse delivery, high-trust workflow, and enterprise solution-architecture conversations.
 Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-engineer flagship and use this repo as the enterprise/governed-delivery support flagship for solutions-architecture conversations.
@@ -18,13 +18,13 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 ## Portfolio posture
 - Read this repo like an enterprise decision lab you can actually run, not like a sales deck wearing a UI.
 - In the overall portfolio story, this repo is the governed-enterprise branch that supports the primary `stage-pilot` AI-engineer narrative rather than replacing it.
-- The strongest proof is still service brief -> executive review pack -> audit/metrics -> checked-in eval artifacts.
-- Fast review path: Review Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
+- The strongest proof is still service brief -> executive summary pack -> audit/metrics -> checked-in eval artifacts.
+- Fast review path: Summary Pack At A Glance -> 2-Minute Proof Path -> Further Reading.
 
 ## Role signals
 - **AI engineer:** evals, governance, runtime diagnostics, and enterprise LLM surfaces are runnable here, but this repo is best read as the enterprise support branch behind the primary `stage-pilot` flagship.
 - **Solutions architect / cloud architect:** this is the best portfolio repo for governed enterprise AI, rollout and rollback conversations, and platform-mapping discussions backed by working proof.
-- **Field / solutions engineer:** executive review pack, rollout tracks, and proof assets support a buyer-facing walkthrough without hiding the technical surfaces.
+- **Field / solutions engineer:** executive summary pack, rollout tracks, and test assets support a buyer-facing walkthrough without hiding the technical surfaces.
 
 
 ## Portfolio context
@@ -47,16 +47,16 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 
 | Team lens | What should stand out fast | Start here |
 |---|---|---|
-| Governed analytics | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /audit/summary` |
+| Governed analytics | governed analytics posture, auditability, warehouse/platform dialogue, rollout packaging | `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /audit/summary` |
 | Lakehouse delivery | evals, platform mapping, experiment-friendly runtime surfaces, deployment options | `GET /ops/service-brief`, `GET /metrics`, [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) |
-| High-trust enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/review-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
-| Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), `GET /ops/workshop-readout-pack`, `GET /ops/review-pack`, `/metrics` |
+| High-trust enterprise ops | approval-safe workflow, review-first artifacts, operational handoff, policy-visible runtime | `GET /ops/summary-pack`, `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill` |
+| Solution architect / field engineer | executive narrative plus technical proof in one repo | [`docs/application/evidence_map.md`](docs/application/evidence_map.md), `GET /ops/workshop-readout-pack`, `GET /ops/summary-pack`, `/metrics` |
 
 ## Repository surfaces
 - **Primary runtime:** the runnable product lives under `app/` (backend + frontend demo flow).
 - **Supporting evidence:** `docs/`, `evals/`, and `tools/` collect architecture notes, review artifacts, and validation utilities.
 - **Generated review bundles:** `dist/application_bundle_*` is generated on demand by `scripts/package_application.sh` and is intentionally not kept as source-of-truth content in the repo.
-- **If you're new:** run the app first, then pull in the review pack and eval artifacts once the runtime story is already clear.
+- **If you're new:** run the app first, then pull in the summary pack and eval artifacts once the runtime story is already clear.
 
 ## Demo video
 - YouTube: https://youtu.be/yMq03b0js0E
@@ -67,34 +67,34 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 ## Workshop evidence
 ![Workshop readout board](docs/sales/demo_screenshots/15_workshop_readout.svg)
 
-## Review Pack At A Glance
-- Reviewer API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
+## Summary Pack At A Glance
+- Evaluation API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
 - Workshop closeout surface: `GET /ops/workshop-readout-pack`, `GET /ops/workshop-readout-pack/schema`
 - Rollout decision surfaces: `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill`
 - Bounded public live lane: `POST /ops/live-workshop-preview`
-- Proof bundle: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
-- Platform dialogue: AWS, warehouse, lakehouse, high-trust delivery, and MariaDB rollout mapping in one pack
-- Reviewer map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
+- Evidence summary: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
+- Platform dialogue: AWS, warehouse, lakehouse, reliable delivery, and MariaDB rollout mapping in one pack
+- Reviewer map: [`docs/application/evidence_map.md`](docs/application/evidence_map.md)
 
 ## 2-Minute Proof Path
 - `GET /ops/service-brief` -> confirm runtime posture and evidence counts.
 - `GET /ops/workshop-readout-pack` -> inspect discovery output, pilot recommendation, visual evidence, and handoff assets.
-- `GET /ops/review-pack` -> inspect buyer promises, rollout tracks, and proof assets.
+- `GET /ops/summary-pack` -> inspect buyer promises, rollout tracks, and test assets.
 - `GET /ops/rollout-gates` -> inspect go/no-go owners, blockers, rollback posture, and release recommendation.
 - `GET /audit/summary` + `GET /metrics` -> show governance and LLMOps signals.
 - `docs/architecture/llm_deployment_options.md` + `docs/blueprint/09_customer_journey.md` -> connect evidence to rollout path.
 
-## Reviewer Front Door
-- **Recruiter / hiring manager:** start with [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md), then open `GET /ops/service-brief`.
+## Quick Start
+- **Recruiter / hiring manager:** start with [`docs/application/evidence_map.md`](docs/application/evidence_map.md), then open `GET /ops/service-brief`.
 - **AI engineer:** use `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
-- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/workshop-readout-pack` -> `GET /ops/review-pack` -> `GET /ops/rollout-gates`.
-- **Operator / platform reviewer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /ops/rollout-gates` -> `GET /metrics`.
+- **Solutions architect:** start with [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md), then open `GET /ops/workshop-readout-pack` -> `GET /ops/summary-pack` -> `GET /ops/rollout-gates`.
+- **Operator / platform engineer:** use `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /ops/rollout-gates` -> `GET /metrics`.
 
-![Enterprise review pack](docs/review-pack.svg)
+![Enterprise summary pack](docs/summary-pack.svg)
 
 ## Further Reading
 
-- Reviewer proof map: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
+- Validation data map: [`docs/application/evidence_map.md`](docs/application/evidence_map.md)
 - Reading guide: [`docs/application/role_ready_paths.md`](docs/application/role_ready_paths.md)
 - Application bundle README: [`docs/application/README.md`](docs/application/README.md)
 
@@ -102,11 +102,11 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 
 - AdSense and analytics are optional review-surface extras, not part of the core product proof.
 - Keep monetization IDs and analytics consent settings environment-specific when moving beyond review/demo deployments.
-- For enterprise walkthroughs, prioritize the service brief, review pack, and audit/metrics routes before any sponsored/community surfaces.
+- For enterprise walkthroughs, prioritize the service brief, summary pack, and audit/metrics routes before any sponsored/community surfaces.
 
 ## Project summary (implementation-focused)
 - Built an end-to-end adoption kit to show how enterprise LLM discovery turns into a secure, testable, and observable PoC.
-- Implemented a working backend + frontend demo so reviewers can run it locally and verify behavior.
+- Implemented a working backend + frontend demo so anyone can run it locally and verify behavior.
 - Kept the scope realistic: stub LLM adapter, synthetic data, and explicit limitations so the portfolio stays honest.
 
 ## My role & scope
@@ -133,10 +133,10 @@ Within the broader portfolio hierarchy, keep `stage-pilot` as the primary AI-eng
 - SQLite for daily cost rollups
 
 ## Canonical runtime + artifact map
-- Canonical runtime: `app/backend` FastAPI plus the `app/frontend` React/Vite reviewer UI.
+- Canonical runtime: `app/backend` FastAPI plus the `app/frontend` React/Vite operator UI.
 - `docs/` is the editable source for the architecture, sales, and eval collateral referenced by the review APIs.
 - `scripts/package_application.sh` assembles timestamped review/export snapshots from `docs/` into `dist/application_bundle_*` when you need a handoff bundle.
-- `app/frontend/dist/` is the static publish output for the reviewer shell, while `dist/scenario_runs/` is generated Scenario Runner output.
+- `app/frontend/dist/` is the static publish output for the operator shell, while `dist/scenario_runs/` is generated Scenario Runner output.
 
 ## Troubleshooting & verification notes (reproducible checks)
 - RBAC leakage risk: access-group filtering enforced in retrieval and re-checked post-query. Verification: `tests/test_rbac.py` and AT-02 in `docs/blueprint/06_acceptance_tests.md`.
@@ -167,22 +167,22 @@ make portfolio-check
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
-curl -fsS http://localhost:8000/ops/review-pack | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/summary-pack | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/rollout-gates | python3 -m json.tool | head -n 60
-curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | head -n 40
+curl -fsS http://localhost:8000/ops/summary-pack/schema | python3 -m json.tool | head -n 40
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
 ## Runtime Surfaces
-- `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and reviewers
+- `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and operators
 - `GET /ops/workshop-readout-pack`: field-ready workshop closeout pack tying discovery, pilot lane, rollout gates, and visual evidence together
-- `GET /ops/review-pack`: executive-facing review surface with rollout tracks, platform dialogue, and review sequence
+- `GET /ops/summary-pack`: executive-facing review surface with rollout tracks, platform dialogue, and review sequence
 - `GET /ops/rollout-board`: compact rollout decision board for matching buyer fit, runtime posture, and delivery lane
 - `GET /ops/rollout-gates`: go/no-go gate surface for runtime, governance, eval, and rollback decisions
 - `GET /ops/rollout-drill`: rollback drill surface for guardrail trip points, kill-switch posture, and rollout recovery
-- `GET /ops/review-pack/schema`: explicit contract surface for review actions, proof assets, and runtime surfaces
+- `GET /ops/summary-pack/schema`: explicit contract surface for review actions, test assets, and runtime surfaces
 - `GET /ops/service-brief/schema`: explicit contract surface for the service brief payload
-- Home/Readiness UI now renders an `Executive Readiness Board` plus `Executive Review Pack`, including review actions, proof assets, and runtime surfaces, even in static mode
+- Home/Readiness UI now renders an `Executive Readiness Board` plus `Executive Summary Pack`, including review actions, test assets, and runtime surfaces, even in static mode
 
 ## Customer journey (Discovery -> Production)
 - Blueprint: `docs/blueprint/09_customer_journey.md`
@@ -262,7 +262,7 @@ ollama pull llama3.2:latest
 make demo-ollama-local
 ```
 
-The script starts backend + frontend and opens a reviewer-ready local flow on `http://localhost:5173`.
+The script starts backend + frontend and opens a ready local flow on `http://localhost:5173`.
 
 ## Value tour (5 minutes)
 Use this sequence to feel the service utility, not just feature checkboxes:
@@ -377,12 +377,12 @@ make quality-backend
 - Integration demo checklist: `docs/sales/integration_demo_checklist.md`
 - Red-team summary: `docs/evals/redteam_summary.md`
 - Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
-These proof artifacts and demo scripts are designed to support discovery and PoC alignment in pre-sales conversations.
+These test artifacts and demo scripts are designed to support discovery and PoC alignment in pre-sales conversations.
 
 ## UI walkthrough (local)
 - Tabs: Overview / Capabilities / Readiness / Scenario Runner / Console
 - Scenario Runner: runs JWT -> UC1 -> UC2 -> governance/ops checks and exports a Markdown report
-- Console: lets reviewers call UC1/UC2 and load `/audit/summary` and `/ops/runtime` (role-gated)
+- Console: lets operators call UC1/UC2 and load `/audit/summary` and `/ops/runtime` (role-gated)
 
 ## Publishing safety (before you push)
 This repo is safe to publish: runtime data (SQLite DB, audit log, Chroma persistence) is generated locally and ignored by git.

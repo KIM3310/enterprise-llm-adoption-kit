@@ -11,7 +11,7 @@ Early‑career Applied AI / Pre‑Sales Architect candidate demonstrating end‑
 - LLMOps metrics, cost tracking, rate limiting, retry/backoff
 
 ## Project Suite (1–5)
-1. **Pre‑Sales PoC Kit** — secure LLM app patterns + proof artifacts
+1. **Pre‑Sales PoC Kit** — secure LLM app patterns + test artifacts
 2. **Enterprise Integration Pack** — OIDC mock, Slack webhook, Jira ticket flow
 3. **Workshop‑in‑a‑Box** — 3‑hour workshop with auto‑generated outputs
 4. **Red Team & Safety Pack** — redteam dataset + refusal guardrail + gate

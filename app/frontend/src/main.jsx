@@ -65,7 +65,7 @@ class AppErrorBoundary extends React.Component {
               The interactive console hit a render error.
             </h1>
             <p style={{ color: "#475467", lineHeight: 1.6, margin: 0 }}>
-              Refresh the page or open the reviewer bundle path while the interactive surface recovers.
+              Refresh the page or open the export summary path while the interactive surface recovers.
             </p>
           </section>
         </div>

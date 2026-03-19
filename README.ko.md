@@ -10,19 +10,19 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 ## 스냅샷
 ![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
 
-## Review Pack 한눈에 보기
-- 리뷰어 API: `GET /ops/service-brief`, `GET /ops/review-pack`, `GET /ops/review-pack/schema`
+## Summary Pack 한눈에 보기
+- 리뷰어 API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
 - 증거 번들: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - 플랫폼 대화: AWS, Databricks, Snowflake, Palantir, MariaDB 롤아웃 매핑을 한 팩에 압축
-- 리뷰어 맵: [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md)
+- 리뷰어 맵: [`docs/application/evidence_map.md`](docs/application/evidence_map.md)
 
-## Reviewer Front Door
-- **채용 담당자 / hiring manager:** [`docs/application/reviewer_proof_map.md`](docs/application/reviewer_proof_map.md) -> `GET /ops/service-brief`
+## Quick Start
+- **채용 담당자 / hiring manager:** [`docs/application/evidence_map.md`](docs/application/evidence_map.md) -> `GET /ops/service-brief`
 - **AI engineer 면접관:** `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`
-- **솔루션 아키텍트 면접관:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/review-pack`
+- **솔루션 아키텍트 면접관:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/summary-pack`
 - **운영 / 플랫폼 리뷰어:** `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`
 
-![Enterprise review pack](docs/review-pack.svg)
+![Enterprise summary pack](docs/summary-pack.svg)
 
 ## 프로젝트 요약 (신입/핸즈온 관점)
 - 엔터프라이즈 LLM 도입의 Discovery 결과가 어떻게 안전하고 검증 가능한 PoC로 이어지는지 end-to-end로 보여주기 위해 만들었습니다.
@@ -81,17 +81,17 @@ make portfolio-check
 ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
-curl -fsS http://localhost:8000/ops/review-pack | python3 -m json.tool | head -n 60
-curl -fsS http://localhost:8000/ops/review-pack/schema | python3 -m json.tool | head -n 40
+curl -fsS http://localhost:8000/ops/summary-pack | python3 -m json.tool | head -n 60
+curl -fsS http://localhost:8000/ops/summary-pack/schema | python3 -m json.tool | head -n 40
 curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool | head -n 40
 ```
 
 ## Runtime Surface
 - `GET /ops/service-brief`: 구매자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
-- `GET /ops/review-pack`: executive review surface, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
-- `GET /ops/review-pack/schema`: review actions, proof assets, runtime surfaces에 대한 명시적 계약 표면
+- `GET /ops/summary-pack`: executive review surface, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
+- `GET /ops/summary-pack/schema`: review actions, test assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
-- Home/Readiness UI에 `Executive Readiness Board`와 `Executive Review Pack`을 추가해 review actions, proof assets, runtime surfaces까지 정적 fallback으로 유지합니다
+- Home/Readiness UI에 `Executive Readiness Board`와 `Executive Summary Pack`을 추가해 review actions, test assets, runtime surfaces까지 정적 fallback으로 유지합니다
 
 ## 고객 여정 (Discovery -> Production)
 - Blueprint: `docs/blueprint/09_customer_journey.md`

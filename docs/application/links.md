@@ -1,7 +1,7 @@
 # Links (local paths)
 
 - Main repo README: `README.md`
-- Reviewer proof map: `docs/application/reviewer_proof_map.md`
+- Validation data map: `docs/application/evidence_map.md`
 - Modules index: `docs/modules/README.md`
 - Customer journey: `docs/blueprint/09_customer_journey.md`
 - LLM deployment options: `docs/architecture/llm_deployment_options.md`

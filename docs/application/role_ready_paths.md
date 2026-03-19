@@ -1,6 +1,6 @@
 # Role-Ready Paths
 
-This repo already contains a large amount of pre-sales, architecture, eval, and rollout material. Start with `docs/application/reviewer_proof_map.md` if you want the shortest reviewer route, then use the paths below depending on the target role.
+This repo already contains a large amount of pre-sales, architecture, eval, and rollout material. Start with `docs/application/evidence_map.md` if you want the shortest data route, then use the paths below depending on the target role.
 
 ## AI Engineer
 
@@ -9,7 +9,7 @@ This repo already contains a large amount of pre-sales, architecture, eval, and 
 - `docs/architecture/llmops_observability.md`
 - `docs/architecture/safety_guardrails.md`
 - `GET /ops/service-brief`
-- `GET /ops/review-pack`
+- `GET /ops/summary-pack`
 
 ## Solutions Architect
 

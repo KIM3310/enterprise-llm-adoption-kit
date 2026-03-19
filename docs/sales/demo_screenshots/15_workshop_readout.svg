@@ -42,10 +42,10 @@
   <text x="108" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Visual evidence</text>
   <text x="108" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- exec value dashboard snapshot</text>
   <text x="108" y="732" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- workshop readout board</text>
-  <text x="108" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- review pack diagram</text>
+  <text x="108" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">- summary pack diagram</text>
 
   <rect x="520" y="620" width="380" height="180" rx="20" fill="#172036" stroke="#334155"/>
-  <text x="548" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Primary proof routes</text>
+  <text x="548" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Primary evidence routes</text>
   <text x="548" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">/ops/service-brief</text>
   <text x="548" y="732" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">/ops/customer-architecture-pack</text>
   <text x="548" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">/ops/workshop-readout-pack</text>

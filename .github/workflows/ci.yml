@@ -83,5 +83,5 @@ jobs:
       - name: Install ripgrep
         run: sudo apt-get update && sudo apt-get install -y ripgrep
 
-      - name: AdSense/Cloudflare review gate
+      - name: AdSense/Cloudflare quality gate
         run: bash tools/release_ops.sh check

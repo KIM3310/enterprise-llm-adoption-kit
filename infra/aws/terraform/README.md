@@ -3,7 +3,7 @@ This folder contains a **draft** Terraform configuration that matches the concep
 - `docs/architecture/aws_openai_reference_architecture.md`
 
 Notes:
-- This is **not** a production module. It is a portfolio-quality scaffold for reviewers.
+- This is **not** a production module. It is a portfolio-quality scaffold for operators.
 - Defaults are conservative and avoid embedding secrets in code.
 - You should use remote state (S3 + DynamoDB) for any real environment.
 

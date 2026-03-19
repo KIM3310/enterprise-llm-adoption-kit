@@ -36,14 +36,14 @@
 |------|--------|
 | test_ops_service_brief_contract | PASSED |
 | test_ops_service_brief_schema_contract | PASSED |
-| test_ops_review_pack_contract | PASSED |
+| test_ops_summary_pack_contract | PASSED |
 | test_ops_customer_architecture_pack_contract | PASSED |
 | test_ops_customer_architecture_pack_schema_contract | PASSED |
 | test_ops_workshop_readout_pack_contract | PASSED |
 | test_ops_live_workshop_preview_contract | PASSED |
 | test_ops_workshop_readout_pack_schema_contract | PASSED |
-| test_ops_review_pack_flags_degraded_runtime_posture | PASSED |
-| test_ops_review_pack_schema_contract | PASSED |
+| test_ops_summary_pack_flags_degraded_runtime_posture | PASSED |
+| test_ops_summary_pack_schema_contract | PASSED |
 | test_ops_review_summary_contract | PASSED |
 | test_ops_rollout_board_contract | PASSED |
 | test_ops_rollout_board_schema_contract | PASSED |
@@ -72,7 +72,7 @@
 | test_frontend_index_includes_review_surface_metadata | PASSED |
 | test_exec_deck_html_contains_title | PASSED |
 | test_ui_includes_service_brief_board | PASSED |
-| test_ui_includes_executive_review_pack | PASSED |
+| test_ui_includes_executive_summary_pack | PASSED |
 | test_ui_includes_discovery_audit_tab | PASSED |
 | test_demo_placeholders_created | PASSED |
 

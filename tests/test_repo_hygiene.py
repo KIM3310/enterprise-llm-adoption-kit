@@ -10,7 +10,7 @@ def test_public_repo_hygiene_files_exist() -> None:
         "SECURITY.md",
         "CONTRIBUTING.md",
         "docs/portfolio_overhaul_plan.md",
-        "docs/application/reviewer_proof_map.md",
+        "docs/application/evidence_map.md",
     ]:
         assert (ROOT_DIR / relative_path).exists(), relative_path
 
@@ -21,10 +21,10 @@ def test_readme_and_application_docs_reference_proof_map() -> None:
     application_readme = (ROOT_DIR / "docs/application/README.md").read_text()
     application_links = (ROOT_DIR / "docs/application/links.md").read_text()
 
-    assert "docs/application/reviewer_proof_map.md" in readme
-    assert "docs/application/reviewer_proof_map.md" in readme_ko
-    assert "reviewer_proof_map.md" in application_readme
-    assert "docs/application/reviewer_proof_map.md" in application_links
+    assert "docs/application/evidence_map.md" in readme
+    assert "docs/application/evidence_map.md" in readme_ko
+    assert "evidence_map.md" in application_readme
+    assert "docs/application/evidence_map.md" in application_links
 
 
 def test_makefile_includes_portfolio_review_targets() -> None:

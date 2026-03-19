@@ -441,7 +441,7 @@ class StubLLMAdapter(LLMAdapter):
 
             lines.append("")
             lines.append("Recommended next actions:")
-            lines.append("- Run the Scenario Runner and export a validation report for reviewers.")
+            lines.append("- Run the Scenario Runner and export a validation report for operators.")
             lines.append("- Verify citations are relevant and stable across roles (Employee vs Ops/Admin).")
             lines.append("- Set explicit cost/latency guardrails and monitor via /metrics.")
             if citations:

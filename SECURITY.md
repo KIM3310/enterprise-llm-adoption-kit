@@ -14,7 +14,7 @@ Please do **not** include:
 
 ## Expected posture
 - Default runtime is demo-safe and often stubbed.
-- Reviewer-facing claims should stay grounded in checked-in docs, tests, and runtime endpoints.
+- User-facing claims should stay grounded in checked-in docs, tests, and runtime endpoints.
 - Changes that affect auth, audit handling, integrations, or data exposure should include verification evidence.
 
 ## Out of scope

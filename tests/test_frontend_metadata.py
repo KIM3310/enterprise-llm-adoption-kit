@@ -17,4 +17,4 @@ def test_frontend_index_includes_review_surface_metadata():
     assert 'name="twitter:description"' in content
     assert 'name="twitter:image"' in content
     assert 'name="google-adsense-account"' in content
-    assert "review-pack.svg" in content
+    assert "summary-pack.svg" in content

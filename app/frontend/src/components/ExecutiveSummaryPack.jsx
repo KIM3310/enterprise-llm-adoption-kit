@@ -29,29 +29,29 @@ async function copyTextToClipboard(text) {
   }
 }
 
-export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
+export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) {
   const [copyStatus, setCopyStatus] = React.useState("");
 
-  if (!reviewPack) {
+  if (!summaryPack) {
     return null;
   }
 
   const compact = variant === "compact";
-  const buyerPromises = Array.isArray(reviewPack.buyer_promises) ? reviewPack.buyer_promises : [];
-  const rolloutTracks = Array.isArray(reviewPack.rollout_tracks) ? reviewPack.rollout_tracks : [];
-  const platformDialogues = Array.isArray(reviewPack.platform_dialogues) ? reviewPack.platform_dialogues : [];
-  const reviewSequence = Array.isArray(reviewPack.review_sequence) ? reviewPack.review_sequence : [];
-  const stageMap = Array.isArray(reviewPack.stage_map) ? reviewPack.stage_map : [];
-  const watchouts = Array.isArray(reviewPack.watchouts) ? reviewPack.watchouts : [];
-  const reviewActions = Array.isArray(reviewPack.review_actions) ? reviewPack.review_actions : [];
-  const twoMinuteReview = Array.isArray(reviewPack.two_minute_review) ? reviewPack.two_minute_review : [];
-  const rolePaths = Array.isArray(reviewPack.role_paths) ? reviewPack.role_paths : [];
-  const reviewGate = reviewPack.review_gate || {};
-  const proofBundle = reviewPack.proof_bundle || {};
-  const reviewAssets = Array.isArray(proofBundle.review_assets) ? proofBundle.review_assets : [];
-  const runtimeSurfaces = Array.isArray(proofBundle.runtime_surfaces) ? proofBundle.runtime_surfaces : [];
-  const runtimeSummary = reviewPack.runtime_summary || {};
-  const fastReviewSurfaces = Object.entries(reviewPack.links || {}).filter(([, surface]) => typeof surface === "string" && surface).slice(0, compact ? 4 : 6);
+  const buyerPromises = Array.isArray(summaryPack.buyer_promises) ? summaryPack.buyer_promises : [];
+  const rolloutTracks = Array.isArray(summaryPack.rollout_tracks) ? summaryPack.rollout_tracks : [];
+  const platformDialogues = Array.isArray(summaryPack.platform_dialogues) ? summaryPack.platform_dialogues : [];
+  const reviewSequence = Array.isArray(summaryPack.review_sequence) ? summaryPack.review_sequence : [];
+  const stageMap = Array.isArray(summaryPack.stage_map) ? summaryPack.stage_map : [];
+  const watchouts = Array.isArray(summaryPack.watchouts) ? summaryPack.watchouts : [];
+  const reviewActions = Array.isArray(summaryPack.review_actions) ? summaryPack.review_actions : [];
+  const twoMinuteReview = Array.isArray(summaryPack.two_minute_review) ? summaryPack.two_minute_review : [];
+  const rolePaths = Array.isArray(summaryPack.role_paths) ? summaryPack.role_paths : [];
+  const reviewGate = summaryPack.review_gate || {};
+  const evidenceBundle = summaryPack.evidence_bundle || {};
+  const reviewAssets = Array.isArray(evidenceBundle.review_assets) ? evidenceBundle.review_assets : [];
+  const runtimeSurfaces = Array.isArray(evidenceBundle.runtime_surfaces) ? evidenceBundle.runtime_surfaces : [];
+  const runtimeSummary = summaryPack.runtime_summary || {};
+  const fastReviewSurfaces = Object.entries(summaryPack.links || {}).filter(([, surface]) => typeof surface === "string" && surface).slice(0, compact ? 4 : 6);
   const describePlatformDialogue = (item) => {
     if (typeof item === "string") {
       return item;
@@ -69,15 +69,15 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   const surfaceHints = {
     health: "Confirm startup posture and runtime state before discussing rollout.",
     service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
-    review_pack: "Open the executive overview for buyer promises and rollout tracks.",
-    review_pack_schema: "Lock the explicit contract for review actions and proof assets.",
-    metrics: "Show runtime cost and latency visibility without leaving the reviewer path.",
+    summary_pack: "Open the executive overview for buyer promises and rollout tracks.",
+    summary_pack_schema: "Lock the explicit contract for review actions and test assets.",
+    metrics: "Show runtime cost and latency visibility without leaving the evaluation path.",
     audit_summary: "Surface audit and governance signals before making enterprise-readiness claims.",
     customer_journey: "Tie the technical proof back to adoption sequence.",
     deployment_options: "Map API-first, workspace-first, and hybrid rollout options.",
     exec_summary_template: "Keep the narrative anchored in buyer language.",
     qbr_template: "Show how proof rolls forward into executive cadence.",
-    proof_map: "Open the role-based proof map when the reviewer needs the shortest evidence path.",
+    proof_map: "Open the role-based evidence map when the user needs the shortest evidence path.",
   };
   const fastReviewRouteText = [
     "Enterprise review routes",
@@ -89,10 +89,10 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   ].join("\n");
   const supportingEvidenceText = [
     "Enterprise executive overview",
-    `Tests: ${proofBundle.tests || 0}`,
-    `Blueprints: ${proofBundle.blueprints || 0}`,
-    `Eval Assets: ${proofBundle.eval_assets || 0}`,
-    `Review Assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
+    `Tests: ${evidenceBundle.tests || 0}`,
+    `Blueprints: ${evidenceBundle.blueprints || 0}`,
+    `Eval Assets: ${evidenceBundle.eval_assets || 0}`,
+    `Review Assets: ${evidenceBundle.review_assets_count || reviewAssets.length || 0}`,
     ...(reviewAssets.length
       ? ["", "Supporting assets", ...reviewAssets.map((item) => `- ${item}`)]
       : []),
@@ -102,7 +102,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   ].join("\n");
   const rolloutSnapshotText = [
     "Enterprise rollout snapshot",
-    `Headline: ${reviewPack.headline}`,
+    `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
     "",
     "Buyer promises",
@@ -116,10 +116,10 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   ].join("\n");
   const buyerThesisText = [
     "Enterprise buyer thesis snapshot",
-    `Headline: ${reviewPack.headline}`,
+    `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
-    `Review assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
-    `Endpoints: ${Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0}`,
+    `Review assets: ${evidenceBundle.review_assets_count || reviewAssets.length || 0}`,
+    `Endpoints: ${Array.isArray(evidenceBundle.review_endpoints) ? evidenceBundle.review_endpoints.length : 0}`,
     "",
     "Buyer promises",
     ...buyerPromises.slice(0, 3).map((item) => `- ${item}`),
@@ -129,11 +129,11 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   ].join("\n");
   const rolloutDecisionBriefText = [
     "Enterprise rollout decision brief",
-    `Headline: ${reviewPack.headline}`,
+    `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
     `Circuit: ${runtimeSummary.llm_circuit_state || "-"}`,
-    `Review assets: ${proofBundle.review_assets_count || reviewAssets.length || 0}`,
-    `Endpoints: ${Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0}`,
+    `Review assets: ${evidenceBundle.review_assets_count || reviewAssets.length || 0}`,
+    `Endpoints: ${Array.isArray(evidenceBundle.review_endpoints) ? evidenceBundle.review_endpoints.length : 0}`,
     "",
     "Recommended rollout tracks",
     ...(rolloutTracks.length > 0
@@ -141,7 +141,7 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
           (track, index) =>
             `${index + 1}. ${track.track}: ${track.milestone} (${Array.isArray(track.fit_for) ? track.fit_for.join(", ") : "fit review"})`
         )
-      : ["1. Review pack unavailable. Start with /ops/service-brief and /ops/rollout-board."]),
+      : ["1. Summary pack unavailable. Start with /ops/service-brief and /ops/rollout-board."]),
     "",
     "Platform dialogue",
     ...(platformDialogues.length > 0
@@ -189,59 +189,59 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
   };
 
   return (
-    <section className={`executive-review-pack${compact ? " compact" : ""}`}>
+    <section className={`executive-summary-pack${compact ? " compact" : ""}`}>
       <div className="service-brief-head">
         <div className="service-brief-copy">
-          <p className="eyebrow">Executive Review Pack</p>
+          <p className="eyebrow">Executive Summary Pack</p>
           <h3>Buyer thesis, governance proof, and deployment narrative</h3>
-          <p>{reviewPack.headline}</p>
+          <p>{summaryPack.headline}</p>
         </div>
         <div className="service-chip-row">
-          <span className="chip">{reviewPack.contract_version}</span>
+          <span className="chip">{summaryPack.contract_version}</span>
           <span className="chip">runtime {runtimeSummary.llm_provider || "-"}</span>
           <span className="chip">startup {runtimeSummary.startup_status || "-"}</span>
           <span className="chip">circuit {runtimeSummary.llm_circuit_state || "-"}</span>
         </div>
       </div>
 
-      <div className="review-pack-metrics">
+      <div className="summary-pack-metrics">
         <article className="service-metric-card">
           <span>Tests</span>
-          <strong>{proofBundle.tests || 0}</strong>
+          <strong>{evidenceBundle.tests || 0}</strong>
         </article>
         <article className="service-metric-card">
           <span>Blueprints</span>
-          <strong>{proofBundle.blueprints || 0}</strong>
+          <strong>{evidenceBundle.blueprints || 0}</strong>
         </article>
         <article className="service-metric-card">
           <span>Eval Assets</span>
-          <strong>{proofBundle.eval_assets || 0}</strong>
+          <strong>{evidenceBundle.eval_assets || 0}</strong>
         </article>
         <article className="service-metric-card">
           <span>Endpoints</span>
-          <strong>{Array.isArray(proofBundle.review_endpoints) ? proofBundle.review_endpoints.length : 0}</strong>
+          <strong>{Array.isArray(evidenceBundle.review_endpoints) ? evidenceBundle.review_endpoints.length : 0}</strong>
         </article>
         <article className="service-metric-card">
           <span>Review Assets</span>
-          <strong>{proofBundle.review_assets_count || reviewAssets.length || 0}</strong>
+          <strong>{evidenceBundle.review_assets_count || reviewAssets.length || 0}</strong>
         </article>
       </div>
 
-      <div className="review-pack-grid">
+      <div className="summary-pack-grid">
         <article className="service-brief-card">
-          <p className="service-card-label">Review gate</p>
+          <p className="service-card-label">Quality gate</p>
           <strong>{reviewGate.status || "unknown"}</strong>
           <p>{reviewGate.blocker || "No explicit blocker recorded."}</p>
-          <p className="meta-text">{reviewGate.next_step || "Open the review pack before moving into runtime-specific claims."}</p>
+          <p className="meta-text">{reviewGate.next_step || "Open the summary pack before moving into runtime-specific claims."}</p>
         </article>
         <article className="service-brief-card">
           <p className="service-card-label">Fallback posture</p>
           <strong>{runtimeSummary.startup_status || "-"}</strong>
-          <p>{reviewGate.fallback_posture || "Keep the walkthrough grounded in checked-in proof assets if runtime evidence is degraded."}</p>
+          <p>{reviewGate.fallback_posture || "Keep the walkthrough grounded in checked-in test assets if runtime evidence is degraded."}</p>
         </article>
       </div>
 
-      <div className="review-pack-toolbar">
+      <div className="summary-pack-toolbar">
         <button type="button" onClick={() => void handleCopyRoutes()}>
           Copy Review Routes
         </button>
@@ -260,24 +260,24 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         <button type="button" onClick={() => void handleCopyRolloutDecisionBrief()}>
           Copy Rollout Decision Brief
         </button>
-        {copyStatus ? <span className="review-pack-toolbar-status">{copyStatus}</span> : null}
+        {copyStatus ? <span className="summary-pack-toolbar-status">{copyStatus}</span> : null}
       </div>
 
       <article className="service-brief-card">
         <p className="service-card-label">Fast review surfaces</p>
-        <p className="service-support-note">Keep governance and deployment evidence visible in the same reviewer path.</p>
-        <div className="review-pack-action-list">
+        <p className="service-support-note">Keep governance and deployment evidence visible in the same evaluation path.</p>
+        <div className="summary-pack-action-list">
           {fastReviewSurfaces.map(([label, surface]) => (
-            <div key={`${label}-${surface}`} className="review-pack-action-card">
+            <div key={`${label}-${surface}`} className="summary-pack-action-card">
               <strong>{label.replaceAll("_", " ")}</strong>
               <code className="service-path">{surface}</code>
-              <p>{surfaceHints[label] || "Reviewer-visible route or doc for the executive walkthrough."}</p>
+              <p>{surfaceHints[label] || "Visible route or doc for the executive walkthrough."}</p>
             </div>
           ))}
         </div>
       </article>
 
-      <div className="review-pack-grid">
+      <div className="summary-pack-grid">
         <article className="service-brief-card">
           <p className="service-card-label">Buyer promises</p>
           <ul className="service-brief-list">
@@ -298,10 +298,10 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
       </div>
 
       <article className="service-brief-card">
-        <p className="service-card-label">2-minute proof path</p>
-        <div className="review-pack-action-list">
+        <p className="service-card-label">2-minute evidence path</p>
+        <div className="summary-pack-action-list">
           {twoMinuteReview.slice(0, compact ? 2 : 4).map((item) => (
-            <div key={`${item.step}-${item.surface}`} className="review-pack-action-card">
+            <div key={`${item.step}-${item.surface}`} className="summary-pack-action-card">
               <strong>{item.step}</strong>
               <code className="service-path">{item.surface}</code>
               <p>{item.proof}</p>
@@ -313,9 +313,9 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
       {rolePaths.length > 0 && (
         <article className="service-brief-card">
           <p className="service-card-label">Reviewer lanes</p>
-          <div className="review-pack-action-list">
+          <div className="summary-pack-action-list">
             {rolePaths.map((path) => (
-              <div key={path.role} className="review-pack-action-card">
+              <div key={path.role} className="summary-pack-action-card">
                 <strong>{path.role}</strong>
                 <p>{path.goal}</p>
                 <code className="service-path">Entry: {path.first_surface}</code>
@@ -326,12 +326,12 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         </article>
       )}
 
-      <div className="review-pack-columns">
+      <div className="summary-pack-columns">
         <article className="service-brief-card">
           <p className="service-card-label">Rollout tracks</p>
-          <div className="review-pack-track-list">
+          <div className="summary-pack-track-list">
             {rolloutTracks.slice(0, compact ? 2 : 3).map((track) => (
-              <div key={track.track} className="review-pack-track-card">
+              <div key={track.track} className="summary-pack-track-card">
                 <strong>{track.track}</strong>
                 <p>{Array.isArray(track.fit_for) ? track.fit_for.join(" · ") : ""}</p>
                 <code className="service-path">{track.evidence}</code>
@@ -362,12 +362,12 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
         </article>
       </div>
 
-      <div className="review-pack-columns">
+      <div className="summary-pack-columns">
         <article className="service-brief-card">
           <p className="service-card-label">Review actions</p>
-          <div className="review-pack-action-list">
+          <div className="summary-pack-action-list">
             {reviewActions.slice(0, compact ? 2 : 4).map((item) => (
-              <div key={`${item.label}-${item.surface}`} className="review-pack-action-card">
+              <div key={`${item.label}-${item.surface}`} className="summary-pack-action-card">
                 <strong>{item.label}</strong>
                 <code className="service-path">{item.surface}</code>
                 <p>{item.proof}</p>
@@ -378,9 +378,9 @@ export default function ExecutiveReviewPack({ reviewPack, variant = "full" }) {
 
         <article className="service-brief-card">
           <p className="service-card-label">Proof assets</p>
-          <div className="review-pack-asset-list">
+          <div className="summary-pack-asset-list">
             {reviewAssets.slice(0, compact ? 3 : 5).map((item) => (
-              <div key={`${item.label}-${item.path}`} className="review-pack-asset-card">
+              <div key={`${item.label}-${item.path}`} className="summary-pack-asset-card">
                 <strong>{item.label}</strong>
                 <p>{item.kind}</p>
                 <code className="service-path">{item.path}</code>

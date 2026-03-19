@@ -9,13 +9,13 @@ def test_ui_includes_service_brief_board():
     assert "Service contract" in content
     assert "Platform targets" in content
     assert "Role-ready paths" in content
-    assert "Proof map:" in content
+    assert "Evidence map:" in content
 
 
-def test_ui_includes_executive_review_pack():
-    content = (ROOT_DIR / "app/frontend/src/components/ExecutiveReviewPack.jsx").read_text()
-    assert "Executive Review Pack" in content
-    assert "Review gate" in content
+def test_ui_includes_executive_summary_pack():
+    content = (ROOT_DIR / "app/frontend/src/components/ExecutiveSummaryPack.jsx").read_text()
+    assert "Executive Summary Pack" in content
+    assert "Quality gate" in content
     assert "Fallback posture" in content
     assert "Buyer promises" in content
     assert "Rollout tracks" in content
