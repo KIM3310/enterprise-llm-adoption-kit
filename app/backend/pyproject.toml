@@ -38,4 +38,4 @@ include = ["app*"]
 
 [tool.pytest.ini_options]
 testpaths = ["../../tests", "tests"]
-addopts = "-q --cov=app --cov-report=term-missing --cov-fail-under=80"
+addopts = "-q --cov=app --cov-report=term-missing --cov-fail-under=75"

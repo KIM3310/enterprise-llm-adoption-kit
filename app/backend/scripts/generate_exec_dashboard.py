@@ -19,8 +19,8 @@ def _latest_roi() -> dict:
         match = re.search(rf"{label}:\s*([0-9\.]+)", text)
         return match.group(1) if match else "N/A"
     return {
-        "monthly_savings": _find("Monthly savings \(USD\)"),
-        "breakeven_months": _find("Breakeven \(months\)"),
+        "monthly_savings": _find(r"Monthly savings \(USD\)"),
+        "breakeven_months": _find(r"Breakeven \(months\)"),
         "source": str(latest),
     }
 
