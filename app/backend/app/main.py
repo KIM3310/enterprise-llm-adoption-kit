@@ -1036,7 +1036,7 @@ def ops_service_brief_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/customer-architecture-pack", tags=["ops"], summary="Customer architecture pack")
-def ops_customer_architecture_pack(platform: str | None = None) -> Dict[str, object]:
+def ops_customer_architecture_pack(platform: Optional[str] = None) -> Dict[str, object]:
     try:
         return build_service_customer_architecture_pack(
             platform=platform,
@@ -1053,7 +1053,7 @@ def ops_customer_architecture_pack_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/workshop-readout-pack", tags=["ops"], summary="Workshop readout pack")
-def ops_workshop_readout_pack(platform: str | None = None) -> Dict[str, object]:
+def ops_workshop_readout_pack(platform: Optional[str] = None) -> Dict[str, object]:
     try:
         return build_service_workshop_readout_pack(
             platform=platform,
@@ -1155,7 +1155,7 @@ def ops_summary_pack_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/rollout-board", tags=["ops"], summary="Rollout board")
-def ops_rollout_board(track: str | None = None) -> Dict[str, object]:
+def ops_rollout_board(track: Optional[str] = None) -> Dict[str, object]:
     try:
         return build_service_rollout_board(
             track=track,
@@ -1172,7 +1172,7 @@ def ops_rollout_board_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/rollout-drill", tags=["ops"], summary="Rollout drill")
-def ops_rollout_drill(track: str | None = None) -> Dict[str, object]:
+def ops_rollout_drill(track: Optional[str] = None) -> Dict[str, object]:
     try:
         return build_service_rollout_drill(
             track=track,
@@ -1189,7 +1189,7 @@ def ops_rollout_drill_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/rollout-gates", tags=["ops"], summary="Rollout gates")
-def ops_rollout_gates(track: str | None = None) -> Dict[str, object]:
+def ops_rollout_gates(track: Optional[str] = None) -> Dict[str, object]:
     try:
         return build_service_rollout_gates(
             track=track,
@@ -1206,7 +1206,7 @@ def ops_rollout_gates_schema() -> Dict[str, object]:
 
 
 @app.get("/ops/review-summary", tags=["ops"], summary="Review summary")
-def ops_review_summary(stage: str | None = None) -> Dict[str, object]:
+def ops_review_summary(stage: Optional[str] = None) -> Dict[str, object]:
     try:
         return build_service_review_summary(
             stage=stage,
