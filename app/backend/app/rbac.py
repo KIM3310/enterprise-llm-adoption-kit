@@ -6,11 +6,17 @@ ROLE_TO_GROUPS = {
     "Admin": ["employee", "ops", "admin"],
 }
 
+ALLOWED_ROLES = frozenset(ROLE_TO_GROUPS.keys())
+
 
 def allowed_access_groups(roles: List[str]) -> List[str]:
     groups = set()
     for role in roles:
-        for group in ROLE_TO_GROUPS.get(role, []):
+        if role not in ALLOWED_ROLES:
+            raise ValueError(
+                f"Invalid role {role!r}; allowed roles are {sorted(ALLOWED_ROLES)}"
+            )
+        for group in ROLE_TO_GROUPS[role]:
             groups.add(group)
     return sorted(groups)
 

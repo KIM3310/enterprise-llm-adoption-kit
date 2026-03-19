@@ -36,7 +36,8 @@ _user_api_keys: Dict[str, str] = {}
 
 
 def _estimate_tokens(text: str) -> int:
-    return max(1, len(text.split()))
+    """Estimate token count using chars/4 heuristic (closer to BPE reality for English)."""
+    return max(1, len(text) // 4)
 
 
 def _estimate_cost(tokens_in: int, tokens_out: int) -> float:
@@ -74,15 +75,17 @@ def _normalize_runtime_model(provider: str, model: str) -> str:
 
 def _active_runtime_config() -> Dict[str, object]:
     with _runtime_lock:
-        provider_raw = _runtime_overrides["provider"]
-        model_raw = _runtime_overrides["model"]
-        temperature_raw = _runtime_overrides["temperature"]
-        max_tokens_raw = _runtime_overrides["max_tokens"]
-        timeout_raw = _runtime_overrides["timeout_sec"]
-        base_url_raw = _runtime_overrides["openai_base_url"]
-        ollama_base_url_raw = _runtime_overrides["ollama_base_url"]
-        org_raw = _runtime_overrides["openai_org"]
-        api_key_raw = _runtime_overrides["openai_api_key"]
+        snapshot = dict(_runtime_overrides)
+
+    provider_raw = snapshot["provider"]
+    model_raw = snapshot["model"]
+    temperature_raw = snapshot["temperature"]
+    max_tokens_raw = snapshot["max_tokens"]
+    timeout_raw = snapshot["timeout_sec"]
+    base_url_raw = snapshot["openai_base_url"]
+    ollama_base_url_raw = snapshot["ollama_base_url"]
+    org_raw = snapshot["openai_org"]
+    api_key_raw = snapshot["openai_api_key"]
 
     provider = _normalize_provider(str(provider_raw or settings.llm_provider or "stub"))
     model = _normalize_runtime_model(provider, str(model_raw or settings.llm_model).strip())

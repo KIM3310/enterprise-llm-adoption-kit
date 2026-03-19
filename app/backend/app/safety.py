@@ -3,8 +3,15 @@ from typing import List
 
 REFUSAL_MESSAGE = "Request refused due to safety policy."
 
+# Maximum input length to scan; inputs beyond this are truncated for safety
+# checking to prevent ReDoS on very large payloads.
+_MAX_SCAN_LENGTH = 10_000
+
+# Patterns use bounded wildcards (.{0,200}) instead of unbounded (.*) to
+# prevent catastrophic backtracking (ReDoS).  The (?i) flag is set once per
+# pattern and each pattern is kept linear or bounded.
 PATTERNS: List[re.Pattern] = [
-    re.compile(r"(?i)(exfiltrat|leak|steal|dump|reveal).*(secrets?|credentials?|tokens?|keys?|passwords?)"),
+    re.compile(r"(?i)(exfiltrat|leak|steal|dump|reveal).{0,200}(secrets?|credentials?|tokens?|keys?|passwords?)"),
     re.compile(r"(?i)phishing|credential\s+harvesting"),
     re.compile(r"(?i)passwords?\s+from\s+(database|db)|/etc/shadow"),
     re.compile(r"(?i)ssn|social\s+security|credit\s+card|raw\s+pii"),
@@ -32,7 +39,9 @@ PATTERNS: List[re.Pattern] = [
 def should_refuse(text: str) -> bool:
     if not text:
         return False
+    # Truncate to a safe length to bound regex evaluation time.
+    scan_text = text[:_MAX_SCAN_LENGTH]
     for pattern in PATTERNS:
-        if pattern.search(text):
+        if pattern.search(scan_text):
             return True
     return False
