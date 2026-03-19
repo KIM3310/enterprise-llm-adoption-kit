@@ -1,9 +1,57 @@
 # Enterprise LLM Adoption Kit
-Tagline: Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
+
+[![CI](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/security-scan.yml/badge.svg)](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/security-scan.yml)
+[![Docker](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/docker-publish.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-80%25%2B-brightgreen.svg)]()
+
+**Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps**
 
 All customers, data, and rollout scenarios in this repo are synthetic. The goal is a reviewable enterprise-style validation kit, not a fictional production claim.
 
 Korean version: `README.ko.md`
+
+---
+
+## Multi-Cloud Architecture
+
+```
+                          +---------------------------+
+                          |      Ingress (TLS)        |
+                          |   nginx / ALB / GCP LB    |
+                          +------------+--------------+
+                                       |
+                          +------------+--------------+
+                          |     Kubernetes (HPA)      |
+                          |   +-------------------+   |
+                          |   | FastAPI Backend    |   |
+                          |   | - RBAC / Auth      |   |
+                          |   | - RAG (Chroma)     |   |
+                          |   | - Safety / Audit   |   |
+                          |   | - OpenAPI /docs    |   |
+                          |   +--------+----------+   |
+                          +------------|----------+---+
+                                       |
+             +---------------+---------+---------+---------------+
+             |               |                   |               |
+     +-------+-------+ +----+----+       +-------+-------+ +----+--------+
+     |  LLM Provider | | Metrics |       |   Snowflake   | |  Databricks |
+     |  OpenAI/Ollama| |Prometheus|       | Eval Results  | |   MLflow    |
+     |  stub fallback| | Grafana |       | Audit Logs    | | Delta Tables|
+     +---------------+ +---------+       | Query API     | | Experiment  |
+                                         +---------------+ |  Tracking   |
+             +---------------+---------------+              +-------------+
+             |               |               |
+     +-------+------+ +-----+------+ +------+------+
+     |    AWS       | |    GCP     | |   Docker    |
+     |  Terraform   | |  Terraform | | Compose     |
+     |  ECS / EKS   | |  GKE / CR  | | Local Dev   |
+     +--------------+ +------------+ +-------------+
+```
+
+---
 
 ## Why this repo matters
 
@@ -56,6 +104,156 @@ A runnable enterprise decision lab:
 - Architecture: [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md)
 - Blueprint: [`docs/blueprint/`](docs/blueprint/)
 
+## API Documentation (OpenAPI)
+
+Interactive API documentation is available at runtime:
+
+| Surface | URL | Description |
+|---|---|---|
+| Swagger UI | `/docs` | Interactive API explorer with try-it-out |
+| ReDoc | `/redoc` | Clean read-only API reference |
+| OpenAPI JSON | `/openapi.json` | Machine-readable spec for codegen |
+
+All endpoints are tagged by domain (`auth`, `uc1`, `uc2`, `ops`, `admin`, `integrations`, `control-tower`, `metrics`, `audit`, `health`) with response models and summaries.
+
+---
+
+## Snowflake Integration
+
+Snowflake integration is **env-var gated** and activates only when `SNOWFLAKE_ACCOUNT` is set. It stores eval results and audit logs in Snowflake tables for historical analysis.
+
+### Setup
+
+```bash
+export SNOWFLAKE_ACCOUNT="xy12345.us-east-1"
+export SNOWFLAKE_USER="llm_service_account"
+export SNOWFLAKE_PASSWORD="..."          # or SNOWFLAKE_PASSWORD_FILE=/run/secrets/sf_pw
+export SNOWFLAKE_DATABASE="LLM_OPS"
+export SNOWFLAKE_SCHEMA="PUBLIC"         # optional, default PUBLIC
+export SNOWFLAKE_WAREHOUSE="COMPUTE_WH"  # optional, default COMPUTE_WH
+```
+
+### What it does
+
+- **Eval persistence:** `eval_results` table stores per-sample scores (accuracy, groundedness, helpfulness, safety, latency) with run_id for tracking.
+- **Audit persistence:** `audit_logs` table stores hashed audit events with user/role/endpoint metadata.
+- **Query interface:** `query_eval_history()` and `query_audit_history()` support filtered lookups by run, user, date range.
+- **Aggregate reporting:** `get_eval_summary()` returns avg scores across runs for dashboards.
+
+Tables are auto-created on first connection. Install the connector: `pip install snowflake-connector-python`.
+
+See: [`app/backend/app/snowflake_adapter.py`](app/backend/app/snowflake_adapter.py)
+
+---
+
+## Databricks Integration
+
+Databricks integration is **env-var gated** and activates only when `DATABRICKS_HOST` is set. It provides MLflow experiment tracking and Delta table persistence.
+
+### Setup
+
+```bash
+export DATABRICKS_HOST="https://dbc-abc123.cloud.databricks.com"
+export DATABRICKS_TOKEN="dapi..."        # or DATABRICKS_TOKEN_FILE=/run/secrets/db_token
+export DATABRICKS_SQL_HTTP_PATH="/sql/1.0/warehouses/abc123"  # for Delta tables
+export MLFLOW_EXPERIMENT_NAME="enterprise-llm-eval"           # optional
+export DATABRICKS_CATALOG="main"                              # optional, Unity Catalog
+export DATABRICKS_DELTA_SCHEMA="llm_ops"                      # optional
+```
+
+### What it does
+
+- **MLflow experiment tracking:** Each eval run is logged as an MLflow run with parameters (model, temperature, dataset) and metrics (accuracy, safety, latency).
+- **Delta audit tables:** `audit_events` and `eval_runs` tables in Unity Catalog for durable, queryable persistence.
+- **Query interface:** `query_audit_events()` and `query_eval_runs()` support filtered lookups from Delta tables.
+
+Install dependencies: `pip install mlflow databricks-sql-connector`.
+
+See: [`app/backend/app/databricks_adapter.py`](app/backend/app/databricks_adapter.py)
+
+---
+
+## Kubernetes Deployment
+
+Production-ready Kubernetes manifests are in [`infra/k8s/`](infra/k8s/).
+
+### Manifests
+
+| File | Purpose |
+|---|---|
+| `deployment.yaml` | 2-replica deployment with rolling updates, health probes, resource limits, security context |
+| `service.yaml` | ClusterIP service for internal routing |
+| `configmap.yaml` | Non-secret configuration (LLM settings, rate limits, storage options) |
+| `secret.yaml` | Secret template for JWT, API keys, Snowflake/Databricks credentials |
+| `hpa.yaml` | Horizontal Pod Autoscaler (2-10 replicas, CPU/memory targets) |
+| `ingress.yaml` | Nginx ingress with TLS via cert-manager, rate limiting, security headers |
+
+### Deploy
+
+```bash
+# Create namespace
+kubectl create namespace llm-adoption
+
+# Apply secrets (edit secret.yaml first or use external-secrets-operator)
+kubectl apply -f infra/k8s/secret.yaml
+
+# Apply all manifests
+kubectl apply -f infra/k8s/
+
+# Verify
+kubectl -n llm-adoption get pods,svc,hpa,ingress
+```
+
+### Image
+
+The CI pipeline builds and pushes to GHCR on every push to `main`:
+
+```bash
+docker pull ghcr.io/OWNER/enterprise-llm-adoption-kit:main
+```
+
+---
+
+## Monitoring & Grafana
+
+### Prometheus Metrics
+
+The backend exposes `GET /metrics` with:
+- `requests_total` (counter) - by endpoint, use_case, role, status
+- `request_latency_seconds` (histogram) - by endpoint, use_case
+- `llm_tokens_in_total` / `llm_tokens_out_total` (counters) - by use_case
+- `llm_cost_usd_total` (counter) - by use_case
+- `llm_failures_total` (counter) - by use_case, provider
+- `llm_circuit_events_total` (counter) - by provider, event
+- `policy_events_total` (counter) - by event type
+
+### Grafana Dashboard
+
+Import [`infra/monitoring/grafana-dashboard.json`](infra/monitoring/grafana-dashboard.json) into Grafana. Panels include:
+
+- Request rate, error rate, total cost (stat panels)
+- Latency P50/P95/P99 (time series)
+- Token usage, LLM failures, circuit breaker events
+- Policy events by type
+- Request breakdown by role and use case (pie charts)
+
+### AlertManager Rules
+
+Load [`infra/monitoring/alertmanager-rules.yaml`](infra/monitoring/alertmanager-rules.yaml) into Prometheus. Alerts:
+
+| Alert | Severity | Condition |
+|---|---|---|
+| HighErrorRate | critical | >5% error rate for 5m |
+| HighLatencyP95 | warning | P95 > 5s for 5m |
+| BackendDown | critical | Instance unreachable 2m |
+| LLMCircuitBreakerOpen | critical | Circuit breaker tripped |
+| LLMHighFailureRate | warning | >0.5 failures/s for 3m |
+| LLMCostSpike | warning | Projected >$50/hour for 15m |
+| HighInjectionRate | warning | >10% injection rate for 10m |
+| HighRefusalRate | warning | >20% refusal rate for 10m |
+
+---
+
 ## Monetization and analytics posture
 
 - AdSense and analytics are optional review-surface extras, not part of the core product proof.
@@ -71,7 +269,7 @@ A runnable enterprise decision lab:
 - Solo implementation of backend API, frontend UI, eval harness, and pre-sales artifacts.
 - Focused on reproducibility: every claim is backed by a doc, a test, or a runnable script.
 - Designed with "new hire readiness" in mind: clear separation of concerns, simple setup, and safe defaults.
-- Added CI checks via GitHub Actions (backend quality gate, frontend build, eval gate).
+- Added CI checks via GitHub Actions (backend quality gate, frontend build, eval gate, security scan, Docker publish).
 
 ## Core capabilities (what you can see working)
 - Role-based access (RBAC) enforced at retrieval time
@@ -83,6 +281,8 @@ A runnable enterprise decision lab:
 - Integration patterns: Slack/Jira-style ingestion endpoints (simulatable from the UI)
 - Scenario Runner exports a shareable Markdown report and keeps a local run history (browser localStorage)
 - Pre-sales artifacts: discovery wizard, ROI calculator, demo scripts, exec deck
+- Snowflake integration for eval/audit persistence (env-var gated)
+- Databricks MLflow tracking and Delta table persistence (env-var gated)
 
 ## Architecture at a glance (local demo)
 - FastAPI backend for UC1/UC2 flows, audit log, metrics, and integrations
@@ -111,6 +311,9 @@ A runnable enterprise decision lab:
 - LLMOps readiness (metrics, reliability controls, cost tracking)
 - Pre-sales artifacts (demo scripts, objections, MAP, 30/60/90)
 - LLM adoption paths (API vs LLM Workspace) and hybrid rollout planning
+- Multi-cloud deployment (AWS, GCP, Kubernetes, Docker)
+- Data platform integration (Snowflake, Databricks)
+- Production observability (Prometheus, Grafana, AlertManager, OpenTelemetry)
 
 ## Evidence (what to look at)
 - RBAC proof: follow AT-02 in [docs/blueprint/06_acceptance_tests.md](docs/blueprint/06_acceptance_tests.md) (login as Employee vs Admin, run the same UC1 query, compare citations)
@@ -181,22 +384,9 @@ python3 -m app
 ```
 cd app/frontend
 npm install
-# optional community integrations
-# export VITE_FORMSPREE_ENDPOINT="https://formspree.io/f/xxxxxx"
-# export VITE_DISQUS_SHORTNAME="your-shortname"
-# export VITE_DISQUS_IDENTIFIER="atelier-home"
-# export VITE_GISCUS_REPO="owner/repo"
-# export VITE_GISCUS_REPO_ID="R_kgxxxx"
-# export VITE_GISCUS_CATEGORY="General"
-# export VITE_GISCUS_CATEGORY_ID="DIC_kwxxxx"
-# optional AdSense
-# export VITE_ADSENSE_CLIENT="ca-pub-xxxxxxxxxxxxxxxx"
-# export VITE_ADSENSE_SLOT="1234567890"
 npm run dev
 ```
 3) Visit `http://localhost:5173`
-
-AdSense review helpers are prepared in `app/frontend/public/ads.txt`, `app/frontend/public/robots.txt`, `app/frontend/public/sitemap.xml`, `app/frontend/public/about.html`, `app/frontend/public/compliance.html`, and `app/frontend/public/_headers`.
 
 ## How to run (docker)
 ```
@@ -312,6 +502,10 @@ make quality-backend
   - `EVENT_STORAGE_BACKEND=sqlite` (default) or `EVENT_STORAGE_BACKEND=jsonl`
   - JSONL paths: `SERVICE_EVENTS_JSONL_PATH`, `CONTROL_TOWER_DECISIONS_JSONL_PATH`, `DAILY_COST_JSON_PATH`
 
+## Environment Variables
+
+All environment variables are documented in [`.env.example`](.env.example). Copy it to `.env` and fill in values for your deployment.
+
 ## Role alignment
 - Employee: limited docs
 - Ops: ops docs
@@ -322,6 +516,19 @@ make quality-backend
 - **LLM API**: implement `LLMAdapter` with provider SDK, map token usage + cost
 - **LLM Workspace**: align SSO/SAML and admin policy requirements with enterprise governance
 - **Cloud storage**: replace local SQLite and file paths with managed DB/object store
+- **Snowflake**: set `SNOWFLAKE_ACCOUNT` env var to activate eval/audit persistence
+- **Databricks**: set `DATABRICKS_HOST` env var to activate MLflow tracking and Delta tables
+
+## CI/CD Pipeline
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | Push/PR to main | Backend tests (80%+ coverage), frontend build, eval gate, review gate |
+| `backend-quality-gate.yml` | Backend changes | Linting and quality checks |
+| `docker-publish.yml` | Push to main / tags | Build and push Docker image to GHCR |
+| `security-scan.yml` | Push/PR + weekly cron | pip-audit, bandit SAST, Trivy filesystem scan |
+| `pages-auto-deploy.yml` | Push to main | Frontend deployment |
+| `production-smoke.yml` | Push to main | Production smoke tests |
 
 ## Pre-Sales Kit Extras
 - Discovery Wizard: `python3 app/backend/scripts/discovery_wizard.py`
@@ -360,6 +567,8 @@ make sanitize
 - RAG: Retrieval-Augmented Generation
 - OIDC: OpenID Connect
 - IaC: Infrastructure as Code (e.g., Terraform)
+- HPA: Horizontal Pod Autoscaler
+- GHCR: GitHub Container Registry
 
 ## Local Verification
 ```bash

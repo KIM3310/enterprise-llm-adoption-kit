@@ -772,7 +772,32 @@ async def lifespan(app: FastAPI):
     shutdown_telemetry()
 
 
-app = FastAPI(title=settings.app_name, lifespan=lifespan)
+app = FastAPI(
+    title=settings.app_name,
+    description=(
+        "Enterprise LLM Adoption Kit API. Provides RAG-powered use-case endpoints, "
+        "role-based access control, audit logging, evaluation framework integration, "
+        "and LLMOps observability. Designed for multi-cloud deployment with "
+        "Snowflake, Databricks, and Kubernetes support."
+    ),
+    version="2.0.0",
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_tags=[
+        {"name": "health", "description": "Health and readiness probes"},
+        {"name": "auth", "description": "Authentication and token management"},
+        {"name": "uc1", "description": "UC1 - Architecture handover and RAG retrieval"},
+        {"name": "uc2", "description": "UC2 - Log intelligence and root-cause analysis"},
+        {"name": "ops", "description": "Operations dashboards, service brief, and runtime scorecard"},
+        {"name": "audit", "description": "Audit log and governance surfaces"},
+        {"name": "metrics", "description": "Prometheus metrics and cost tracking"},
+        {"name": "admin", "description": "Admin runtime configuration and architecture management"},
+        {"name": "integrations", "description": "Slack and Jira integration endpoints"},
+        {"name": "control-tower", "description": "Control tower decision engine"},
+    ],
+    lifespan=lifespan,
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -896,7 +921,7 @@ async def request_validation_exception_handler(request: Request, exc: RequestVal
     )
 
 
-@app.get("/health")
+@app.get("/health", tags=["health"], summary="Health check")
 def health(request: Request) -> Dict[str, object]:
     startup_report = getattr(app.state, "startup_report", None)
     status = "ok"
@@ -996,7 +1021,7 @@ def health(request: Request) -> Dict[str, object]:
     }
 
 
-@app.get("/ops/service-brief", response_model=ServiceBriefResponse)
+@app.get("/ops/service-brief", response_model=ServiceBriefResponse, tags=["ops"], summary="Service brief")
 def ops_service_brief() -> ServiceBriefResponse:
     payload = build_service_brief(
         startup_report=getattr(app.state, "startup_report", None),
@@ -1005,12 +1030,12 @@ def ops_service_brief() -> ServiceBriefResponse:
     return ServiceBriefResponse(**payload)
 
 
-@app.get("/ops/service-brief/schema")
+@app.get("/ops/service-brief/schema", tags=["ops"], summary="Service brief JSON schema")
 def ops_service_brief_schema() -> Dict[str, object]:
     return build_service_brief_schema()
 
 
-@app.get("/ops/customer-architecture-pack")
+@app.get("/ops/customer-architecture-pack", tags=["ops"], summary="Customer architecture pack")
 def ops_customer_architecture_pack(platform: str | None = None) -> Dict[str, object]:
     try:
         return build_service_customer_architecture_pack(
@@ -1022,12 +1047,12 @@ def ops_customer_architecture_pack(platform: str | None = None) -> Dict[str, obj
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/ops/customer-architecture-pack/schema")
+@app.get("/ops/customer-architecture-pack/schema", tags=["ops"], summary="Customer architecture pack schema")
 def ops_customer_architecture_pack_schema() -> Dict[str, object]:
     return build_service_customer_architecture_pack_schema()
 
 
-@app.get("/ops/workshop-readout-pack")
+@app.get("/ops/workshop-readout-pack", tags=["ops"], summary="Workshop readout pack")
 def ops_workshop_readout_pack(platform: str | None = None) -> Dict[str, object]:
     try:
         return build_service_workshop_readout_pack(
@@ -1039,7 +1064,7 @@ def ops_workshop_readout_pack(platform: str | None = None) -> Dict[str, object]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.post("/ops/live-workshop-preview")
+@app.post("/ops/live-workshop-preview", tags=["ops"], summary="Live workshop preview")
 async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
     global LIVE_WORKSHOP_LAST_RUN_AT
 
@@ -1111,12 +1136,12 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
     }
 
 
-@app.get("/ops/workshop-readout-pack/schema")
+@app.get("/ops/workshop-readout-pack/schema", tags=["ops"], summary="Workshop readout pack schema")
 def ops_workshop_readout_pack_schema() -> Dict[str, object]:
     return build_service_workshop_readout_pack_schema()
 
 
-@app.get("/ops/summary-pack")
+@app.get("/ops/summary-pack", tags=["ops"], summary="Summary pack")
 def ops_summary_pack() -> Dict[str, object]:
     return build_service_summary_pack(
         startup_report=getattr(app.state, "startup_report", None),
@@ -1124,12 +1149,12 @@ def ops_summary_pack() -> Dict[str, object]:
     )
 
 
-@app.get("/ops/summary-pack/schema")
+@app.get("/ops/summary-pack/schema", tags=["ops"], summary="Summary pack schema")
 def ops_summary_pack_schema() -> Dict[str, object]:
     return build_service_summary_pack_schema()
 
 
-@app.get("/ops/rollout-board")
+@app.get("/ops/rollout-board", tags=["ops"], summary="Rollout board")
 def ops_rollout_board(track: str | None = None) -> Dict[str, object]:
     try:
         return build_service_rollout_board(
@@ -1141,12 +1166,12 @@ def ops_rollout_board(track: str | None = None) -> Dict[str, object]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/ops/rollout-board/schema")
+@app.get("/ops/rollout-board/schema", tags=["ops"], summary="Rollout board schema")
 def ops_rollout_board_schema() -> Dict[str, object]:
     return build_service_rollout_board_schema()
 
 
-@app.get("/ops/rollout-drill")
+@app.get("/ops/rollout-drill", tags=["ops"], summary="Rollout drill")
 def ops_rollout_drill(track: str | None = None) -> Dict[str, object]:
     try:
         return build_service_rollout_drill(
@@ -1158,12 +1183,12 @@ def ops_rollout_drill(track: str | None = None) -> Dict[str, object]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/ops/rollout-drill/schema")
+@app.get("/ops/rollout-drill/schema", tags=["ops"], summary="Rollout drill schema")
 def ops_rollout_drill_schema() -> Dict[str, object]:
     return build_service_rollout_drill_schema()
 
 
-@app.get("/ops/rollout-gates")
+@app.get("/ops/rollout-gates", tags=["ops"], summary="Rollout gates")
 def ops_rollout_gates(track: str | None = None) -> Dict[str, object]:
     try:
         return build_service_rollout_gates(
@@ -1175,12 +1200,12 @@ def ops_rollout_gates(track: str | None = None) -> Dict[str, object]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/ops/rollout-gates/schema")
+@app.get("/ops/rollout-gates/schema", tags=["ops"], summary="Rollout gates schema")
 def ops_rollout_gates_schema() -> Dict[str, object]:
     return build_service_rollout_gates_schema()
 
 
-@app.get("/ops/review-summary")
+@app.get("/ops/review-summary", tags=["ops"], summary="Review summary")
 def ops_review_summary(stage: str | None = None) -> Dict[str, object]:
     try:
         return build_service_review_summary(
@@ -1192,12 +1217,12 @@ def ops_review_summary(stage: str | None = None) -> Dict[str, object]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/ops/review-summary/schema")
+@app.get("/ops/review-summary/schema", tags=["ops"], summary="Review summary schema")
 def ops_review_summary_schema() -> Dict[str, object]:
     return build_service_review_summary_schema()
 
 
-@app.get("/ops/runtime/scorecard")
+@app.get("/ops/runtime/scorecard", tags=["ops"], summary="Runtime scorecard")
 def ops_runtime_scorecard(user=Depends(get_current_user)) -> Dict[str, object]:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1242,17 +1267,17 @@ def ops_runtime_scorecard(user=Depends(get_current_user)) -> Dict[str, object]:
     return payload
 
 
-@app.get("/ops/runtime/scorecard/schema")
+@app.get("/ops/runtime/scorecard/schema", tags=["ops"], summary="Runtime scorecard schema")
 def ops_runtime_scorecard_schema() -> Dict[str, object]:
     return build_ops_runtime_scorecard_schema()
 
 
-@app.get("/metrics")
+@app.get("/metrics", tags=["metrics"], summary="Prometheus metrics")
 def metrics() -> PlainTextResponse:
     return PlainTextResponse(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
-@app.get("/audit/summary")
+@app.get("/audit/summary", tags=["audit"], summary="Audit summary")
 def audit_summary() -> Dict:
     max_lines = _safe_limit(
         getattr(settings, "audit_summary_max_lines", 5000),
@@ -1263,12 +1288,12 @@ def audit_summary() -> Dict:
     return summarize_log(Path(settings.audit_log_path), max_lines=max_lines)
 
 
-@app.get("/costs/daily")
+@app.get("/costs/daily", tags=["metrics"], summary="Daily cost rollup")
 def daily_cost() -> Dict[str, float]:
     return {"total_cost": get_daily_cost()}
 
 
-@app.get("/ops/policy")
+@app.get("/ops/policy", tags=["ops"], summary="Ops policy")
 def ops_policy(user=Depends(get_current_user)) -> Dict[str, object]:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1310,7 +1335,7 @@ def ops_policy(user=Depends(get_current_user)) -> Dict[str, object]:
     return payload
 
 
-@app.get("/ops/alerts", response_model=OpsAlertsResponse)
+@app.get("/ops/alerts", response_model=OpsAlertsResponse, tags=["ops"], summary="Ops alerts")
 def ops_alerts(deliver: bool = False, user=Depends(get_current_user)) -> OpsAlertsResponse:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1350,7 +1375,7 @@ def ops_alerts(deliver: bool = False, user=Depends(get_current_user)) -> OpsAler
     )
 
 
-@app.get("/ops/runtime", response_model=OpsRuntimeResponse)
+@app.get("/ops/runtime", response_model=OpsRuntimeResponse, tags=["ops"], summary="Ops runtime dashboard")
 def ops_runtime(
     events_limit: int = 25,
     decisions_limit: int = 15,
@@ -1500,7 +1525,7 @@ def ops_runtime(
     )
 
 
-@app.post("/ops/diagnostics/refresh", response_model=OpsDiagnosticsRefreshResponse)
+@app.post("/ops/diagnostics/refresh", response_model=OpsDiagnosticsRefreshResponse, tags=["ops"], summary="Refresh diagnostics")
 def ops_diagnostics_refresh(user=Depends(get_current_user)) -> OpsDiagnosticsRefreshResponse:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1537,7 +1562,7 @@ def ops_diagnostics_refresh(user=Depends(get_current_user)) -> OpsDiagnosticsRef
     )
 
 
-@app.get("/v1/control-tower/spec", response_model=ControlTowerSpecResponse)
+@app.get("/v1/control-tower/spec", response_model=ControlTowerSpecResponse, tags=["control-tower"], summary="Control tower spec")
 def control_tower_spec(user=Depends(get_current_user)) -> ControlTowerSpecResponse:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1555,7 +1580,7 @@ def control_tower_spec(user=Depends(get_current_user)) -> ControlTowerSpecRespon
     )
 
 
-@app.post("/v1/control-tower/decision", response_model=ControlTowerDecisionResponse)
+@app.post("/v1/control-tower/decision", response_model=ControlTowerDecisionResponse, tags=["control-tower"], summary="Control tower decision")
 def control_tower_decision(
     payload: ControlTowerDecisionRequest,
     user=Depends(get_current_user),
@@ -1679,7 +1704,7 @@ def control_tower_decision(
     return response
 
 
-@app.post("/auth/login", response_model=AuthResponse)
+@app.post("/auth/login", response_model=AuthResponse, tags=["auth"], summary="Login")
 def login(payload: AuthRequest, request: Request) -> AuthResponse:
     expected_code = str(settings.demo_login_code or "").strip()
     if expected_code:
@@ -1699,27 +1724,27 @@ def login(payload: AuthRequest, request: Request) -> AuthResponse:
     return AuthResponse(access_token=token)
 
 
-@app.post("/auth/oidc/login", response_model=AuthResponse)
+@app.post("/auth/oidc/login", response_model=AuthResponse, tags=["auth"], summary="OIDC login")
 def oidc_login(payload: OIDCLoginRequest) -> AuthResponse:
     roles = map_oidc_claims_to_roles(payload)
     token = create_jwt_for_roles(payload.sub, roles)
     return AuthResponse(access_token=token)
 
 
-@app.post("/auth/oidc/exchange", response_model=AuthResponse)
+@app.post("/auth/oidc/exchange", response_model=AuthResponse, tags=["auth"], summary="OIDC token exchange")
 def oidc_exchange(payload: OIDCTokenExchangeRequest) -> AuthResponse:
     user = decode_oidc_token(payload.id_token)
     token = create_jwt_for_roles(user.user_id, user.roles)
     return AuthResponse(access_token=token)
 
 
-@app.get("/auth/keys")
+@app.get("/auth/keys", tags=["auth"], summary="Auth key metadata")
 def auth_keys(user=Depends(get_current_user)) -> Dict[str, object]:
     _ensure_any_role(user.roles, ["Admin"])
     return auth_key_metadata()
 
 
-@app.get("/runtime/user-api-key", response_model=UserLLMApiKeyView)
+@app.get("/runtime/user-api-key", response_model=UserLLMApiKeyView, tags=["auth"], summary="User API key")
 def user_runtime_api_key(user=Depends(get_current_user)) -> UserLLMApiKeyView:
     start = time.time()
     role = user.roles[0]
@@ -1731,7 +1756,7 @@ def user_runtime_api_key(user=Depends(get_current_user)) -> UserLLMApiKeyView:
     return payload
 
 
-@app.post("/runtime/user-api-key", response_model=UserLLMApiKeyView)
+@app.post("/runtime/user-api-key", response_model=UserLLMApiKeyView, tags=["auth"], summary="User API key")
 def user_runtime_api_key_update(
     payload: UserLLMApiKeyUpdate,
     user=Depends(get_current_user),
@@ -1762,7 +1787,7 @@ def user_runtime_api_key_update(
     return view
 
 
-@app.delete("/runtime/user-api-key", response_model=UserLLMApiKeyView)
+@app.delete("/runtime/user-api-key", response_model=UserLLMApiKeyView, tags=["auth"], summary="User API key")
 def user_runtime_api_key_delete(user=Depends(get_current_user)) -> UserLLMApiKeyView:
     start = time.time()
     role = user.roles[0]
@@ -1786,7 +1811,7 @@ def user_runtime_api_key_delete(user=Depends(get_current_user)) -> UserLLMApiKey
     return view
 
 
-@app.get("/admin/runtime/llm", response_model=AdminLLMRuntimeView)
+@app.get("/admin/runtime/llm", response_model=AdminLLMRuntimeView, tags=["admin"], summary="Admin LLM runtime")
 def admin_runtime_llm(user=Depends(get_current_user)) -> AdminLLMRuntimeView:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1799,7 +1824,7 @@ def admin_runtime_llm(user=Depends(get_current_user)) -> AdminLLMRuntimeView:
     return AdminLLMRuntimeView(**runtime)
 
 
-@app.post("/admin/runtime/llm", response_model=AdminLLMRuntimeView)
+@app.post("/admin/runtime/llm", response_model=AdminLLMRuntimeView, tags=["admin"], summary="Admin LLM runtime")
 def admin_runtime_llm_update(
     payload: AdminLLMRuntimeUpdate,
     user=Depends(get_current_user),
@@ -1843,7 +1868,7 @@ def admin_runtime_llm_update(
     return AdminLLMRuntimeView(**runtime)
 
 
-@app.get("/admin/architecture/catalog", response_model=ArchitectureCatalogResponse)
+@app.get("/admin/architecture/catalog", response_model=ArchitectureCatalogResponse, tags=["admin"], summary="Architecture catalog")
 def admin_architecture_catalog(user=Depends(get_current_user)) -> ArchitectureCatalogResponse:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1856,7 +1881,7 @@ def admin_architecture_catalog(user=Depends(get_current_user)) -> ArchitectureCa
     return ArchitectureCatalogResponse(**payload)
 
 
-@app.post("/admin/architecture/import", response_model=ArchitectureCatalogResponse)
+@app.post("/admin/architecture/import", response_model=ArchitectureCatalogResponse, tags=["admin"], summary="Architecture import")
 def admin_architecture_import(
     payload: ArchitectureImportRequest,
     user=Depends(get_current_user),
@@ -1896,7 +1921,7 @@ def admin_architecture_import(
     return ArchitectureCatalogResponse(**summary)
 
 
-@app.post("/admin/architecture/reindex", response_model=ArchitectureCatalogResponse)
+@app.post("/admin/architecture/reindex", response_model=ArchitectureCatalogResponse, tags=["admin"], summary="Architecture reindex")
 def admin_architecture_reindex(user=Depends(get_current_user)) -> ArchitectureCatalogResponse:
     start = time.time()
     role = _effective_role(user.roles)
@@ -1927,7 +1952,7 @@ def admin_architecture_reindex(user=Depends(get_current_user)) -> ArchitectureCa
     return ArchitectureCatalogResponse(**summary)
 
 
-@app.post("/integrations/slack/events")
+@app.post("/integrations/slack/events", tags=["integrations"], summary="Slack event ingestion")
 def slack_events(
     payload: SlackEvent,
     auth_user: Optional[UserContext] = Depends(get_optional_user),
@@ -1968,7 +1993,7 @@ def slack_events(
     return {"text": reply}
 
 
-@app.post("/integrations/jira/ticket")
+@app.post("/integrations/jira/ticket", tags=["integrations"], summary="Jira ticket ingestion")
 def jira_ticket(
     payload: JiraTicket,
     auth_user: Optional[UserContext] = Depends(get_optional_user),
@@ -1998,8 +2023,8 @@ def jira_ticket(
     }
 
 
-@app.post("/uc1/architecture", response_model=HandoverResponse)
-@app.post("/uc1/handover", response_model=HandoverResponse)
+@app.post("/uc1/architecture", response_model=HandoverResponse, tags=["uc1"], summary="UC1 architecture query")
+@app.post("/uc1/handover", response_model=HandoverResponse, tags=["uc1"], summary="UC1 handover query")
 def handover(
     payload: HandoverRequest,
     user=Depends(get_current_user),
@@ -2131,7 +2156,7 @@ def handover(
     return HandoverResponse(answer=redacted_answer, citations=citations)
 
 
-@app.post("/uc2/log-intel", response_model=LogIntelResponse)
+@app.post("/uc2/log-intel", response_model=LogIntelResponse, tags=["uc2"], summary="UC2 log intelligence")
 def log_intel(
     payload: LogIntelRequest,
     user=Depends(get_current_user),
