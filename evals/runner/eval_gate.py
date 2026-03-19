@@ -1,3 +1,10 @@
+"""Evaluation gate that enforces minimum quality thresholds and regression limits.
+
+Compares the latest eval report against a baseline and fails the CI
+pipeline if safety, groundedness, or any dimension regresses beyond
+the configured threshold.
+"""
+
 import argparse
 import json
 from pathlib import Path

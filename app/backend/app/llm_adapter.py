@@ -1,3 +1,11 @@
+"""LLM provider adapters with runtime configuration and BYOK support.
+
+Supports four provider backends: ``stub`` (offline deterministic),
+``openai``, ``openai_compatible``, and ``ollama``.  Runtime settings
+can be hot-swapped by Admin users without restarting the server.
+Per-user OpenAI API keys (BYOK) are held in-memory for the session.
+"""
+
 from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, List, Optional
@@ -9,6 +17,8 @@ from .config import settings
 
 @dataclass
 class LLMResult:
+    """Container for an LLM generation result with token counts and cost estimate."""
+
     text: str
     tokens_in: int
     tokens_out: int
@@ -47,7 +57,10 @@ def _estimate_cost(tokens_in: int, tokens_out: int) -> float:
 
 
 class LLMAdapter:
+    """Abstract base class for LLM provider adapters."""
+
     def generate(self, messages: List[Dict[str, str]], use_case: str) -> LLMResult:
+        """Generate a response from the LLM. Must be overridden by subclasses."""
         raise NotImplementedError
 
 
@@ -128,6 +141,7 @@ def _runtime_config_for_request(*, api_key_override: Optional[str] = None) -> Di
 
 
 def get_llm_runtime_settings() -> Dict[str, object]:
+    """Return the current LLM runtime settings with the API key masked."""
     config = _active_runtime_config()
     api_key = str(config.pop("openai_api_key", "")).strip()
     config["openai_api_key_configured"] = bool(api_key)
@@ -135,6 +149,7 @@ def get_llm_runtime_settings() -> Dict[str, object]:
 
 
 def get_llm_runtime_settings_for_request(*, api_key_override: Optional[str] = None) -> Dict[str, object]:
+    """Return runtime settings for a specific request, applying any BYOK override."""
     config = _runtime_config_for_request(api_key_override=api_key_override)
     api_key = str(config.pop("openai_api_key", "")).strip()
     config["openai_api_key_configured"] = bool(api_key)
@@ -142,6 +157,7 @@ def get_llm_runtime_settings_for_request(*, api_key_override: Optional[str] = No
 
 
 def set_user_openai_api_key(user_id: str, api_key: str) -> bool:
+    """Store a per-user OpenAI API key in memory for BYOK sessions."""
     safe_user_id = str(user_id or "").strip()
     safe_api_key = str(api_key or "").strip()
     if not safe_user_id:
@@ -154,6 +170,7 @@ def set_user_openai_api_key(user_id: str, api_key: str) -> bool:
 
 
 def get_user_openai_api_key(user_id: str) -> str:
+    """Retrieve the stored OpenAI API key for *user_id*, or empty string if unset."""
     safe_user_id = str(user_id or "").strip()
     if not safe_user_id:
         return ""
@@ -162,6 +179,7 @@ def get_user_openai_api_key(user_id: str) -> str:
 
 
 def clear_user_openai_api_key(user_id: str) -> bool:
+    """Remove the stored API key for *user_id*. Returns ``True`` if a key was removed."""
     safe_user_id = str(user_id or "").strip()
     if not safe_user_id:
         return False
@@ -170,13 +188,14 @@ def clear_user_openai_api_key(user_id: str) -> bool:
 
 
 def reset_llm_runtime_settings() -> Dict[str, object]:
+    """Reset all runtime overrides back to environment-variable defaults."""
     with _runtime_lock:
         for key in _runtime_overrides:
             _runtime_overrides[key] = None
     return get_llm_runtime_settings()
 
 
-def update_llm_runtime_settings(
+def update_llm_runtime_settings(  # noqa: PLR0913
     *,
     provider: Optional[str] = None,
     model: Optional[str] = None,
@@ -189,6 +208,7 @@ def update_llm_runtime_settings(
     openai_api_key: Optional[str] = None,
     reset_to_env: bool = False,
 ) -> Dict[str, object]:
+    """Hot-swap LLM runtime settings without restarting the server."""
     if reset_to_env:
         return reset_llm_runtime_settings()
 
@@ -219,6 +239,7 @@ def update_llm_runtime_settings(
 
 
 class OpenAICompatibleAdapter(LLMAdapter):
+    """Adapter for OpenAI and OpenAI-compatible API endpoints."""
     def __init__(self, runtime: Optional[Dict[str, object]] = None) -> None:
         runtime = runtime or _active_runtime_config()
         self.base_url = str(runtime["openai_base_url"]).rstrip("/")
@@ -270,6 +291,7 @@ class OpenAICompatibleAdapter(LLMAdapter):
 
 
 class OllamaAdapter(LLMAdapter):
+    """Adapter for locally-hosted Ollama models."""
     def __init__(self, runtime: Optional[Dict[str, object]] = None) -> None:
         runtime = runtime or _active_runtime_config()
         self.base_url = str(runtime["ollama_base_url"]).rstrip("/")
@@ -324,6 +346,7 @@ class OllamaAdapter(LLMAdapter):
 
 
 class StubLLMAdapter(LLMAdapter):
+    """Offline deterministic adapter for testing and demo mode."""
     def generate(self, messages: List[Dict[str, str]], use_case: str) -> LLMResult:
         # Offline-first deterministic "good enough" responses.
         user_text = next(
@@ -503,6 +526,7 @@ def _extract_ollama_response_text(data: Dict) -> str:
 
 
 def get_llm_adapter(*, api_key_override: Optional[str] = None) -> LLMAdapter:
+    """Return an ``LLMAdapter`` instance for the active provider configuration."""
     runtime = _runtime_config_for_request(api_key_override=api_key_override)
     provider = str(runtime["provider"])
     if provider in {"openai", "openai_compatible"}:

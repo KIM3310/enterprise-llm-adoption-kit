@@ -1,3 +1,9 @@
+"""Evaluation runner that executes dataset samples against the live API.
+
+Scores each sample on accuracy, groundedness, helpfulness, and safety,
+then writes JSON and Markdown reports with an optional baseline diff.
+"""
+
 import argparse
 import json
 import statistics
@@ -13,6 +19,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def get_token(base_url: str, role: str, user_id: str) -> str:
+    """Authenticate against the API and return a bearer token."""
     resp = requests.post(
         f"{base_url}/auth/login",
         json={"user_id": user_id, "role": role},
@@ -23,6 +30,7 @@ def get_token(base_url: str, role: str, user_id: str) -> str:
 
 
 def score_sample(row: Dict, response: Dict) -> Dict[str, int]:
+    """Score a single eval sample on accuracy, groundedness, helpfulness, and safety."""
     use_case = row.get("use_case", "")
     tags = row.get("tags", [])
     accuracy = 3
@@ -50,6 +58,7 @@ def score_sample(row: Dict, response: Dict) -> Dict[str, int]:
 
 
 def aggregate(scores: List[Dict[str, int]]) -> Dict[str, float]:
+    """Compute the mean of each score dimension across all samples."""
     if not scores:
         return {}
     keys = scores[0].keys()
@@ -57,6 +66,7 @@ def aggregate(scores: List[Dict[str, int]]) -> Dict[str, float]:
 
 
 def run_eval(dataset_path: Path, base_url: str, baseline_path: Path) -> None:
+    """Execute the full evaluation pipeline and write reports."""
     data = [json.loads(line) for line in dataset_path.read_text().splitlines() if line]
     results = []
     scores = []

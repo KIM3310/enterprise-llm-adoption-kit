@@ -1,3 +1,10 @@
+"""RAG (Retrieval-Augmented Generation) store with ChromaDB and local fallback.
+
+Manages document ingestion, normalization, indexing, and RBAC-filtered
+retrieval.  When ChromaDB is unavailable, falls back to an in-memory
+cosine-similarity search using hash-based embeddings.
+"""
+
 import json
 import logging
 import os
@@ -43,6 +50,8 @@ VALID_ACCESS_GROUPS = {"employee", "ops", "admin"}
 
 
 class HashEmbedding:
+    """Deterministic hash-based embedding function for offline retrieval."""
+
     def __init__(self, dim: int = 384) -> None:
         self.dim = dim
 
@@ -63,6 +72,8 @@ class HashEmbedding:
 
 @dataclass
 class RetrievedChunk:
+    """A single retrieved document chunk with metadata."""
+
     doc_id: str
     field_path: str
     content: str
@@ -70,6 +81,8 @@ class RetrievedChunk:
 
 
 class RAGStore:
+    """Document retrieval store with ChromaDB or in-memory fallback backend."""
+
     def __init__(self) -> None:
         os.makedirs(settings.chroma_persist_dir, exist_ok=True)
         self._embedder = HashEmbedding()
@@ -96,9 +109,11 @@ class RAGStore:
         )
 
     def backend_name(self) -> str:
+        """Return the active backend name (``chromadb`` or ``local``)."""
         return str(self._backend)
 
     def chunk_count(self) -> int:
+        """Return the number of indexed chunks."""
         if self._backend == "chromadb":
             try:
                 return int(self.collection.count())
@@ -107,6 +122,7 @@ class RAGStore:
         return int(len(self._local_entries))
 
     def ensure_index(self) -> None:
+        """Ensure the index is populated, loading from disk if empty."""
         if self._backend == "chromadb":
             if self.collection.count() > 0:
                 return
@@ -117,6 +133,7 @@ class RAGStore:
         self._index_docs(docs)
 
     def rebuild_index(self, docs: Optional[List[Dict]] = None) -> int:
+        """Drop and rebuild the index, returning the number of chunks indexed."""
         normalized_docs = docs if docs is not None else load_normalized_docs()
         self._reset_collection()
         return self._index_docs(normalized_docs)
@@ -179,6 +196,7 @@ class RAGStore:
         env: Optional[str],
         top_k: int = 5,
     ) -> List[RetrievedChunk]:
+        """Retrieve the top-k chunks matching *text*, filtered by RBAC groups."""
         where = {"access_group": {"$in": allowed_groups}}
         if system:
             where["system"] = system
@@ -248,6 +266,7 @@ class RAGStore:
 
 
 def load_raw_docs() -> List[Dict]:
+    """Load raw handover documents from the JSONL source file."""
     if not os.path.exists(RAW_DOCS_PATH):
         return []
     docs = []
@@ -294,6 +313,7 @@ def _normalize_owner(value: object) -> Dict[str, str]:
 
 
 def normalize_doc(raw: Dict) -> Dict:
+    """Normalize a raw document dict into the canonical schema with cleaned fields."""
     doc = json.loads(json.dumps(CANONICAL_SCHEMA))
     for key in doc.keys():
         if key in raw:
@@ -315,6 +335,11 @@ def normalize_doc(raw: Dict) -> Dict:
 
 
 def validate_normalized_doc(doc: Dict) -> None:
+    """Validate that a normalized document has all required fields.
+
+    Raises:
+        ValueError: When a required field is missing or has an invalid value.
+    """
     if not doc.get("doc_id"):
         raise ValueError("doc_id is required")
     if not doc.get("system"):
@@ -330,6 +355,11 @@ def validate_normalized_doc(doc: Dict) -> None:
 
 
 def parse_jsonl_to_normalized_docs(jsonl_text: str) -> List[Dict]:
+    """Parse a JSONL string into normalized, validated documents.
+
+    Raises:
+        ValueError: On invalid JSON, missing fields, or duplicate ``doc_id`` values.
+    """
     docs: List[Dict] = []
     seen_doc_ids = set()
     raw_lines = str(jsonl_text or "").splitlines()
@@ -356,6 +386,7 @@ def parse_jsonl_to_normalized_docs(jsonl_text: str) -> List[Dict]:
 
 
 def write_normalized_docs(docs: List[Dict]) -> int:
+    """Write normalized documents to the JSONL file, returning the count written."""
     with open(NORM_DOCS_PATH, "w", encoding="utf-8") as f:
         for doc in docs:
             f.write(json.dumps(doc, ensure_ascii=True) + "\n")
@@ -363,6 +394,7 @@ def write_normalized_docs(docs: List[Dict]) -> int:
 
 
 def summarize_normalized_docs(docs: List[Dict]) -> Dict[str, object]:
+    """Return a summary of systems, envs, and access groups across all documents."""
     systems = sorted({str(doc.get("system", "")).strip().lower() for doc in docs if doc.get("system")})
     envs = sorted({str(doc.get("env", "")).strip().lower() for doc in docs if doc.get("env")})
     groups = sorted(
@@ -378,6 +410,7 @@ def summarize_normalized_docs(docs: List[Dict]) -> Dict[str, object]:
 
 
 def load_normalized_docs() -> List[Dict]:
+    """Load normalized docs from disk, or normalize raw docs if the file is missing."""
     if os.path.exists(NORM_DOCS_PATH):
         docs = []
         with open(NORM_DOCS_PATH, "r", encoding="utf-8") as f:

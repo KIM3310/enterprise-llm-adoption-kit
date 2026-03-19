@@ -1,3 +1,10 @@
+"""OIDC claim-to-role mapping for federated identity providers.
+
+Translates standard OIDC ``groups`` and ``roles`` claims into the
+application's internal role set (``Admin``, ``Ops``, ``Employee``),
+preserving priority ordering.
+"""
+
 from typing import List
 
 from .models import OIDCLoginRequest
@@ -16,6 +23,15 @@ ROLE_PRIORITY = ["Admin", "Ops", "Employee"]
 
 
 def map_oidc_claims_to_roles(claims: OIDCLoginRequest) -> List[str]:
+    """Map OIDC claims to internal application roles.
+
+    Args:
+        claims: Parsed OIDC login request containing ``roles`` and ``groups``.
+
+    Returns:
+        Priority-ordered list of unique internal roles.  Defaults to
+        ``["Employee"]`` when no claims match.
+    """
     candidates = []
     for entry in (claims.roles or []) + (claims.groups or []):
         key = str(entry).strip().lower()

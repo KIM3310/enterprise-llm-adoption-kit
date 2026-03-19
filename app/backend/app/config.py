@@ -1,3 +1,11 @@
+"""Application configuration loaded from environment variables.
+
+All settings are read once at import time and frozen in an immutable
+``Settings`` dataclass.  Secrets can be supplied either as plain
+environment variables or as file paths (``*_FILE`` variants) for
+Docker/Kubernetes secret-mount compatibility.
+"""
+
 import json
 import os
 from dataclasses import dataclass, field
@@ -9,6 +17,7 @@ DATA_DIR = BASE_DIR / "data"
 
 
 def _read_secret_file(path: str) -> str:
+    """Read and strip a secret from *path*, returning empty string on failure."""
     if not path:
         return ""
     try:
@@ -18,6 +27,7 @@ def _read_secret_file(path: str) -> str:
 
 
 def _load_env_or_file(value_env: str, file_env: str) -> str:
+    """Return env var *value_env* or fall back to reading the file at *file_env*."""
     value = os.getenv(value_env, "").strip()
     if value:
         return value
@@ -26,6 +36,7 @@ def _load_env_or_file(value_env: str, file_env: str) -> str:
 
 
 def _parse_csv_env(name: str, fallback: List[str]) -> List[str]:
+    """Parse a comma-separated env var into a list of stripped strings."""
     raw = os.getenv(name, "").strip()
     if not raw:
         return fallback
@@ -34,6 +45,7 @@ def _parse_csv_env(name: str, fallback: List[str]) -> List[str]:
 
 
 def _parse_bool_env(name: str, default: bool) -> bool:
+    """Parse a boolean env var accepting ``1/true/yes/on`` and ``0/false/no/off``."""
     raw = os.getenv(name)
     if raw is None:
         return default
@@ -133,6 +145,7 @@ def _load_jwt_secrets(default_secret: str) -> Dict[str, str]:
 
 @dataclass(frozen=True)
 class Settings:
+    """Immutable application settings loaded from environment variables at import time."""
     app_name: str = "Enterprise LLM Adoption Kit (Korea)"
     jwt_secret: str = os.getenv("JWT_SECRET", "dev-secret-change")
     jwt_active_kid: str = os.getenv("JWT_ACTIVE_KID", "v1")

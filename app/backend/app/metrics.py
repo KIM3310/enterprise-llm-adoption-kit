@@ -1,3 +1,11 @@
+"""Prometheus metric definitions for request, LLM, and policy observability.
+
+All counters and histograms are defined at module scope so they are
+registered once and shared across the application.  These feed into the
+``/metrics`` endpoint consumed by Prometheus scrapers and the ops
+runtime scorecard.
+"""
+
 from prometheus_client import Counter, Histogram
 
 REQUEST_COUNTER = Counter(

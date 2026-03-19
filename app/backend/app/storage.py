@@ -1,3 +1,10 @@
+"""Dual-backend storage layer (SQLite or JSONL) for operational data.
+
+Manages daily cost tracking, control-tower decision persistence, and
+service-event logging.  The backend is selected via the
+``EVENT_STORAGE_BACKEND`` environment variable (``sqlite`` or ``jsonl``).
+"""
+
 import json
 import os
 import sqlite3
@@ -97,7 +104,7 @@ def _read_jsonl_recent(path: str, limit: int) -> List[Dict]:
             continue
         try:
             results.append(json.loads(line))
-        except Exception:
+        except (json.JSONDecodeError, ValueError, KeyError):
             continue
         if len(results) >= safe_limit:
             break
@@ -110,7 +117,7 @@ def _load_cost_map() -> Dict[str, float]:
         return {}
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    except (OSError, json.JSONDecodeError, ValueError):
         return {}
     if not isinstance(raw, dict):
         return {}
@@ -118,7 +125,7 @@ def _load_cost_map() -> Dict[str, float]:
     for key, value in raw.items():
         try:
             result[str(key)] = float(value)
-        except Exception:
+        except (ValueError, TypeError):
             continue
     return result
 
@@ -131,6 +138,7 @@ def _save_cost_map(cost_map: Dict[str, float]) -> None:
 
 
 def init_db() -> None:
+    """Initialize the storage backend (create tables for SQLite, touch files for JSONL)."""
     if _storage_backend() == "jsonl":
         _ensure_jsonl_storage()
         return
@@ -180,6 +188,7 @@ def init_db() -> None:
 
 
 def add_cost(amount: float) -> None:
+    """Record an incremental LLM cost for the current UTC day."""
     day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     if _storage_backend() == "jsonl":
@@ -203,6 +212,7 @@ def add_cost(amount: float) -> None:
 
 
 def get_daily_cost(day: Optional[str] = None) -> float:
+    """Return the accumulated cost in USD for *day* (defaults to today UTC)."""
     if day is None:
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
@@ -221,7 +231,7 @@ def get_daily_cost(day: Optional[str] = None) -> float:
         conn.close()
 
 
-def record_control_tower_decision(
+def record_control_tower_decision(  # noqa: PLR0913
     decision_id: str,
     scenario_id: str,
     user_id: str,
@@ -232,6 +242,7 @@ def record_control_tower_decision(
     refusal: bool,
     details: Dict,
 ) -> None:
+    """Persist a control-tower decision to the active storage backend."""
     created_at = datetime.now(timezone.utc).isoformat()
 
     if _storage_backend() == "jsonl":
@@ -290,6 +301,7 @@ def record_control_tower_decision(
 
 
 def get_recent_control_tower_decisions(limit: int = 20) -> List[Dict]:
+    """Return the most recent control-tower decisions, newest first."""
     safe_limit = max(1, min(limit, 200))
 
     if _storage_backend() == "jsonl":
@@ -363,6 +375,7 @@ def record_service_event(
     message: str,
     context: Optional[Dict] = None,
 ) -> None:
+    """Record a service-level event (info, warning, error) for ops visibility."""
     created_at = datetime.now(timezone.utc).isoformat()
 
     if _storage_backend() == "jsonl":
@@ -406,6 +419,7 @@ def record_service_event(
 
 
 def get_recent_service_events(limit: int = 50) -> List[Dict]:
+    """Return the most recent service events, newest first."""
     safe_limit = max(1, min(limit, 500))
 
     if _storage_backend() == "jsonl":

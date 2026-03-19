@@ -1,3 +1,9 @@
+"""Tool router for allow-listed agent tools (runbook lookup, log signatures, knowledge search).
+
+Enforces a strict tool allowlist from configuration so that only
+pre-approved tools can be invoked during request processing.
+"""
+
 import json
 import os
 import re
@@ -17,11 +23,14 @@ RUNBOOK_PATH = str(DATA_DIR / "runbooks.json")
 
 
 class ToolRouter:
+    """Routes tool calls through the allowlist and dispatches to implementations."""
+
     def __init__(self, knowledge_search_fn):
         self.knowledge_search_fn = knowledge_search_fn
         self.runbooks = _load_runbooks()
 
     def call(self, name: str, payload: Dict, role: str) -> Tuple[Dict, str]:
+        """Dispatch a tool call, returning ``(result, status)``."""
         if name not in ALLOWED_TOOLS:
             return {"error": "tool not allowed"}, "denied"
         if name == "runbook_lookup":
@@ -33,12 +42,14 @@ class ToolRouter:
         return {"error": "unknown"}, "denied"
 
     def runbook_lookup(self, query: str) -> Dict:
+        """Look up a runbook by matching the query against known signatures."""
         for item in self.runbooks:
             if item["signature"].lower() in query.lower():
                 return {"steps": item["steps"], "signature": item["signature"]}
         return {"steps": ["No exact runbook found. Escalate to on-call."], "signature": "unknown"}
 
     def log_signature_extract(self, text: str) -> Dict:
+        """Extract known error signatures from log text."""
         patterns = [
             r"OutOfMemoryError",
             r"Connection refused",

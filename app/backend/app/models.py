@@ -1,3 +1,10 @@
+"""Pydantic request/response models for all API endpoints.
+
+Every model enforces strict field validation (length, pattern, range)
+at the serialization boundary to prevent malformed data from reaching
+business logic.
+"""
+
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 

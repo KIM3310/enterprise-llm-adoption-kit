@@ -1,3 +1,12 @@
+"""Startup diagnostics runner that verifies critical subsystem health.
+
+Checks SQLite connectivity, audit-log writability, runbook availability,
+RAG collection readiness, control-tower spec validity, auth configuration,
+and storage-backend configuration.  Each check is tagged with a severity
+(``critical`` or ``warning``) so the overall startup status can be
+computed.
+"""
+
 import json
 from pathlib import Path
 from typing import Dict, List
@@ -17,7 +26,8 @@ CHECK_SEVERITY_POLICY = {
 }
 
 
-def run_startup_diagnostics(rag_store, sqlite_path: str, audit_log_path: str) -> Dict:
+def run_startup_diagnostics(rag_store: object, sqlite_path: str, audit_log_path: str) -> Dict:
+    """Run all startup health checks and return a structured report."""
     checks: List[Dict] = []
 
     sqlite_ok = _decorate_check(_sqlite_check(sqlite_path))

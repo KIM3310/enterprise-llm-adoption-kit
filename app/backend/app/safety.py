@@ -1,3 +1,11 @@
+"""Safety guardrail engine for content-policy enforcement.
+
+Evaluates user input against a curated list of regex patterns that
+target data exfiltration, privilege escalation, prompt injection, and
+other adversarial behaviours.  Inputs exceeding ``_MAX_SCAN_LENGTH``
+are truncated before scanning to prevent ReDoS.
+"""
+
 import re
 from typing import List
 
@@ -37,6 +45,14 @@ PATTERNS: List[re.Pattern] = [
 
 
 def should_refuse(text: str) -> bool:
+    """Return ``True`` when *text* triggers any safety-policy pattern.
+
+    Args:
+        text: The user-supplied input to evaluate.
+
+    Returns:
+        ``True`` if the request should be refused, ``False`` otherwise.
+    """
     if not text:
         return False
     # Truncate to a safe length to bound regex evaluation time.

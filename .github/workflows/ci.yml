@@ -23,12 +23,17 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e "./app/backend[dev]"
 
-      - name: Run backend + integration tests
+      - name: Run backend + integration tests with coverage
         env:
           LLM_PROVIDER: stub
           LLM_OPENAI_API_KEY: ""
           INTEGRATIONS_REQUIRE_AUTH: "true"
-        run: python -m pytest -q tests app/backend/tests
+        run: >
+          python -m pytest -q
+          --cov=app
+          --cov-report=term-missing
+          --cov-fail-under=80
+          tests app/backend/tests
 
   frontend-build:
     runs-on: ubuntu-latest

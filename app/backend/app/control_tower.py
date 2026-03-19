@@ -1,3 +1,11 @@
+"""Control Tower decision engine with multi-platform execution planning.
+
+Computes a weighted risk score from six operational signals, classifies
+the risk level against configurable bands, and generates platform-specific
+execution tasks for AWS, Databricks, Snowflake, Palantir, and MariaDB.
+The spec is loaded from disk and cached with mtime-based invalidation.
+"""
+
 import json
 import uuid
 from pathlib import Path
@@ -222,6 +230,7 @@ def _load_spec_from_disk(path: Path) -> Tuple[Dict, bool, str]:
 
 
 def get_control_tower_spec_snapshot() -> Tuple[Dict, bool, str]:
+    """Return the cached spec, validation status, and any validation error message."""
     path = Path(settings.control_tower_spec_path)
     mtime = path.stat().st_mtime if path.exists() else None
     cache_hit = (
@@ -247,6 +256,7 @@ def get_control_tower_spec_snapshot() -> Tuple[Dict, bool, str]:
 
 
 def clear_control_tower_spec_cache() -> None:
+    """Invalidate the cached spec so the next call reloads from disk."""
     _SPEC_CACHE["path"] = ""
     _SPEC_CACHE["mtime"] = None
     _SPEC_CACHE["spec"] = None
@@ -334,6 +344,7 @@ def _build_execution_plan(
 
 
 def build_control_tower_decision(payload: ControlTowerDecisionRequest) -> Dict:
+    """Build a complete control-tower decision from the given operational signals."""
     spec, _, _ = get_control_tower_spec_snapshot()
     thresholds = spec["thresholds"]
     weights = _normalized_weights(spec["weights"])

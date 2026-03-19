@@ -1,3 +1,10 @@
+"""Operational alert evaluation and webhook dispatch.
+
+Evaluates request metrics against configurable thresholds for refusal
+ratio, injection ratio, and daily cost.  Alerts are optionally
+dispatched to an external webhook (Slack, PagerDuty, etc.).
+"""
+
 from typing import Dict, List
 
 import requests
@@ -18,6 +25,7 @@ def _policy_counts(summary: Dict) -> Dict[str, int]:
 
 
 def evaluate_ops_alerts(summary: Dict, daily_cost_usd: float) -> List[Dict]:
+    """Evaluate operational metrics and return a list of triggered alerts."""
     alerts: List[Dict] = []
     requests_total = int(summary.get("requests", 0))
     policy = _policy_counts(summary)
@@ -69,6 +77,7 @@ def evaluate_ops_alerts(summary: Dict, daily_cost_usd: float) -> List[Dict]:
 
 
 def dispatch_ops_alerts(alerts: List[Dict], summary: Dict, daily_cost_usd: float) -> Dict[str, int]:
+    """Send alerts to the configured webhook URL, returning sent/failed counts."""
     webhook_url = getattr(settings, "ops_alert_webhook_url", "").strip()
     if not webhook_url or not alerts:
         return {"sent": 0, "failed": 0}

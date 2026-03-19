@@ -1,3 +1,9 @@
+"""Dataset ingestion pipeline for customer-supplied eval datasets.
+
+Validates field schemas, enriches under-sized datasets with auto-generated
+samples, and writes timestamped JSONL output for the eval runner.
+"""
+
 import argparse
 import csv
 import json
@@ -14,6 +20,7 @@ ALLOWED_ROLES = {"Employee", "Ops", "Admin"}
 
 
 def load_records(path: Path) -> List[dict]:
+    """Load records from a CSV or JSONL file."""
     records: List[dict] = []
     if path.suffix.lower() == ".csv":
         with path.open("r", encoding="utf-8") as f:
@@ -31,6 +38,7 @@ def load_records(path: Path) -> List[dict]:
 
 
 def validate_records(records: List[dict]) -> List[str]:
+    """Validate records against the required schema, returning a list of error messages."""
     errors: List[str] = []
     for idx, record in enumerate(records, 1):
         missing = REQUIRED_FIELDS - set(record.keys())
@@ -90,6 +98,7 @@ def _suggestions() -> List[dict]:
 
 
 def enrich_records(records: List[dict]) -> Tuple[List[dict], bool]:
+    """Enrich small datasets (<10 records) with auto-generated samples."""
     if len(records) >= 10:
         return records, False
     augmented = records + _suggestions()
@@ -97,6 +106,7 @@ def enrich_records(records: List[dict]) -> Tuple[List[dict], bool]:
 
 
 def write_output(records: List[dict], source_name: str) -> Path:
+    """Write validated records to a timestamped JSONL file."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out_path = OUTPUT_DIR / f"{ts}_{source_name}.jsonl"

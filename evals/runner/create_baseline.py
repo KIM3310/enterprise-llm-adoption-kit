@@ -1,3 +1,9 @@
+"""Baseline report generator that runs the eval suite and saves the output.
+
+Executes ``run_eval`` to produce a latest report, then copies it to the
+specified baseline path for use by the eval gate.
+"""
+
 import argparse
 import shutil
 from pathlib import Path

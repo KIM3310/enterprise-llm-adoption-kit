@@ -1,3 +1,9 @@
+"""Token-bucket rate limiter with per-key tracking and automatic cleanup.
+
+Provides a thread-safe rate limiter backed by in-memory token buckets.
+Stale buckets are periodically pruned to prevent unbounded memory growth.
+"""
+
 import time
 import threading
 from dataclasses import dataclass
@@ -6,12 +12,14 @@ from typing import Dict
 
 @dataclass
 class Bucket:
+    """A single token bucket for one rate-limit key."""
     capacity: int
     refill_per_sec: float
     tokens: float
     last_refill: float
 
     def allow(self) -> bool:
+        """Consume a token and return ``True`` if the request is allowed."""
         now = time.time()
         elapsed = now - self.last_refill
         self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_per_sec)
@@ -23,6 +31,7 @@ class Bucket:
 
 
 class RateLimiter:
+    """Thread-safe per-key token-bucket rate limiter with periodic cleanup."""
     def __init__(
         self,
         capacity: int,
@@ -47,6 +56,7 @@ class RateLimiter:
         self._checks = 0
 
     def check(self, key: str) -> bool:
+        """Return ``True`` if the request for *key* is within the rate limit."""
         now = time.time()
         with self._lock:
             self._checks += 1

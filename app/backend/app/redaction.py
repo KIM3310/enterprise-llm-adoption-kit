@@ -1,3 +1,11 @@
+"""PII redaction engine for emails, phone numbers, and identifiers.
+
+Applies regex-based replacements to mask personally identifiable
+information before content is persisted or returned to users.  Each
+redaction category is tracked independently so callers can log which
+types of PII were found.
+"""
+
 import re
 from typing import Dict, Tuple
 
@@ -14,6 +22,16 @@ def _apply(pattern: re.Pattern, text: str, token: str) -> Tuple[str, bool]:
 
 
 def redact_text(text: str) -> Tuple[str, Dict[str, bool]]:
+    """Replace PII tokens in *text* with ``[REDACTED_*]`` placeholders.
+
+    Args:
+        text: The input string to scan and redact.
+
+    Returns:
+        A tuple of ``(redacted_text, event_flags)`` where *event_flags*
+        maps each category (``email``, ``phone``, ``id``) to whether a
+        match was found.
+    """
     events = {
         "email": False,
         "phone": False,

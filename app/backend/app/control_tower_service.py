@@ -1,3 +1,10 @@
+"""Control Tower service orchestrator with safety, redaction, and injection checks.
+
+Wraps the pure decision engine with policy guards (safety refusal,
+PII redaction, prompt-injection detection) and returns a unified
+result containing the decision plus all policy-event metadata.
+"""
+
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Tuple
 
@@ -9,11 +16,12 @@ from .safety import REFUSAL_MESSAGE, should_refuse
 
 
 class ControlTowerDecisionBuildError(Exception):
-    pass
+    """Raised when the control-tower decision builder fails."""
 
 
 @dataclass
 class ControlTowerServiceResult:
+    """Result of a control-tower decision including policy-event metadata."""
     response: ControlTowerDecisionResponse
     redacted_notes: str
     redaction_applied: bool
@@ -23,6 +31,7 @@ class ControlTowerServiceResult:
 
 
 class ControlTowerService:
+    """Orchestrates decision building with safety, redaction, and injection checks."""
     def __init__(
         self,
         decision_builder: Callable[[ControlTowerDecisionRequest], Dict] = build_control_tower_decision,
@@ -40,6 +49,7 @@ class ControlTowerService:
         payload: ControlTowerDecisionRequest,
         decision_timestamp_ms: int,
     ) -> ControlTowerServiceResult:
+        """Execute the full decision pipeline with policy guards."""
         notes = payload.notes or ""
         redacted_notes, redaction_events = self.redactor(notes)
         redaction_applied = any(redaction_events.values())

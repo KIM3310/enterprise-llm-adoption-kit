@@ -1,3 +1,15 @@
+"""Authentication and JWT/OIDC token management.
+
+Supports two authentication modes:
+
+* ``local_jwt`` -- issues and validates HS256 JWTs with rotating key IDs.
+* ``oidc`` -- validates RS256 tokens from an external identity provider
+  via JWKS discovery.
+
+Both modes produce a ``UserContext`` containing the authenticated user's
+ID and role list for downstream RBAC enforcement.
+"""
+
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
@@ -147,6 +159,7 @@ def _decode_oidc_token(token: str) -> UserContext:
 
 
 def create_jwt(user_id: str, role: str) -> str:
+    """Issue a signed JWT for *user_id* with a single *role*."""
     kid = _active_kid()
     keyring = _jwt_keyring()
     payload = _issue_payload(user_id, _normalize_roles_for_issue([role]))
@@ -154,6 +167,7 @@ def create_jwt(user_id: str, role: str) -> str:
 
 
 def create_jwt_for_roles(user_id: str, roles: List[str]) -> str:
+    """Issue a signed JWT for *user_id* with multiple *roles*."""
     normalized_roles = _normalize_roles_for_issue(roles)
     kid = _active_kid()
     keyring = _jwt_keyring()
@@ -177,6 +191,7 @@ def _resolve_decode_candidates(token: str) -> List[Tuple[str, str]]:
 
 
 def decode_jwt(token: str) -> UserContext:
+    """Decode and verify a local JWT, returning the authenticated user context."""
     candidates = _resolve_decode_candidates(token)
     last_error: Optional[Exception] = None
     for _kid, secret in candidates:
@@ -200,6 +215,7 @@ def decode_jwt(token: str) -> UserContext:
 
 
 def decode_auth_token(token: str) -> UserContext:
+    """Decode a token using the active auth mode (local JWT or OIDC)."""
     mode = getattr(settings, "auth_mode", "local_jwt").strip().lower()
     if mode == "oidc":
         return _decode_oidc_token(token)
@@ -207,10 +223,12 @@ def decode_auth_token(token: str) -> UserContext:
 
 
 def decode_oidc_token(token: str) -> UserContext:
+    """Decode an OIDC token and return the authenticated user context."""
     return _decode_oidc_token(token)
 
 
 def auth_key_metadata() -> Dict[str, object]:
+    """Return metadata about the active auth mode and key IDs."""
     keyring = _jwt_keyring()
     return {
         "auth_mode": getattr(settings, "auth_mode", "local_jwt"),
@@ -223,6 +241,7 @@ def get_current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> UserContext:
+    """FastAPI dependency: extract and validate the bearer token, returning a ``UserContext``."""
     token = credentials.credentials
     user = decode_auth_token(token)
     request.state.user = user
@@ -233,6 +252,7 @@ def get_optional_user(
     request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
 ) -> Optional[UserContext]:
+    """FastAPI dependency: optionally extract bearer token; returns ``None`` when absent."""
     if credentials is None or not credentials.credentials:
         return None
     token = credentials.credentials

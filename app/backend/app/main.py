@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
+from .logging_config import configure_logging, correlation_id_ctx, generate_correlation_id
 from .alerts import dispatch_ops_alerts, evaluate_ops_alerts
 from .auth import (
     auth_key_metadata,
@@ -748,6 +749,10 @@ def _run_startup(app: FastAPI) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Application lifespan manager: configure logging, telemetry, and startup checks."""
+    # --- Structured JSON logging ---
+    configure_logging()
+
     # --- OpenTelemetry (opt-in) ---
     from .telemetry import init_telemetry, shutdown_telemetry, is_otel_enabled
 
@@ -783,8 +788,10 @@ app.add_middleware(
 
 @app.middleware("http")
 async def request_context_middleware(request: Request, call_next):
+    """Attach a correlation ID to every request for structured log tracing."""
     request_id = request.headers.get("x-request-id") or f"req-{uuid.uuid4().hex[:12]}"
     request.state.request_id = request_id
+    correlation_id_ctx.set(request_id)
     started = time.time()
 
     raw_content_length = str(request.headers.get("content-length", "")).strip()

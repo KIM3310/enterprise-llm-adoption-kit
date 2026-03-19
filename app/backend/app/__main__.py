@@ -1,3 +1,5 @@
+"""Entry point for running the backend with ``python -m app``."""
+
 import uvicorn
 
 if __name__ == "__main__":

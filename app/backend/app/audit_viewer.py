@@ -1,3 +1,9 @@
+"""Audit log viewer that summarises request patterns, users, tools, and policy events.
+
+Reads the structured audit log file (JSONL) and produces an aggregate
+summary suitable for the ``/audit/summary`` API endpoint.
+"""
+
 import json
 from collections import Counter, deque
 from pathlib import Path
@@ -5,6 +11,7 @@ from typing import Deque, Dict, List, Optional
 
 
 def summarize_events(lines: List[str]) -> Dict:
+    """Aggregate audit event lines into a summary of requests, users, tools, and policy events."""
     requests = 0
     users = Counter()
     tools = Counter()
@@ -16,7 +23,7 @@ def summarize_events(lines: List[str]) -> Dict:
             continue
         try:
             event = json.loads(line)
-        except Exception:
+        except (json.JSONDecodeError, ValueError):
             continue
         requests += 1
         user_id = event.get("user_id", "unknown")
@@ -65,6 +72,7 @@ def _read_recent_lines(path: Path, max_lines: Optional[int]) -> List[str]:
 
 
 def summarize_log(path: Path, max_lines: Optional[int] = None) -> Dict:
+    """Summarize the audit log at *path*, optionally limiting to the last *max_lines* entries."""
     if not path.exists():
         return _empty_summary()
     try:

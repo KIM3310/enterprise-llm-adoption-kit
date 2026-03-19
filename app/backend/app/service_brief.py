@@ -1,3 +1,10 @@
+"""Service brief, review pack, rollout board, and workshop readout generators.
+
+Builds comprehensive governance and delivery surfaces by composing
+runtime posture, evidence counts, platform targets, rollout gates,
+and review-flow metadata into structured JSON responses.
+"""
+
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -105,6 +112,7 @@ def build_service_brief(
     startup_report: Optional[Dict[str, object]],
     circuit_snapshot: Dict[str, object],
 ) -> Dict[str, object]:
+    """Build the full service brief with runtime posture, evidence, and stage readiness."""
     runtime = get_llm_runtime_settings()
     openai_live = build_openai_live_contract()
     control_tower_spec, validation_ok, validation_error = get_control_tower_spec_snapshot()
@@ -383,6 +391,7 @@ def build_service_review_pack(
     startup_report: Optional[Dict[str, object]],
     circuit_snapshot: Dict[str, object],
 ) -> Dict[str, object]:
+    """Build the executive review pack with buyer promises and proof bundles."""
     brief = build_service_brief(
         startup_report=startup_report,
         circuit_snapshot=circuit_snapshot,

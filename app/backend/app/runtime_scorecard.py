@@ -1,3 +1,10 @@
+"""Operations runtime scorecard for startup readiness and governance pressure.
+
+Produces a compact operations view suitable for pre-review posture
+checks, combining startup diagnostics, circuit-breaker state, audit
+summaries, alerts, and recent decisions.
+"""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -18,6 +25,7 @@ def build_ops_runtime_scorecard(
     service_events: List[Dict[str, object]],
     recent_decisions: List[Dict[str, object]],
 ) -> Dict[str, object]:
+    """Build the ops runtime scorecard with startup, circuit, alert, and cost data."""
     startup_state = startup_report if isinstance(startup_report, dict) else {}
     failed_checks = list(startup_state.get("failed_checks", []))
     startup_status = str(startup_state.get("overall_status", "unknown"))
