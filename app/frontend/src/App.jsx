@@ -107,9 +107,9 @@ const scenarioSteps = [
 ];
 
 const homeLenses = {
-  operator: {
-    label: "Operator",
-    eyebrow: "Operator quick path",
+  reviewer: {
+    label: "Reviewer",
+    eyebrow: "Reviewer quick path",
     headline: "See the proof in three moves",
     description:
       "Start with the readiness board, jump to the scenario runner, then copy a compact export summary when the story is clear.",
