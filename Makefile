@@ -1,13 +1,31 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local frontend-build quality-check bundle-application quality-backend smoke-backend verify sanitize
+.PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local backend-install frontend-build quality-check bundle-application quality-backend smoke-backend verify sanitize
 
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND_DIR := app/backend
-BACKEND_PYTHON := $(BACKEND_DIR)/.venv/bin/python
-BACKEND_UVICORN := $(BACKEND_DIR)/.venv/bin/uvicorn
+PYTHON ?= python3
+BACKEND_VENV := $(BACKEND_DIR)/.venv
+BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
+BACKEND_UVICORN := $(BACKEND_VENV)/bin/uvicorn
+BACKEND_STAMP := $(BACKEND_VENV)/.installed-dev
 
 eval-gate:
 	python3 evals/runner/eval_gate.py
+
+backend-install: $(BACKEND_STAMP)
+
+$(BACKEND_STAMP): $(BACKEND_DIR)/pyproject.toml $(BACKEND_DIR)/requirements.txt
+	@if [ ! -x "$(BACKEND_PYTHON)" ] || ! $(BACKEND_PYTHON) -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)" >/dev/null 2>&1; then \
+		rm -rf $(BACKEND_VENV); \
+		$(PYTHON) -m venv $(BACKEND_VENV); \
+	fi
+	@if ! $(BACKEND_PYTHON) -m pip --version >/dev/null 2>&1; then \
+		$(BACKEND_PYTHON) -m ensurepip --upgrade; \
+	fi
+	@cd $(BACKEND_DIR) && \
+		.venv/bin/python -m pip install --upgrade pip && \
+		.venv/bin/python -m pip install -e ".[dev]"
+	@touch $(BACKEND_STAMP)
 
 demo:
 	@echo "[1/6] starting services..."
@@ -56,11 +74,11 @@ scenario-demo-ollama-local:
 frontend-build:
 	@cd app/frontend && npm run build
 
-quality-check:
+quality-check: backend-install
 	@cd app/backend && ./scripts/quality_gate.sh
 	@$(MAKE) frontend-build
 
-smoke-backend:
+smoke-backend: backend-install
 	@cd $(BACKEND_DIR) && \
 	PORT=8012; \
 	LOG=/tmp/enterprise-llm-adoption-kit-smoke.log; \

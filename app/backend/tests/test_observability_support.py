@@ -92,7 +92,7 @@ def _install_fake_otel(monkeypatch, exporter_cls=_FakeExporter):
     fake_sdk_trace_export.BatchSpanProcessor = _FakeBatchSpanProcessor
 
     fake_exporter_module = types.ModuleType(
-        "opentelemetry.exporter.otlp.proto.grpc.trace_exporter"
+        "opentelemetry.exporter.otlp.proto.http.trace_exporter"
     )
     fake_exporter_module.OTLPSpanExporter = exporter_cls
 
@@ -109,7 +109,7 @@ def _install_fake_otel(monkeypatch, exporter_cls=_FakeExporter):
     )
     monkeypatch.setitem(
         sys.modules,
-        "opentelemetry.exporter.otlp.proto.grpc.trace_exporter",
+        "opentelemetry.exporter.otlp.proto.http.trace_exporter",
         fake_exporter_module,
     )
     monkeypatch.setitem(sys.modules, "opentelemetry.sdk.resources", fake_resources)
