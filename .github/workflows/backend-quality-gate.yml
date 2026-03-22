@@ -39,3 +39,8 @@ jobs:
           QUALITY_AUDIT_LOG_PATH: /tmp/ellm_backend_quality_ci_audit.log
           QUALITY_CHROMA_DIR: /tmp/ellm_backend_quality_ci_chroma
         run: ./scripts/quality_gate.sh
+
+      - name: Backend smoke boot
+        run: |
+          cd ../..
+          make smoke-backend
