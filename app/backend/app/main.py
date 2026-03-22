@@ -983,6 +983,14 @@ def health(request: Request) -> Dict[str, object]:
             "version": 1,
             "required_fields": ["service", "status", "diagnostics.next_action"],
         },
+        "reviewer_fast_path": [
+            "/health",
+            "/ops/service-brief",
+            "/ops/summary-pack",
+            "/ops/rollout-gates",
+            "/ops/review-summary",
+            "/ops/runtime/scorecard",
+        ],
         "capabilities": [
             "rbac-gated-review-console",
             "ops-runtime-observability",

@@ -92,6 +92,17 @@ A runnable enterprise decision lab:
 - `GET /audit/summary` + `GET /metrics` -> show governance and LLMOps signals.
 - `docs/architecture/llm_deployment_options.md` + `docs/blueprint/09_customer_journey.md` -> connect evidence to rollout path.
 
+## Reviewer Fast Path
+
+If someone opens the backend first, the shortest trustworthy route is:
+
+1. `GET /health` — confirm runtime posture, links, and diagnostics
+2. `GET /ops/service-brief` — inspect the compact service contract
+3. `GET /ops/summary-pack` — read the strongest proof surfaces in one bundle
+4. `GET /ops/rollout-gates` — verify go/no-go posture and ownership
+5. `GET /ops/review-summary` — compress the current state into a reviewer handoff
+6. `GET /ops/runtime/scorecard` — check runtime and observability posture before any production-style claim
+
 ## Quick Start
 - `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
 - Or: [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/workshop-readout-pack` -> `GET /ops/summary-pack` -> `GET /ops/rollout-gates`.

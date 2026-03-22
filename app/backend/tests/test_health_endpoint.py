@@ -36,6 +36,14 @@ async def test_health_includes_runtime_metadata() -> None:
     assert payload.get("request_max_body_bytes", 0) >= 1024
     assert payload.get("links", {}).get("ops_runtime_scorecard") == "/ops/runtime/scorecard"
     assert payload.get("links", {}).get("ops_runtime") == "/ops/runtime"
+    assert payload.get("reviewer_fast_path") == [
+        "/health",
+        "/ops/service-brief",
+        "/ops/summary-pack",
+        "/ops/rollout-gates",
+        "/ops/review-summary",
+        "/ops/runtime/scorecard",
+    ]
     assert "ops-runtime-observability" in payload.get("capabilities", [])
     assert "diagnostics" in payload
     assert "next_action" in payload["diagnostics"]
