@@ -25,13 +25,12 @@ PIP_CHECK_STATUS=$?
 set -e
 if [[ ${PIP_CHECK_STATUS} -ne 0 ]]; then
   if echo "${PIP_CHECK_OUTPUT}" | grep -q "is not supported on this platform"; then
-    echo "${PIP_CHECK_OUTPUT}"
-    echo "pip check reported platform-specific wheel compatibility warning; continuing."
+    echo "pip check reported a platform-specific wheel compatibility warning; continuing."
   else
     echo "${PIP_CHECK_OUTPUT}" >&2
     exit ${PIP_CHECK_STATUS}
   fi
-else
+elif [[ -n "${PIP_CHECK_OUTPUT}" ]]; then
   echo "${PIP_CHECK_OUTPUT}"
 fi
 
