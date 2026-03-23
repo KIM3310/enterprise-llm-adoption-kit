@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import json
+import csv
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, cast
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = REPO_ROOT / "data"
+EXTERNAL_DIR = DATA_DIR / "external" / "customer_support"
 
 
 def data_files() -> dict[str, Path]:
@@ -54,11 +56,17 @@ def resource_pack_summary() -> dict[str, int]:
 
 
 def build_review_resource_pack() -> dict[str, object]:
+    external_ticket_path = EXTERNAL_DIR / "customer_support_tickets.csv"
     return {
         "service": "enterprise-adoption-review-resource-pack",
         "contract_version": "enterprise-adoption-review-resource-pack-v1",
         "intended_use": "reviewable enterprise rollout and workshop proof without customer data",
         "summary": resource_pack_summary(),
+        "external_data": {
+            "present": external_ticket_path.exists(),
+            "path": str(external_ticket_path.relative_to(REPO_ROOT)),
+            "row_count": _count_csv_rows(external_ticket_path),
+        },
         "workshop_scenarios": list(load_workshop_scenarios()),
         "operator_checks": list(load_operator_checks()),
         "validation_cases": list(load_validation_cases()),
@@ -77,3 +85,10 @@ def build_review_resource_pack() -> dict[str, object]:
             for key, path in data_files().items()
         },
     }
+
+
+def _count_csv_rows(path: Path) -> int:
+    if not path.exists():
+        return 0
+    with path.open(newline="", encoding="utf-8") as handle:
+        return max(0, sum(1 for _ in csv.reader(handle)) - 1)
