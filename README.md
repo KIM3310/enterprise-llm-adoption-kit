@@ -78,6 +78,7 @@ A runnable enterprise decision lab:
 
 ## Summary Pack At A Glance
 - Evaluation API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
+- Built-in review pack: `GET /ops/resource-pack`
 - Workshop closeout surface: `GET /ops/workshop-readout-pack`, `GET /ops/workshop-readout-pack/schema`
 - Rollout decision surfaces: `GET /ops/rollout-board`, `GET /ops/rollout-gates`, `GET /ops/rollout-drill`
 - Bounded public live lane: `POST /ops/live-workshop-preview`
@@ -98,10 +99,11 @@ If someone opens the backend first, the shortest trustworthy route is:
 
 1. `GET /health` — confirm runtime posture, links, and diagnostics
 2. `GET /ops/service-brief` — inspect the compact service contract
-3. `GET /ops/summary-pack` — read the strongest proof surfaces in one bundle
-4. `GET /ops/rollout-gates` — verify go/no-go posture and ownership
-5. `GET /ops/review-summary` — compress the current state into a reviewer handoff
-6. `GET /ops/runtime/scorecard` — check runtime and observability posture before any production-style claim
+3. `GET /ops/resource-pack` — inspect built-in workshop scenarios, checks, and rollout playbooks
+4. `GET /ops/summary-pack` — read the strongest proof surfaces in one bundle
+5. `GET /ops/rollout-gates` — verify go/no-go posture and ownership
+6. `GET /ops/review-summary` — compress the current state into a reviewer handoff
+7. `GET /ops/runtime/scorecard` — check runtime and observability posture before any production-style claim
 
 ## Quick Start
 - `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`.
@@ -347,6 +349,7 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 
 ## Runtime Surfaces
 - `GET /ops/service-brief`: concise runtime + evidence + rollout stage contract for buyers, operators, and operators
+- `GET /ops/resource-pack`: checked-in workshop scenarios, operator checks, validation cases, and rollout playbooks
 - `GET /ops/workshop-readout-pack`: field-ready workshop closeout pack tying discovery, pilot lane, rollout gates, and visual evidence together
 - `GET /ops/summary-pack`: executive-facing review surface with rollout tracks, platform dialogue, and review sequence
 - `GET /ops/rollout-board`: compact rollout decision board for matching buyer fit, runtime posture, and delivery lane

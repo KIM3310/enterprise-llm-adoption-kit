@@ -313,6 +313,7 @@ class ServiceBriefEvidence(BaseModel):
     eval_datasets: int = Field(ge=0)
     eval_reports: int = Field(ge=0)
     application_artifacts: int = Field(ge=0)
+    resource_packs: int = Field(ge=0)
 
 
 class ServiceBriefRolePath(BaseModel):

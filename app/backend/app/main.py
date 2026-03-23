@@ -94,6 +94,7 @@ from .rag import (
 )
 from .rate_limit import RateLimiter
 from .redaction import redact_text
+from .review_resource_pack import build_review_resource_pack
 from .runtime_scorecard import (
     build_ops_runtime_scorecard,
     build_ops_runtime_scorecard_schema,
@@ -986,6 +987,7 @@ def health(request: Request) -> Dict[str, object]:
         "reviewer_fast_path": [
             "/health",
             "/ops/service-brief",
+            "/ops/resource-pack",
             "/ops/summary-pack",
             "/ops/rollout-gates",
             "/ops/review-summary",
@@ -1012,6 +1014,7 @@ def health(request: Request) -> Dict[str, object]:
             "control_tower_spec": "/v1/control-tower/spec",
             "service_brief": "/ops/service-brief",
             "service_brief_schema": "/ops/service-brief/schema",
+            "resource_pack": "/ops/resource-pack",
             "customer_architecture_pack": "/ops/customer-architecture-pack",
             "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "workshop_readout_pack": "/ops/workshop-readout-pack",
@@ -1036,6 +1039,11 @@ def ops_service_brief() -> ServiceBriefResponse:
         circuit_snapshot=_llm_circuit_snapshot(),
     )
     return ServiceBriefResponse(**payload)
+
+
+@app.get("/ops/resource-pack", tags=["ops"], summary="Review resource pack")
+def ops_resource_pack() -> Dict[str, object]:
+    return build_review_resource_pack()
 
 
 @app.get("/ops/service-brief/schema", tags=["ops"], summary="Service brief JSON schema")

@@ -29,6 +29,7 @@ async def test_ops_service_brief_contract() -> None:
     assert body["links"]["review_summary"] == "/ops/review-summary"
     assert body["links"]["ops_runtime_scorecard"] == "/ops/runtime/scorecard"
     assert body["links"]["service_brief_schema"] == "/ops/service-brief/schema"
+    assert body["links"]["resource_pack"] == "/ops/resource-pack"
     assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
     assert body["links"]["workshop_readout_pack_schema"] == "/ops/workshop-readout-pack/schema"
     assert body["links"]["live_workshop_preview"] == "/ops/live-workshop-preview"
@@ -73,11 +74,14 @@ async def test_ops_summary_pack_contract() -> None:
     assert "/ops/runtime/scorecard" in body["evidence_bundle"]["runtime_surfaces"]
     assert "/ops/summary-pack/schema" in body["evidence_bundle"]["runtime_surfaces"]
     assert any(item["label"] == "Inspect executive overview" for item in body["review_actions"])
-    assert len(body["two_minute_review"]) == 4
+    assert len(body["two_minute_review"]) == 5
     assert body["review_gate"]["status"] in {"ready", "attention"}
     assert body["review_gate"]["next_step"]
     assert any("snowflake" in item for item in body["platform_dialogues"])
+    assert body["evidence_bundle"]["resource_pack"]["scenario_count"] >= 4
+    assert "/ops/resource-pack" in body["evidence_bundle"]["runtime_surfaces"]
     assert body["links"]["summary_pack"] == "/ops/summary-pack"
+    assert body["links"]["resource_pack"] == "/ops/resource-pack"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
     assert body["links"]["rollout_board"] == "/ops/rollout-board"
     assert body["links"]["rollout_drill"] == "/ops/rollout-drill"

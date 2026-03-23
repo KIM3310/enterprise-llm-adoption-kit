@@ -93,6 +93,7 @@ smoke-backend: backend-install
 	done; \
 	curl -fsS "http://127.0.0.1:$$PORT/health" >/dev/null; \
 	curl -fsS "http://127.0.0.1:$$PORT/ops/service-brief" >/dev/null; \
+	curl -fsS "http://127.0.0.1:$$PORT/ops/resource-pack" >/dev/null; \
 	echo "smoke ok: http://127.0.0.1:$$PORT"
 
 verify: quality-check smoke-backend

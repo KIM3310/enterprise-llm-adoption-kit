@@ -1,0 +1,20 @@
+[
+  {
+    "playbook_id": "security-first-pilot",
+    "entry_surface": "/ops/service-brief",
+    "handoff_surface": "/ops/rollout-gates",
+    "focus": "Use when the customer asks for trust boundary, safety checks, and approval ownership first."
+  },
+  {
+    "playbook_id": "exec-sponsor-walkthrough",
+    "entry_surface": "/ops/summary-pack",
+    "handoff_surface": "/ops/review-summary",
+    "focus": "Use when the audience needs a short buyer-ready explanation tied to visible evidence."
+  },
+  {
+    "playbook_id": "field-workshop-closeout",
+    "entry_surface": "/ops/workshop-readout-pack",
+    "handoff_surface": "/ops/customer-architecture-pack?platform=aws",
+    "focus": "Use when discovery output needs to become a concrete implementation path."
+  }
+]

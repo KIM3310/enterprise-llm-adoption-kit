@@ -13,6 +13,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 from .config import settings
 from .control_tower import get_control_tower_spec_snapshot
 from .llm_adapter import get_llm_runtime_settings
+from .review_resource_pack import build_review_resource_pack, resource_pack_summary
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -135,6 +136,7 @@ def build_service_brief(
     ) if (REPO_ROOT / "evals" / "reports").exists() else 0
     test_files = _count_files(REPO_ROOT / "tests", "test_*.py")
     application_artifacts = _count_files(REPO_ROOT / "docs" / "application", "*.md")
+    resource_packs = len(resource_pack_summary())
 
     discovery_artifacts = _artifacts(
         [
@@ -276,6 +278,7 @@ def build_service_brief(
             "eval_datasets": eval_datasets,
             "eval_reports": eval_reports,
             "application_artifacts": application_artifacts,
+            "resource_packs": resource_packs,
         },
         "run_modes": [
             "local-jwt demo",
@@ -368,6 +371,7 @@ def build_service_brief(
             "customer_architecture_pack_schema": "/ops/customer-architecture-pack/schema",
             "workshop_readout_pack": "/ops/workshop-readout-pack",
             "workshop_readout_pack_schema": "/ops/workshop-readout-pack/schema",
+            "resource_pack": "/ops/resource-pack",
             "live_workshop_preview": "/ops/live-workshop-preview",
             "summary_pack": "/ops/summary-pack",
             "rollout_board": "/ops/rollout-board",
@@ -413,8 +417,10 @@ def build_service_summary_pack(
             ("Security compliance packet", "docs/sales/security_compliance_packet.md", "doc"),
             ("Latest eval report", "evals/reports/latest_report.md", "report"),
             ("Customer journey blueprint", "docs/blueprint/09_customer_journey.md", "doc"),
+            ("Review resource pack", "app/backend/data/review_resource_pack.json", "dataset"),
         ]
     )
+    resource_pack = build_review_resource_pack()
     review_actions = [
         {
             "label": "Check buyer-ready runtime posture",
@@ -449,12 +455,17 @@ def build_service_summary_pack(
             "proof": "Use buyer promises, test assets, and rollout tracks to frame the system in one pass.",
         },
         {
-            "step": "3. Governance path",
+            "step": "3. Built-in workshop pack",
+            "surface": "/ops/resource-pack",
+            "proof": "Inspect synthetic workshop scenarios, operator checks, and rollout playbooks without customer data.",
+        },
+        {
+            "step": "4. Governance path",
             "surface": "/audit/summary -> /metrics",
             "proof": "Show auditability, policy events, and cost/latency visibility without leaving the runtime surface.",
         },
         {
-            "step": "4. Deployment decision",
+            "step": "5. Deployment decision",
             "surface": "docs/architecture/llm_deployment_options.md -> docs/blueprint/09_customer_journey.md",
             "proof": "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
         },
@@ -511,12 +522,14 @@ def build_service_summary_pack(
             "module_packs": int(evidence.get("module_packs", 0)),
             "eval_assets": int(evidence.get("eval_datasets", 0)) + int(evidence.get("eval_reports", 0)),
             "application_artifacts": int(evidence.get("application_artifacts", 0)),
+            "resource_pack": resource_pack["summary"],
             "review_assets_count": len(review_assets),
             "review_assets": review_assets,
             "platform_targets": platform_targets,
             "runtime_surfaces": [
                 "/health",
                 "/ops/service-brief",
+                "/ops/resource-pack",
                 "/ops/summary-pack",
                 "/ops/rollout-board",
                 "/ops/rollout-drill",
@@ -530,6 +543,7 @@ def build_service_summary_pack(
             "review_endpoints": [
                 "/health",
                 "/ops/service-brief",
+                "/ops/resource-pack",
                 "/ops/summary-pack",
                 "/ops/rollout-gates",
                 "/ops/review-summary",
@@ -573,6 +587,7 @@ def build_service_summary_pack(
         "links": {
             "health": "/health",
             "service_brief": "/ops/service-brief",
+            "resource_pack": "/ops/resource-pack",
             "customer_architecture_pack": "/ops/customer-architecture-pack",
             "summary_pack": "/ops/summary-pack",
             "rollout_board": "/ops/rollout-board",
