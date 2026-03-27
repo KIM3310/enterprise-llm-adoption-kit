@@ -6,7 +6,6 @@ Snowflake instance.
 """
 
 import json
-import types
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, call, patch
 
@@ -90,12 +89,6 @@ def test_get_connection_creates_and_caches(monkeypatch):
     fake_conn = MagicMock()
     fake_conn.cursor.return_value = fake_cursor
 
-    fake_connector = types.SimpleNamespace(
-        connect=MagicMock(return_value=fake_conn)
-    )
-
-    _install_fake_snowflake(monkeypatch, fake_connector)
-
     monkeypatch.setattr(sa, "SNOWFLAKE_ACCOUNT", "xy12345.us-east-1")
     monkeypatch.setattr(sa, "SNOWFLAKE_USER", "svc_user")
     monkeypatch.setattr(sa, "SNOWFLAKE_DATABASE", "LLM_OPS")
@@ -105,18 +98,19 @@ def test_get_connection_creates_and_caches(monkeypatch):
     monkeypatch.setattr(sa, "_connection", None)
     monkeypatch.setenv("SNOWFLAKE_PASSWORD", "test-pw")
 
-    conn = sa._get_connection()
-    assert conn is fake_conn
-    fake_connector.connect.assert_called_once()
-    connect_kwargs = fake_connector.connect.call_args[1]
-    assert connect_kwargs["account"] == "xy12345.us-east-1"
-    assert connect_kwargs["user"] == "svc_user"
-    assert connect_kwargs["database"] == "LLM_OPS"
+    with patch("snowflake.connector.connect", return_value=fake_conn) as mock_connect:
+        conn = sa._get_connection()
+        assert conn is fake_conn
+        mock_connect.assert_called_once()
+        connect_kwargs = mock_connect.call_args[1]
+        assert connect_kwargs["account"] == "xy12345.us-east-1"
+        assert connect_kwargs["user"] == "svc_user"
+        assert connect_kwargs["database"] == "LLM_OPS"
 
-    # Second call should return cached connection
-    conn2 = sa._get_connection()
-    assert conn2 is fake_conn
-    assert fake_connector.connect.call_count == 1
+        # Second call should return cached connection
+        conn2 = sa._get_connection()
+        assert conn2 is fake_conn
+        assert mock_connect.call_count == 1
 
     # Cleanup
     monkeypatch.setattr(sa, "_connection", None)
@@ -125,12 +119,6 @@ def test_get_connection_creates_and_caches(monkeypatch):
 def test_get_connection_includes_role_when_set(monkeypatch):
     fake_conn = MagicMock()
     fake_conn.cursor.return_value = MagicMock()
-
-    fake_connector = types.SimpleNamespace(
-        connect=MagicMock(return_value=fake_conn)
-    )
-
-    _install_fake_snowflake(monkeypatch, fake_connector)
 
     monkeypatch.setattr(sa, "SNOWFLAKE_ACCOUNT", "xy12345.us-east-1")
     monkeypatch.setattr(sa, "SNOWFLAKE_USER", "svc_user")
@@ -141,9 +129,10 @@ def test_get_connection_includes_role_when_set(monkeypatch):
     monkeypatch.setattr(sa, "_connection", None)
     monkeypatch.setenv("SNOWFLAKE_PASSWORD", "test-pw")
 
-    sa._get_connection()
-    connect_kwargs = fake_connector.connect.call_args[1]
-    assert connect_kwargs["role"] == "DATA_ENGINEER"
+    with patch("snowflake.connector.connect", return_value=fake_conn) as mock_connect:
+        sa._get_connection()
+        connect_kwargs = mock_connect.call_args[1]
+        assert connect_kwargs["role"] == "DATA_ENGINEER"
 
     monkeypatch.setattr(sa, "_connection", None)
 
