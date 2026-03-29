@@ -24,6 +24,12 @@ Demo video: https://youtu.be/yMq03b0js0E
 - **Outcome:** passed locally; syntax check, dependency check, pytest, smoke diagnostics, and frontend production build completed with 84.13% backend coverage
 - **Notes:** `make verify` now bootstraps the Python 3.11 backend venv and installs missing frontend dependencies automatically
 
+## Datadog Proof Pack
+
+- Spec-first Datadog resource pack: [`docs/datadog/README.md`](docs/datadog/README.md)
+- Existing env hooks already reserve a Datadog integration lane in `.env.example`
+- Best use: show how enterprise LLM governance, audit, latency, and rollout readiness would be observed in one operator-facing Datadog surface
+
 ## Key Capabilities
 
 - **RBAC** enforced at retrieval time (Employee / Ops / Admin roles)
