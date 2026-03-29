@@ -1,5 +1,5 @@
 .SHELLFLAGS := -eu -o pipefail -c
-.PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local backend-install frontend-install frontend-build quality-check bundle-application quality-backend smoke-backend verify sanitize
+.PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local backend-install frontend-install frontend-build quality-check bundle-application quality-backend smoke-backend verify sanitize datadog-plan datadog-sync
 
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND_DIR := app/backend
@@ -104,6 +104,12 @@ smoke-backend: backend-install
 	echo "smoke ok: http://127.0.0.1:$$PORT"
 
 verify: quality-check smoke-backend
+
+datadog-plan:
+	@python3 scripts/datadog_assets.py plan
+
+datadog-sync:
+	@python3 scripts/datadog_assets.py sync
 
 bundle-application:
 	@bash scripts/package_application.sh

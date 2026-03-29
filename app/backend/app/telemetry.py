@@ -25,9 +25,44 @@ _tracer_provider = None
 SERVICE_NAME = "enterprise-llm-adoption-kit"
 
 
+def _read_env(name: str) -> str | None:
+    value = os.environ.get(name, "").strip()
+    return value or None
+
+
+def _resolve_otlp_trace_endpoint(raw_value: str | None = None) -> str | None:
+    """Resolve the OTLP traces endpoint from standard env vars."""
+    candidate = raw_value or _read_env("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT") or _read_env(
+        "OTEL_EXPORTER_OTLP_ENDPOINT"
+    )
+    if not candidate:
+        return None
+
+    normalized = candidate.rstrip("/")
+    if normalized.endswith("/v1/traces"):
+        return normalized
+    return f"{normalized}/v1/traces"
+
+
+def _parse_otlp_headers(raw_value: str | None = None) -> dict[str, str]:
+    """Parse OTLP headers from a comma-separated env var."""
+    header_value = raw_value if raw_value is not None else os.environ.get("OTEL_EXPORTER_OTLP_HEADERS", "")
+    headers: dict[str, str] = {}
+    for part in header_value.split(","):
+        token = part.strip()
+        if not token or "=" not in token:
+            continue
+        key, value = token.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if key and value:
+            headers[key] = value
+    return headers
+
+
 def is_otel_enabled() -> bool:
     """Return True when the OTLP endpoint is configured."""
-    return bool(os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT"))
+    return bool(_resolve_otlp_trace_endpoint())
 
 
 def init_telemetry() -> None:
@@ -40,6 +75,11 @@ def init_telemetry() -> None:
         return
     _initialized = True
 
+    endpoint = _resolve_otlp_trace_endpoint()
+    if not endpoint:
+        _initialized = False
+        return
+
     try:
         from opentelemetry import trace
         from opentelemetry.sdk.trace import TracerProvider
@@ -51,9 +91,11 @@ def init_telemetry() -> None:
 
         resource = Resource(attributes={RES_SVC: SERVICE_NAME})
         provider = TracerProvider(resource=resource)
+        headers = _parse_otlp_headers()
 
         exporter = OTLPSpanExporter(
-            endpoint=os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"],
+            endpoint=endpoint,
+            headers=headers or None,
         )
         provider.add_span_processor(BatchSpanProcessor(exporter))
         trace.set_tracer_provider(provider)

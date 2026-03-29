@@ -1,0 +1,59 @@
+[
+  {
+    "name": "{{PREFIX}} Enterprise LLM Failures Detected",
+    "type": "query alert",
+    "query": "sum(last_15m):sum:llm_failures_total{*}.as_count() > 0",
+    "message": "Enterprise LLM runtime recorded at least one post-retry LLM failure. Review provider health, fallback behavior, and the governance runtime board.",
+    "tags": [
+      "service:{{SERVICE}}",
+      "env:{{ENV}}",
+      "repo:enterprise-llm-adoption-kit"
+    ],
+    "options": {
+      "include_tags": true,
+      "notify_audit": false,
+      "new_host_delay": 300,
+      "thresholds": {
+        "critical": 0
+      }
+    }
+  },
+  {
+    "name": "{{PREFIX}} Enterprise LLM Refusals Spiking",
+    "type": "query alert",
+    "query": "sum(last_10m):sum:policy_events_total{event:refusal}.as_count() > 10",
+    "message": "Safety or policy refusals spiked above the agreed baseline. Review request mix, prompt-injection pressure, and recent rule changes before rollout.",
+    "tags": [
+      "service:{{SERVICE}}",
+      "env:{{ENV}}",
+      "repo:enterprise-llm-adoption-kit"
+    ],
+    "options": {
+      "include_tags": true,
+      "notify_audit": false,
+      "new_host_delay": 300,
+      "thresholds": {
+        "critical": 10
+      }
+    }
+  },
+  {
+    "name": "{{PREFIX}} Enterprise LLM Circuit Opened",
+    "type": "query alert",
+    "query": "sum(last_30m):sum:llm_circuit_events_total{event:opened}.as_count() > 0",
+    "message": "An LLM circuit breaker opened in the last 30 minutes. Check provider stability, fallback behavior, and cost-control posture before continuing rollout.",
+    "tags": [
+      "service:{{SERVICE}}",
+      "env:{{ENV}}",
+      "repo:enterprise-llm-adoption-kit"
+    ],
+    "options": {
+      "include_tags": true,
+      "notify_audit": false,
+      "new_host_delay": 300,
+      "thresholds": {
+        "critical": 0
+      }
+    }
+  }
+]

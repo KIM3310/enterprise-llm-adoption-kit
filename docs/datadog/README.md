@@ -1,8 +1,10 @@
-# Enterprise LLM Adoption Kit Datadog Proof Pack
+# Enterprise LLM Adoption Kit Datadog-Ready Pack
 
 This pack documents how the kit should look in Datadog when the buyer conversation is about governance, reliability, rollout control, and operational readiness.
 
-It is intentionally review-friendly: the repo keeps the Datadog story explicit without forcing a live Datadog account into the local demo path.
+The current repo posture is `Datadog-ready, currently disabled`.
+
+It is intentionally review-friendly: the repo keeps the Datadog story explicit without forcing a live Datadog account into the local demo path. It also ships asset JSON and a sync helper so the same board can be created in a real tenant later if credentials are available again.
 
 ## Why this repo is a strong Datadog fit
 
@@ -74,11 +76,20 @@ That means the observability story is already architecturally expected, even tho
 - one notebook or runbook note that ties `policy event spike -> operator action`
 - one service-map screenshot connecting frontend, backend, and persistence edges
 
-## Minimal implementation path
+## Asset files
 
-1. Enable tracing for the FastAPI backend.
-2. Send metrics and traces to Datadog.
-3. Build the three boards above.
-4. Capture dashboard and monitor screenshots for `docs/datadog/`.
+- `docs/datadog/assets/dashboard.json`
+- `docs/datadog/assets/monitors.json`
+- `scripts/datadog_assets.py`
 
-If you only ship one artifact, make it the `Runtime Governance Board`. That is the highest-signal Datadog story for this repo.
+## Sync path
+
+This path is optional and is intentionally not active in the default local setup.
+
+1. Point `OTEL_EXPORTER_OTLP_ENDPOINT` at a Datadog Agent or OTEL collector.
+2. Run `make datadog-plan` to confirm the board and monitor titles.
+3. Run `python3 scripts/datadog_assets.py validate` once `DD_API_KEY` is present.
+4. Run `make datadog-sync` once both `DD_API_KEY` and `DD_APP_KEY` are present.
+5. Capture dashboard and monitor screenshots for `docs/datadog/`.
+
+If you only ship one artifact, make it the `Runtime Governance Board`. That is the highest-signal Datadog story for this repo, even when the live tenant is disabled.

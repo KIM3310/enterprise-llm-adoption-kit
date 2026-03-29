@@ -1,0 +1,78 @@
+{
+  "title": "{{PREFIX}} Enterprise LLM Governance Board",
+  "description": "Datadog board for runtime governance, policy events, and LLM operations readiness.",
+  "layout_type": "ordered",
+  "is_read_only": false,
+  "widgets": [
+    {
+      "definition": {
+        "type": "note",
+        "content": "Enterprise LLM Adoption Kit Datadog board\\n\\nThese widgets assume Prometheus/OpenMetrics or OTLP-exported runtime metrics are flowing into Datadog. Queries may need tag refinement depending on the collector path.",
+        "background_color": "white",
+        "font_size": "16",
+        "show_tick": false,
+        "tick_pos": "50%"
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Requests by Endpoint",
+        "show_legend": true,
+        "requests": [
+          {
+            "q": "sum:requests_total{*} by {endpoint}.as_count()"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Policy Events by Type",
+        "show_legend": true,
+        "requests": [
+          {
+            "q": "sum:policy_events_total{*} by {event}.as_count()"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "LLM Cost by Use Case",
+        "show_legend": true,
+        "requests": [
+          {
+            "q": "sum:llm_cost_usd_total{*} by {use_case}"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "LLM Failures by Provider",
+        "show_legend": true,
+        "requests": [
+          {
+            "q": "sum:llm_failures_total{*} by {provider}.as_count()"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "type": "timeseries",
+        "title": "Circuit Breaker Events",
+        "show_legend": true,
+        "requests": [
+          {
+            "q": "sum:llm_circuit_events_total{*} by {provider,event}.as_count()"
+          }
+        ]
+      }
+    }
+  ]
+}

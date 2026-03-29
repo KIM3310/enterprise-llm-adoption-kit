@@ -75,8 +75,9 @@ class _FakeResource:
 
 
 class _FakeExporter:
-    def __init__(self, *, endpoint: str) -> None:
+    def __init__(self, *, endpoint: str, headers=None) -> None:
         self.endpoint = endpoint
+        self.headers = headers
 
 
 def _install_fake_otel(monkeypatch, exporter_cls=_FakeExporter):
@@ -176,7 +177,8 @@ def test_init_telemetry_noops_without_endpoint(monkeypatch) -> None:
 
 def test_init_telemetry_success_and_shutdown(monkeypatch) -> None:
     fake_trace = _install_fake_otel(monkeypatch)
-    monkeypatch.setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://collector:4317")
+    monkeypatch.setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://collector:4318")
+    monkeypatch.setenv("OTEL_EXPORTER_OTLP_HEADERS", "dd-api-key=abc123")
     monkeypatch.setattr(telemetry, "_initialized", False)
     monkeypatch.setattr(telemetry, "_tracer_provider", None)
 
@@ -186,7 +188,8 @@ def test_init_telemetry_success_and_shutdown(monkeypatch) -> None:
     assert isinstance(telemetry._tracer_provider, _FakeTracerProvider)
     provider = telemetry._tracer_provider
     assert provider.resource.attributes["service.name"] == telemetry.SERVICE_NAME
-    assert provider.processors[0].exporter.endpoint == "http://collector:4317"
+    assert provider.processors[0].exporter.endpoint == "http://collector:4318/v1/traces"
+    assert provider.processors[0].exporter.headers == {"dd-api-key": "abc123"}
     assert telemetry._get_tracer() is fake_trace.tracer
 
     telemetry.shutdown_telemetry()
@@ -197,7 +200,7 @@ def test_init_telemetry_success_and_shutdown(monkeypatch) -> None:
 
 def test_init_telemetry_failure_logs_and_resets(monkeypatch, caplog) -> None:
     class _ExplodingExporter:
-        def __init__(self, *, endpoint: str) -> None:
+        def __init__(self, *, endpoint: str, headers=None) -> None:
             raise RuntimeError(f"bad endpoint: {endpoint}")
 
     _install_fake_otel(monkeypatch, exporter_cls=_ExplodingExporter)
@@ -211,6 +214,18 @@ def test_init_telemetry_failure_logs_and_resets(monkeypatch, caplog) -> None:
     assert telemetry._initialized is False
     assert telemetry._tracer_provider is None
     assert "Failed to initialize OpenTelemetry" in caplog.text
+
+
+def test_otlp_endpoint_resolution_and_header_parsing() -> None:
+    assert telemetry._resolve_otlp_trace_endpoint("http://collector:4318") == "http://collector:4318/v1/traces"
+    assert (
+        telemetry._resolve_otlp_trace_endpoint("https://proxy.internal/v1/traces")
+        == "https://proxy.internal/v1/traces"
+    )
+    assert telemetry._parse_otlp_headers("authorization=Bearer abc, dd-api-key=123, malformed, empty=") == {
+        "authorization": "Bearer abc",
+        "dd-api-key": "123",
+    }
 
 
 def test_span_helpers_attach_expected_attributes(monkeypatch) -> None:
