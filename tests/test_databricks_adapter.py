@@ -8,8 +8,6 @@ workspace.
 import sys
 import types
 from datetime import datetime, timezone
-from unittest.mock import MagicMock
-
 import app.databricks_adapter as da
 
 

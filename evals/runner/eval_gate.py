@@ -8,7 +8,7 @@ the configured threshold.
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 REPORTS_DIR = BASE_DIR / "evals" / "reports"

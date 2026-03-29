@@ -4,7 +4,6 @@ import types
 import httpx
 import pytest
 
-import app.llm_adapter as llm_adapter
 import app.main as main_module
 from app.llm_adapter import BedrockAdapter, get_llm_adapter, reset_llm_runtime_settings, update_llm_runtime_settings
 
