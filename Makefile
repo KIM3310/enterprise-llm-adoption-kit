@@ -4,7 +4,7 @@
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND_DIR := app/backend
 FRONTEND_DIR := app/frontend
-BOOTSTRAP_PYTHON ?= python3.11
+BOOTSTRAP_PYTHON ?= python3
 BACKEND_VENV := $(BACKEND_DIR)/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_UVICORN := $(BACKEND_VENV)/bin/uvicorn
