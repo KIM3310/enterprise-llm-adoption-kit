@@ -10,6 +10,20 @@ End-to-end enterprise LLM adoption kit covering discovery, secure architecture, 
 
 Demo video: https://youtu.be/yMq03b0js0E
 
+## Hiring Fit And Proof Boundary
+
+- **Best fit roles:** solution architect, applied AI engineer, enterprise AI / field engineering
+- **Strongest public proof:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
+- **What is real here:** RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding
+- **What is bounded here:** review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
+
+## Latest Verified Snapshot
+
+- **Verified on:** 2026-03-28
+- **Command:** `make verify`
+- **Outcome:** passed locally; syntax check, dependency check, pytest, smoke diagnostics, and frontend production build completed with 84.13% backend coverage
+- **Notes:** `make verify` now bootstraps the Python 3.11 backend venv and installs missing frontend dependencies automatically
+
 ## Key Capabilities
 
 - **RBAC** enforced at retrieval time (Employee / Ops / Admin roles)

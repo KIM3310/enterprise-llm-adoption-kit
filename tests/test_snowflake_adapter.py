@@ -76,6 +76,15 @@ def test_read_password_missing_file_returns_empty(monkeypatch, tmp_path):
 # ---------------------------------------------------------------------------
 
 
+def _install_fake_snowflake(monkeypatch, fake_connector):
+    import sys
+
+    fake_root_module = types.ModuleType("snowflake")
+    fake_root_module.connector = fake_connector
+    monkeypatch.setitem(sys.modules, "snowflake", fake_root_module)
+    monkeypatch.setitem(sys.modules, "snowflake.connector", fake_connector)
+
+
 def test_get_connection_creates_and_caches(monkeypatch):
     fake_cursor = MagicMock()
     fake_conn = MagicMock()
@@ -85,8 +94,7 @@ def test_get_connection_creates_and_caches(monkeypatch):
         connect=MagicMock(return_value=fake_conn)
     )
 
-    import sys
-    monkeypatch.setitem(sys.modules, "snowflake.connector", fake_connector)
+    _install_fake_snowflake(monkeypatch, fake_connector)
 
     monkeypatch.setattr(sa, "SNOWFLAKE_ACCOUNT", "xy12345.us-east-1")
     monkeypatch.setattr(sa, "SNOWFLAKE_USER", "svc_user")
@@ -122,8 +130,7 @@ def test_get_connection_includes_role_when_set(monkeypatch):
         connect=MagicMock(return_value=fake_conn)
     )
 
-    import sys
-    monkeypatch.setitem(sys.modules, "snowflake.connector", fake_connector)
+    _install_fake_snowflake(monkeypatch, fake_connector)
 
     monkeypatch.setattr(sa, "SNOWFLAKE_ACCOUNT", "xy12345.us-east-1")
     monkeypatch.setattr(sa, "SNOWFLAKE_USER", "svc_user")
