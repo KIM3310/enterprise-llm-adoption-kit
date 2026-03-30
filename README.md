@@ -10,27 +10,6 @@ End-to-end enterprise LLM adoption kit covering discovery, secure architecture, 
 
 Demo video: https://youtu.be/yMq03b0js0E
 
-## Hiring Fit And Proof Boundary
-
-- **Best fit roles:** solution architect, applied AI engineer, enterprise AI / field engineering
-- **Strongest public proof:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
-- **What is real here:** RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding
-- **What is bounded here:** review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
-
-## Latest Verified Snapshot
-
-- **Verified on:** 2026-03-28
-- **Command:** `make verify`
-- **Outcome:** passed locally; syntax check, dependency check, pytest, smoke diagnostics, and frontend production build completed with 84.13% backend coverage
-- **Notes:** `make verify` now bootstraps the Python 3.11 backend venv and installs missing frontend dependencies automatically
-
-## Datadog-Ready Pack
-
-- Datadog-ready resource pack: [`docs/datadog/README.md`](docs/datadog/README.md)
-- Existing env hooks already reserve a Datadog integration lane in `.env.example`
-- Current state: asset sync and OTLP wiring are prepared, but live tenant integration is intentionally disabled by default
-- Best use: show how enterprise LLM governance, audit, latency, and rollout readiness would be observed in one operator-facing Datadog surface
-
 ## Key Capabilities
 
 - **RBAC** enforced at retrieval time (Employee / Ops / Admin roles)
@@ -44,52 +23,6 @@ Demo video: https://youtu.be/yMq03b0js0E
 - **AWS Bedrock** runtime mode alongside stub, OpenAI, Ollama
 - **Kubernetes-ready** with HPA, TLS ingress, AlertManager rules
 
-## Governance Architecture
-
-Every request passes through four governance layers before reaching the LLM provider. The layers interact as a pipeline where each stage can short-circuit the request with a policy refusal.
-
-```
-                           ┌──────────────────────────────────┐
-                           │         Ingress (TLS)            │
-                           └──────────────┬───────────────────┘
-                                          │
-                           ┌──────────────▼───────────────────┐
-                           │  1. RBAC Enforcement              │
-                           │  JWT/OIDC → UserContext → role    │
-                           │  gate (Employee / Ops / Admin)    │
-                           └──────────────┬───────────────────┘
-                                          │ allowed
-                           ┌──────────────▼───────────────────┐
-                           │  2. Prompt Injection Detection    │
-                           │  Keyword heuristics scan input    │
-                           │  → flag + matched patterns list   │
-                           │  → refusal if injection detected  │
-                           └──────────────┬───────────────────┘
-                                          │ clean
-                           ┌──────────────▼───────────────────┐
-                           │  3. PII Redaction                 │
-                           │  Regex-based email/phone/ID mask  │
-                           │  Enterprise-mode: SHA-256 hashing │
-                           │  → redacted payload forwarded     │
-                           └──────────────┬───────────────────┘
-                                          │ redacted
-                           ┌──────────────▼───────────────────┐
-                           │  4. LLM Provider + RAG Retrieval  │
-                           │  Chroma vector store (RBAC-gated) │
-                           │  OpenAI / Ollama / Bedrock / stub │
-                           └──────────────┬───────────────────┘
-                                          │
-                           ┌──────────────▼───────────────────┐
-                           │  5. Audit Logging                 │
-                           │  Every request → structured log   │
-                           │  input_hash + output_hash stored  │
-                           │  → Snowflake / Databricks Delta   │
-                           │  → Prometheus metrics exported    │
-                           └──────────────────────────────────┘
-```
-
-RBAC gates retrieval scope so lower-privilege roles never see documents above their clearance. Prompt injection detection runs before any LLM call, preventing adversarial inputs from reaching the model. PII redaction ensures no personally identifiable information is persisted in logs or forwarded to third-party providers. Audit logging captures a tamper-evident record of every interaction, with hashed payloads stored in Snowflake and Databricks Delta tables for compliance review.
-
 ## Architecture
 
 ```
@@ -101,6 +34,8 @@ Ingress (TLS)  →  FastAPI Backend (RBAC / RAG / Safety / Audit)
                         ↓
               Prometheus + Grafana + OpenTelemetry
 ```
+
+Every request passes through four governance layers: RBAC enforcement, prompt injection detection, PII redaction, and audit logging. Each layer can short-circuit the request with a policy refusal.
 
 ## Quick Start
 
@@ -122,14 +57,6 @@ One-command demo (auto-selects Ollama if available, otherwise stub):
 make demo-local
 ```
 
-## Snowflake / Databricks Integration
-
-**Snowflake** — set `SNOWFLAKE_ACCOUNT` to activate. Stores eval results and audit logs; supports `query_eval_history()`, `query_audit_history()`, aggregate reporting.
-
-**Databricks** — set `DATABRICKS_HOST` to activate. MLflow experiment tracking per eval run; Delta audit tables in Unity Catalog; `databricks-cli` or service-principal OAuth auth.
-
-See [`app/backend/app/snowflake_adapter.py`](app/backend/app/snowflake_adapter.py) and [`app/backend/app/databricks_adapter.py`](app/backend/app/databricks_adapter.py).
-
 ## Core API
 
 | Endpoint | Description |
@@ -140,6 +67,12 @@ See [`app/backend/app/snowflake_adapter.py`](app/backend/app/snowflake_adapter.p
 | `GET /audit/summary` | Governance and audit log summary |
 | `GET /metrics` | Prometheus metrics (requests, latency, tokens, cost, policy events) |
 | `GET /health` | Runtime posture and diagnostics |
+
+## Snowflake / Databricks Integration
+
+**Snowflake** — set `SNOWFLAKE_ACCOUNT` to activate. Stores eval results and audit logs; supports `query_eval_history()`, `query_audit_history()`, aggregate reporting.
+
+**Databricks** — set `DATABRICKS_HOST` to activate. MLflow experiment tracking per eval run; Delta audit tables in Unity Catalog; `databricks-cli` or service-principal OAuth auth.
 
 ## Deployment
 
@@ -153,7 +86,6 @@ cd infra && docker-compose up --build
 kubectl create namespace llm-adoption
 kubectl apply -f infra/k8s/secret.yaml
 kubectl apply -f infra/k8s/
-kubectl -n llm-adoption get pods,svc,hpa,ingress
 ```
 
 **CI/CD** — GHCR Docker image published on every push to `main`. Security scan (pip-audit, bandit, Trivy) runs on schedule.
