@@ -36,6 +36,12 @@ app/data/app.db-shm
 app/data/app.db-wal
 dist/application_bundle_*/
 
+# Kubernetes secrets (never commit real secrets)
+infra/k8s/secret.yaml
+
+# Tool env files
+tools/*.env
+
 # Orchestration and test artifacts
 .omc/
 .coverage
