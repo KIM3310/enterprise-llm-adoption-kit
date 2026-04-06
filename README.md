@@ -10,6 +10,27 @@ End-to-end enterprise LLM adoption kit covering discovery, secure architecture, 
 
 Demo video: https://youtu.be/yMq03b0js0E
 
+## Hiring Fit And Proof Boundary
+
+- **Best fit roles:** solution architect, applied AI engineer, enterprise AI / field engineering
+- **Strongest public proof:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
+- **What is real here:** RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding
+- **What is bounded here:** review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
+
+## Latest Verified Snapshot
+
+- **Verified on:** 2026-04-07
+- **Command:** `make verify`
+- **Outcome:** passed locally; syntax check, dependency check, pytest, smoke diagnostics, and frontend production build completed with 84.20% backend coverage
+- **Notes:** `make verify` bootstraps the Python 3.11 backend venv and installs missing frontend dependencies automatically, and Snowflake adapter plus Snowflake-focused service-brief tests were rerun successfully from `app/backend/.venv`
+
+## Datadog-Ready Pack
+
+- Datadog-ready resource pack: [`docs/datadog/README.md`](docs/datadog/README.md)
+- Existing env hooks already reserve a Datadog integration lane in `.env.example`
+- Current state: asset sync and OTLP wiring are prepared, but live tenant integration is intentionally disabled by default
+- Best use: show how enterprise LLM governance, audit, latency, and rollout readiness would be observed in one operator-facing Datadog surface
+
 ## Key Capabilities
 
 - **RBAC** enforced at retrieval time (Employee / Ops / Admin roles)
