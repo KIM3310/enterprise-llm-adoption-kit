@@ -1286,7 +1286,6 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
 
 @app.get("/ops/runtime/scorecard", tags=["ops"], summary="Ops runtime scorecard")
 def ops_runtime_scorecard(user=Depends(get_current_user)) -> Dict[str, object]:
-    role = _effective_role(user.roles)
     _ensure_any_role(user.roles, ["Ops", "Admin"])
     return build_ops_runtime_scorecard(
         service_name=settings.app_name,
