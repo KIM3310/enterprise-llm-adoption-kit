@@ -3,12 +3,14 @@ name: backend-quality-gate
 on:
   pull_request:
     paths:
+      - "Makefile"
       - "app/backend/**"
       - ".github/workflows/backend-quality-gate.yml"
   push:
     branches:
       - main
     paths:
+      - "Makefile"
       - "app/backend/**"
       - ".github/workflows/backend-quality-gate.yml"
 

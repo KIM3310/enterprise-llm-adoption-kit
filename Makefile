@@ -93,15 +93,27 @@ smoke-backend: backend-install
 	.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port $$PORT >$$LOG 2>&1 & \
 	pid=$$!; \
 	trap 'kill $$pid >/dev/null 2>&1 || true' EXIT INT TERM; \
-	for _ in 1 2 3 4 5 6 7 8 9 10; do \
+	for _ in $$(seq 1 30); do \
 		if curl -fsS "http://127.0.0.1:$$PORT/health" >/dev/null 2>&1; then \
 			break; \
 		fi; \
 		sleep 1; \
 	done; \
-	curl -fsS "http://127.0.0.1:$$PORT/health" >/dev/null; \
-	curl -fsS "http://127.0.0.1:$$PORT/ops/service-brief" >/dev/null; \
-	curl -fsS "http://127.0.0.1:$$PORT/ops/resource-pack" >/dev/null; \
+	if ! curl -fsS "http://127.0.0.1:$$PORT/health" >/dev/null; then \
+		echo "Backend smoke boot failed; server log follows:"; \
+		tail -n 200 $$LOG || true; \
+		exit 1; \
+	fi; \
+	if ! curl -fsS "http://127.0.0.1:$$PORT/ops/service-brief" >/dev/null; then \
+		echo "Service brief smoke check failed; server log follows:"; \
+		tail -n 200 $$LOG || true; \
+		exit 1; \
+	fi; \
+	if ! curl -fsS "http://127.0.0.1:$$PORT/ops/resource-pack" >/dev/null; then \
+		echo "Resource pack smoke check failed; server log follows:"; \
+		tail -n 200 $$LOG || true; \
+		exit 1; \
+	fi; \
 	echo "smoke ok: http://127.0.0.1:$$PORT"
 
 verify: quality-check smoke-backend
