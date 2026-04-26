@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 .PHONY: eval-gate demo demo-local demo-ollama-local scenario-run scenario-demo-local scenario-demo-ollama-local backend-install frontend-install frontend-build quality-check bundle-application quality-backend smoke-backend verify sanitize datadog-plan datadog-sync
 

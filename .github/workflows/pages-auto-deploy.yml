@@ -37,7 +37,17 @@ jobs:
       - name: Build
         run: |
           cd app/frontend
-          npm ci
+          for attempt in 1 2 3; do
+            echo "npm ci attempt $attempt/3"
+            if npm ci --no-audit --no-fund; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              exit 1
+            fi
+            rm -rf node_modules
+            sleep $((attempt * 5))
+          done
           npm run build
           cd ../..
 
