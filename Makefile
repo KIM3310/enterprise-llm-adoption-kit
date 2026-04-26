@@ -90,6 +90,11 @@ smoke-backend: backend-install
 	@cd $(BACKEND_DIR) && \
 	PORT=8012; \
 	LOG=/tmp/enterprise-llm-adoption-kit-smoke.log; \
+	APP_ENV=test \
+	JWT_SECRET=enterprise-llm-test-secret \
+	SQLITE_PATH=/tmp/enterprise-llm-adoption-kit-smoke.db \
+	AUDIT_LOG_PATH=/tmp/enterprise-llm-adoption-kit-smoke-audit.log \
+	CHROMA_PERSIST_DIR=/tmp/enterprise-llm-adoption-kit-smoke-chroma \
 	.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port $$PORT >$$LOG 2>&1 & \
 	pid=$$!; \
 	trap 'kill $$pid >/dev/null 2>&1 || true' EXIT INT TERM; \
