@@ -18,7 +18,7 @@ import app.databricks_adapter as da
 
 def test_is_enabled_with_host_and_token(monkeypatch):
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc-abc123.cloud.databricks.com")
-    monkeypatch.setenv("DATABRICKS_TOKEN", "dapi0123456789")
+    monkeypatch.setenv("DATABRICKS_TOKEN", "test")
     monkeypatch.delenv("DATABRICKS_CONFIG_PROFILE", raising=False)
     monkeypatch.delenv("DATABRICKS_AUTH_TYPE", raising=False)
     monkeypatch.delenv("DATABRICKS_CLIENT_ID", raising=False)
@@ -38,7 +38,7 @@ def test_is_enabled_with_host_and_service_principal(monkeypatch):
 
 def test_is_enabled_false_when_host_missing(monkeypatch):
     monkeypatch.delenv("DATABRICKS_HOST", raising=False)
-    monkeypatch.setenv("DATABRICKS_TOKEN", "dapi0123456789")
+    monkeypatch.setenv("DATABRICKS_TOKEN", "test")
     assert da.is_enabled() is False
 
 

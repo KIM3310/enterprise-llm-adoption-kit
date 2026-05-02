@@ -42,7 +42,7 @@ The adapter activates only when `DATABRICKS_HOST` is set **and** at least one cr
 
 ```bash
 DATABRICKS_HOST=https://dbc-abc123.cloud.databricks.com
-DATABRICKS_TOKEN=dapi0123456789abcdef
+DATABRICKS_TOKEN=<databricks-token>
 DATABRICKS_CATALOG=main
 DATABRICKS_DELTA_SCHEMA=llm_ops
 MLFLOW_EXPERIMENT_NAME=enterprise-llm-eval
