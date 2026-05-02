@@ -33,7 +33,7 @@ async def test_user_api_key_crud_exposes_effective_runtime() -> None:
         save_response = await client.post(
             "/runtime/user-api-key",
             headers=headers,
-            json={"openai_api_key": "sk-byok-user-key-12345678901234567890"},
+            json={"openai_api_key": "test-byok-user-key-12345678901234567890"},
         )
         assert save_response.status_code == 200, save_response.text
         save_payload = save_response.json()
@@ -88,7 +88,7 @@ async def test_uc1_uses_user_api_key_override_when_runtime_provider_is_stub(monk
         save_response = await client.post(
             "/runtime/user-api-key",
             headers=headers,
-            json={"openai_api_key": "sk-uc1-user-key-12345678901234567890"},
+            json={"openai_api_key": "test-uc1-user-key-12345678901234567890"},
         )
         assert save_response.status_code == 200, save_response.text
 
@@ -103,7 +103,7 @@ async def test_uc1_uses_user_api_key_override_when_runtime_provider_is_stub(monk
         assert uc1_response.status_code == 200, uc1_response.text
         assert "BYOK response" in str(uc1_response.json().get("answer", ""))
 
-    assert captured.get("headers", {}).get("Authorization") == "Bearer sk-uc1-user-key-12345678901234567890"
+    assert captured.get("headers", {}).get("Authorization") == "Bearer test-uc1-user-key-12345678901234567890"
     assert str(captured.get("url", "")).endswith("/chat/completions")
     assert captured.get("json", {}).get("model") == "gpt-4o-mini"
 
