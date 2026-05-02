@@ -10,6 +10,8 @@
 
 > All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.
 
+Technical review pack: [`docs/technical-review-pack.md`](docs/technical-review-pack.md)
+
 Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ---
