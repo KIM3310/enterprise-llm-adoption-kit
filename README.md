@@ -233,10 +233,10 @@ enterprise-llm-adoption-kit/
 
 ---
 
-## Hiring Fit and Proof Boundary
+## Technical Proof Boundary
 
-- **Best fit roles:** Solution Architect, Applied AI Engineer, Enterprise AI / Field Engineering
-- **Strongest public proof:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
+- **Primary architecture lane:** enterprise LLM governance, applied AI controls, and platform integration
+- **Strongest proof surface:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
 - **What is real here:** RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding
 - **What is bounded here:** review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
 
