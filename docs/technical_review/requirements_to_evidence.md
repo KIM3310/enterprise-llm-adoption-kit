@@ -41,4 +41,4 @@
 
 ## Cross-functional coordination
 - Customer success RACI: `docs/ops/customer_success_raci.md`
-- RFP requirements matrix: `docs/application/rfp_requirements_matrix.md`
+- RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`

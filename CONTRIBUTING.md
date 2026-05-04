@@ -18,13 +18,13 @@ Useful focused commands:
 ```bash
 python3 -m pytest -q
 cd app/frontend && npm run build
-bash scripts/package_application.sh
+bash scripts/package_technical_review.sh
 ```
 
 ## Repo landmarks
 - `app/backend/` — FastAPI backend, contracts, tests, runtime diagnostics
 - `app/frontend/` — user-facing control-tower UI
-- `docs/application/` — technical review bundle and evidence map
+- `docs/technical_review/` — technical review bundle and evidence map
 - `docs/architecture/`, `docs/blueprint/`, `docs/sales/` — project depth by audience
 - `tests/` — contract and regression protection
 

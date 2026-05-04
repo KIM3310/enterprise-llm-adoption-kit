@@ -1,7 +1,7 @@
 # Latest Eval Report
 
 Run date: January 27, 2026
-Dataset: /Users/s/enterprise-llm-adoption-kit/evals/datasets/initial_20_ko.jsonl
+Dataset: evals/datasets/initial_20_ko.jsonl
 
 ## Summary
 - accuracy: 3

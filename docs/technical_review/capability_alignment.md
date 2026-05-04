@@ -1,4 +1,4 @@
-# Role Alignment (Applied AI Pre-Sales Architect)
+# Capability Alignment
 
 This document maps role responsibilities to concrete evidence in the repo.
 
@@ -38,4 +38,4 @@ This document maps role responsibilities to concrete evidence in the repo.
 - Threat model: `docs/blueprint/03_security_threat_model.md`
 - Integration checklist: `docs/sales/integration_demo_checklist.md`
 - Security & compliance packet: `docs/sales/security_compliance_packet.md`
-- RFP requirements matrix: `docs/application/rfp_requirements_matrix.md`
+- RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`

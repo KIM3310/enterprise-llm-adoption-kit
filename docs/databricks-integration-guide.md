@@ -71,7 +71,7 @@ When a full eval run executes (via `evals/runner/run_eval.py`), the Databricks a
 
 ```
 1. start_eval_run(run_name, dataset, tags)
-   └─ Creates an MLflow run under /Users/<you>/enterprise-llm-eval
+   └─ Creates an MLflow run under a Databricks workspace experiment named enterprise-llm-eval
    └─ Tags: source=enterprise-llm-adoption-kit, dataset=<name>
 
 2. log_eval_metrics(accuracy, groundedness, helpfulness, safety, avg_latency_ms, total_samples)

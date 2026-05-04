@@ -1,17 +1,17 @@
 # Links (local paths)
 
 - Main repo README: `README.md`
-- Validation data map: `docs/application/evidence_map.md`
+- Validation data map: `docs/technical_review/evidence_map.md`
 - Modules index: `docs/modules/README.md`
 - Customer journey: `docs/blueprint/09_customer_journey.md`
 - LLM deployment options: `docs/architecture/llm_deployment_options.md`
 - Integration patterns: `docs/architecture/integration_patterns.md`
 - Eval framework template: `docs/evals/eval_framework_template.md`
 - Eval report template: `docs/evals/customer_eval_report_template.md`
-- Role alignment: `docs/application/role_alignment.md`
+- Capability alignment: `docs/technical_review/capability_alignment.md`
 - Security & compliance packet: `docs/sales/security_compliance_packet.md`
 - LLM Workspace checklist: `docs/sales/llm_workspace_checklist.md`
-- RFP requirements matrix: `docs/application/rfp_requirements_matrix.md`
+- RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`
 - Exec demo script: `docs/sales/demo_script_exec.md`
 - Eng demo script: `docs/sales/demo_script_eng.md`
 - Executive summary template: `docs/sales/executive_summary_template.md`

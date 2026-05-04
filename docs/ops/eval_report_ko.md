@@ -1,6 +1,6 @@
 # 최신 Eval 결과 요약 (Korean)
 
-Dataset: /Users/s/enterprise-llm-adoption-kit/evals/datasets/initial_20_ko.jsonl
+Dataset: evals/datasets/initial_20_ko.jsonl
 
 ## Summary
 - accuracy: 3

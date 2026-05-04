@@ -98,10 +98,10 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 - Eval report template: `docs/evals/customer_eval_report_template.md`
 - Executive summary template: `docs/sales/executive_summary_template.md`
 - Technical deep dive outline: `docs/sales/technical_deep_dive_outline.md`
-- Role alignment: `docs/application/role_alignment.md`
+- Capability alignment: `docs/technical_review/capability_alignment.md`
 - Security & compliance packet: `docs/sales/security_compliance_packet.md`
 - LLM Workspace checklist: `docs/sales/llm_workspace_checklist.md`
-- RFP requirements matrix: `docs/application/rfp_requirements_matrix.md`
+- RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`
 - QBR template: `docs/sales/qbr_template.md`
 - Sample scenario (one-pager): `docs/sales/sample_scenario_onepager.md`
 
@@ -247,7 +247,7 @@ make quality-backend
   - `EVENT_STORAGE_BACKEND=sqlite` (기본) 또는 `EVENT_STORAGE_BACKEND=jsonl`
   - JSONL 경로: `SERVICE_EVENTS_JSONL_PATH`, `CONTROL_TOWER_DECISIONS_JSONL_PATH`, `DAILY_COST_JSON_PATH`
 
-## Role alignment
+## Capability alignment
 - Employee: limited docs
 - Ops: ops docs
 - Admin: all docs

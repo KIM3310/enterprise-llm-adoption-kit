@@ -148,14 +148,14 @@ def build_service_brief(
         ]
     ) if (REPO_ROOT / "evals" / "reports").exists() else 0
     test_files = _count_files(REPO_ROOT / "tests", "test_*.py")
-    application_artifacts = _count_files(REPO_ROOT / "docs" / "application", "*.md")
+    application_artifacts = _count_files(REPO_ROOT / "docs" / "technical_review", "*.md")
     resource_packs = len(resource_pack_summary())
 
     discovery_artifacts = _artifacts(
         [
             ("Discovery questionnaire", "docs/sales/discovery_questionnaire.md", "doc"),
             ("Customer journey blueprint", "docs/blueprint/09_customer_journey.md", "doc"),
-            ("Role alignment", "docs/application/role_alignment.md", "doc"),
+            ("Capability alignment", "docs/technical_review/capability_alignment.md", "doc"),
         ]
     )
     security_artifacts = _artifacts(
@@ -224,7 +224,7 @@ def build_service_brief(
             "follow_up": "/ops/summary-pack",
             "proof_assets": [
                 "docs/architecture/llm_deployment_options.md",
-                "docs/application/project_one_pager_en.md",
+                "docs/technical_review/project_one_pager_en.md",
                 "docs/verification_report.md",
             ],
         },
@@ -398,7 +398,7 @@ def build_service_brief(
             "ops_runtime": "/ops/runtime",
             "control_tower_spec": "/v1/control-tower/spec",
             "customer_journey": "docs/blueprint/09_customer_journey.md",
-            "role_alignment": "docs/application/role_alignment.md",
+            "capability_alignment": "docs/technical_review/capability_alignment.md",
             "proof_map": "docs/architecture/llm_deployment_options.md",
         },
     }

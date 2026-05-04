@@ -267,8 +267,8 @@ function buildStaticServiceBrief() {
         first_surface: "/ops/service-brief",
         follow_up: "/ops/summary-pack",
         proof_assets: [
-          "docs/application/evidence_map.md",
-          "docs/application/project_one_pager_en.md",
+          "docs/technical_review/evidence_map.md",
+          "docs/technical_review/project_one_pager_en.md",
           "docs/verification_report.md",
         ],
       },
@@ -289,7 +289,7 @@ function buildStaticServiceBrief() {
         first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
-          "docs/application/evidence_map.md",
+          "docs/technical_review/evidence_map.md",
           "docs/sales/demo_script_exec.md",
           "docs/sales/exec_value_dashboard/latest.md",
         ],
@@ -313,8 +313,8 @@ function buildStaticServiceBrief() {
             kind: "doc",
           },
           {
-            label: "Role alignment",
-            path: "docs/application/role_alignment.md",
+            label: "Capability alignment",
+            path: "docs/technical_review/capability_alignment.md",
             kind: "doc",
           },
         ],
@@ -474,8 +474,8 @@ function buildStaticServiceBrief() {
       ops_runtime: "/ops/runtime",
       control_tower_spec: "/v1/control-tower/spec",
       customer_journey: "docs/blueprint/09_customer_journey.md",
-      role_alignment: "docs/application/role_alignment.md",
-      proof_map: "docs/application/evidence_map.md",
+      capability_alignment: "docs/technical_review/capability_alignment.md",
+      proof_map: "docs/technical_review/evidence_map.md",
     },
   };
 }
@@ -651,8 +651,8 @@ function buildStaticSummaryPack() {
         first_surface: "/ops/service-brief",
         follow_up: "/ops/summary-pack",
         proof_assets: [
-          "docs/application/evidence_map.md",
-          "docs/application/project_one_pager_en.md",
+          "docs/technical_review/evidence_map.md",
+          "docs/technical_review/project_one_pager_en.md",
           "docs/verification_report.md",
         ],
       },
@@ -673,7 +673,7 @@ function buildStaticSummaryPack() {
         first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
-          "docs/application/evidence_map.md",
+          "docs/technical_review/evidence_map.md",
           "docs/sales/demo_script_exec.md",
           "docs/sales/exec_value_dashboard/latest.md",
         ],
@@ -734,7 +734,7 @@ function buildStaticSummaryPack() {
       deployment_options: "docs/architecture/llm_deployment_options.md",
       exec_summary_template: "docs/sales/executive_summary_template.md",
       qbr_template: "docs/sales/qbr_template.md",
-      proof_map: "docs/application/evidence_map.md",
+      proof_map: "docs/technical_review/evidence_map.md",
     },
   };
 }
