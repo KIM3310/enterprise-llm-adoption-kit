@@ -24,7 +24,7 @@ bash scripts/package_application.sh
 ## Repo landmarks
 - `app/backend/` — FastAPI backend, contracts, tests, runtime diagnostics
 - `app/frontend/` — user-facing control-tower UI
-- `docs/application/` — job-application bundle and evidence map
+- `docs/application/` — technical review bundle and evidence map
 - `docs/architecture/`, `docs/blueprint/`, `docs/sales/` — project depth by audience
 - `tests/` — contract and regression protection
 
