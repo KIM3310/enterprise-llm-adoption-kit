@@ -14,6 +14,9 @@ on:
       - "app/backend/**"
       - ".github/workflows/backend-quality-gate.yml"
 
+permissions:
+  contents: read
+
 jobs:
   backend-quality:
     runs-on: ubuntu-latest
