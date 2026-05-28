@@ -16,6 +16,18 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ---
 
+## Product and Review Surface
+
+| Lens | Current answer |
+|---|---|
+| Buyer or user | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
+| Commercial route | Paid adoption workshop, governance template pack, implementation starter, and optional observability/data-platform integration. |
+| Review signal | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
+| Safety boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
+| Fast proof | `make verify`, [`docs/technical-review-pack.md`](docs/technical-review-pack.md), and [`docs/sales/poc_success_criteria.md`](docs/sales/poc_success_criteria.md). |
+
+---
+
 ## Architecture
 
 Every request passes through four governance layers before reaching the LLM. Each layer can short-circuit the request with a policy refusal, and every decision is audit-logged.
