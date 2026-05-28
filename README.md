@@ -26,6 +26,13 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 | Safety boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
 | Fast proof | `make verify`, [`docs/technical-review-pack.md`](docs/technical-review-pack.md), and [`docs/sales/poc_success_criteria.md`](docs/sales/poc_success_criteria.md). |
 
+## Reviewer Fast Path
+
+- **First minute:** Open the governance layers, eval gate, and PoC success criteria before the full architecture.
+- **Local demo:** Run the backend and frontend quick-start commands, then open `http://localhost:8000` and `http://localhost:5173`.
+- **Verification:** Run `make verify`; it covers backend quality, smoke checks, and frontend build.
+- **Commercial read:** Sell it as an enterprise LLM adoption workshop and governance starter kit.
+
 ---
 
 ## Architecture
