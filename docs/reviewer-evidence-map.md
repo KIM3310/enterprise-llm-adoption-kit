@@ -1,37 +1,33 @@
-# Reviewer Evidence Map - Enterprise LLM Adoption Kit
+# Review Guide - Enterprise LLM Adoption Kit
 
-Updated: 2026-05-29
+Updated: 2026-05-30
 
-This document is the short path for a technical reviewer, engineering leader, product evaluator, or buyer who wants to understand what this repository proves without wandering through every file.
+Use this page as the short path through the repository. It keeps the review grounded in the code, docs, commands, and boundaries that are already present.
 
-## One-Line Proof
+## Summary
 
-**B2B enterprise AI governance.** Governance toolkit with RBAC, redaction, prompt-injection checks, evals, and rollout controls.
-
-## Audience and Commercial Angle
-
-| Lens | Answer |
+| Field | Notes |
 |---|---|
-| Primary reviewer | Enterprise AI, IT governance, security, platform, and operations teams. |
-| Technical signal | Can the project be explained, verified, bounded, and extended like a real product surface? |
-| Buyer signal | Is there a narrow operational pain, a runnable proof path, and a risk-aware pilot shape? |
-| Stack signal | Terraform, Docker |
+| Lane | B2B enterprise AI governance |
+| Core idea | Governance toolkit with RBAC, redaction, prompt-injection checks, evals, and rollout controls. |
+| Primary reader | Enterprise AI, IT governance, security, platform, and operations teams. |
+| Stack | Terraform, Docker |
 
-## Seven-Minute Review Route
+## Open First
 
-1. Read the README `Product and Review Surface` and `Reviewer Fast Path` sections.
-2. Open `docs/monetization-playbook.md` to understand the buyer, offer ladder, and GTM hypothesis.
-3. Run or inspect the strongest local quality gate below.
-4. Inspect CI workflow definitions and test fixtures before deeper implementation review.
-5. Check the risk boundaries so claims stay credible and not overextended.
+1. Start with the README fast path and architecture section.
+2. Open `docs/monetization-playbook.md` only when reviewing the product or service angle.
+3. Check the commands below before making claims about quality.
+4. Skim the CI workflows and fixture data before deeper implementation review.
+5. Read the boundaries section before presenting the project externally.
 
-## Verification Commands
+## Checks
 
 | Purpose | Command |
 |---|---|
 | Full local gate | `make verify` |
 
-## CI and Automation Surface
+## CI
 
 - .github/workflows/architecture-blueprint.yml
 - .github/workflows/backend-quality-gate.yml
@@ -45,7 +41,7 @@ This document is the short path for a technical reviewer, engineering leader, pr
 - .github/workflows/secret-scan.yml
 - .github/workflows/security-scan.yml
 
-## Evidence Inventory
+## Evidence
 
 - infrastructure-as-code review surface
 - containerized delivery path
@@ -53,26 +49,22 @@ This document is the short path for a technical reviewer, engineering leader, pr
 - Sales docs are current
 - Governance controls are demonstrable
 
-## Commercialization Snapshot
+## Commercial Notes
 
-| Offer | Pricing hypothesis |
+| Possible offer | Working price assumption |
 |---|---|
 | Paid adoption workshop | $8k-$20k workshop |
 | Governance starter implementation | $25k-$80k implementation |
 | Security/eval pack subscription | $5k-$20k/month advisory |
 
-## Risk Boundaries
+## Boundaries
 
 - Synthetic data by default
 - Customer adapters need scoped auth
 - No compliance certification claims without audit
 
-## Metrics That Matter
+## Useful Metrics
 
 - Policy coverage
 - Eval pass rate
 - Adoption readiness score
-
-## Review Verdict
-
-This repository should be evaluated as part of the broader KIM3310 portfolio: it is strongest when the reviewer sees the link between a concrete implementation, a documented verification path, and an externally credible operating story.
