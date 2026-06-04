@@ -166,6 +166,19 @@ class Settings:
     jwt_ttl_minutes: int = _parse_int_env("JWT_TTL_MINUTES", 60, min_value=1, max_value=1440)
     auth_mode: str = os.getenv("AUTH_MODE", "local_jwt").strip().lower()
     demo_login_code: str = os.getenv("DEMO_LOGIN_CODE", "").strip()
+    trusted_hosts: List[str] = field(
+        default_factory=lambda: _parse_csv_env(
+            "TRUSTED_HOSTS",
+            [
+                "enterprise-llm-kit.pages.dev",
+                "*.enterprise-llm-kit.pages.dev",
+                "localhost",
+                "127.0.0.1",
+                "testserver",
+                "test",
+            ],
+        )
+    )
 
     oidc_issuer: str = os.getenv("OIDC_ISSUER", "").strip()
     oidc_audience: str = os.getenv("OIDC_AUDIENCE", "").strip()

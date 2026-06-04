@@ -16,6 +16,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .logging_config import configure_logging, correlation_id_ctx
 from .alerts import dispatch_ops_alerts, evaluate_ops_alerts
@@ -814,6 +815,10 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=list(getattr(settings, "trusted_hosts", ["testserver"])),
 )
 
 

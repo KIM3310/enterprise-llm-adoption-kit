@@ -13,7 +13,10 @@ def test_jwt_rotation_uses_active_kid(monkeypatch) -> None:
         "settings",
         SimpleNamespace(
             jwt_secret="fallback-secret",
-            jwt_secrets={"v1": "secret-v1", "v2": "secret-v2"},
+            jwt_secrets={
+                "v1": "rotation-secret-v1-32-byte-minimum",
+                "v2": "rotation-secret-v2-32-byte-minimum",
+            },
             jwt_active_kid="v2",
             jwt_issuer="test-issuer",
             jwt_ttl_minutes=60,
@@ -40,7 +43,10 @@ def test_auth_key_metadata_exposes_kids(monkeypatch) -> None:
         "settings",
         SimpleNamespace(
             jwt_secret="fallback-secret",
-            jwt_secrets={"v1": "secret-v1", "v2": "secret-v2"},
+            jwt_secrets={
+                "v1": "rotation-secret-v1-32-byte-minimum",
+                "v2": "rotation-secret-v2-32-byte-minimum",
+            },
             jwt_active_kid="v2",
             auth_mode="local_jwt",
         ),

@@ -85,3 +85,13 @@ async def test_request_body_size_limit_returns_413(monkeypatch) -> None:
     assert "Request body too large" in str(body.get("detail", ""))
     assert body["request_id"] == response.headers.get("x-request-id")
     _assert_standard_headers(response)
+
+
+@pytest.mark.anyio
+async def test_untrusted_host_header_is_rejected() -> None:
+    transport = httpx.ASGITransport(app=main_module.app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://evil.example") as client:
+        response = await client.get("/health")
+
+    assert response.status_code == 400
+    assert "Invalid host header" in response.text

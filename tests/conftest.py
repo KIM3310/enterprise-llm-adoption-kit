@@ -10,7 +10,7 @@ sys.path.insert(0, str(BACKEND))
 sys.path.insert(0, str(ROOT))
 
 os.environ.setdefault("APP_ENV", "test")
-os.environ.setdefault("JWT_SECRET", "enterprise-llm-test-secret")
+os.environ.setdefault("JWT_SECRET", "enterprise-llm-test-secret-32-byte-minimum")
 
 from app.llm_adapter import reset_llm_runtime_settings, update_llm_runtime_settings
 import app.main as main_module
