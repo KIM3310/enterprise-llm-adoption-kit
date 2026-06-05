@@ -16,6 +16,13 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ---
 
+## Three-Minute Proof
+
+1. Open [`docs/sales/poc_success_criteria.md`](docs/sales/poc_success_criteria.md) to see the paid pilot boundary.
+2. Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.
+3. Run `make verify` to cover backend quality, smoke checks, and frontend build.
+4. Keep synthetic data and environment-gated live providers explicit in any buyer read.
+
 ## Product and Review Surface
 
 | Lens | Current answer |
