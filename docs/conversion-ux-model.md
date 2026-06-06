@@ -49,9 +49,9 @@ This note specializes the repository for service launch. It combines product str
 
 ## Conversion Path
 
-- Risk-reversing entry: Paid adoption workshop ($8k-$20k workshop) with one acceptance metric.
-- Pilot: Governance starter implementation ($25k-$80k implementation) using buyer-approved data and named operators.
-- Recurring layer: Security/eval pack subscription ($5k-$20k/month advisory) for monitoring, governance, support, or managed review.
+- Risk-reversing entry: Paid adoption workshop (scope after buyer intake) with one acceptance metric.
+- Pilot: Governance starter implementation (scope after buyer intake) using buyer-approved data and named operators.
+- Recurring layer: Security/eval pack subscription (scope after buyer intake) for monitoring, governance, support, or managed review.
 
 ## Scope Frame
 

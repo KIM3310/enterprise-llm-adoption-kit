@@ -12,7 +12,7 @@ This is the buyer-ready version of the repository. It turns the technical proof 
 | Buyer | Enterprise AI, IT governance, security, platform, and operations teams. |
 | Pain wedge | Governance toolkit with RBAC, redaction, prompt-injection checks, evals, and rollout controls. |
 | Front-door offer | Paid adoption workshop |
-| Entry scope | $8k-$20k workshop |
+| Entry scope | Scope after buyer intake |
 | Proof before pitch | make verify passes |
 | Next buyer action | Review one proof artifact, then choose diagnostic, workshop, pilot, support, or revival path. |
 
@@ -20,9 +20,9 @@ This is the buyer-ready version of the repository. It turns the technical proof 
 
 | Offer | Scope assumption | Buyer-facing scope |
 |---|---|---|
-| Paid adoption workshop | $8k-$20k workshop | Package 30/60/90 rollout |
-| Governance starter implementation | $25k-$80k implementation | Create vertical-specific demos |
-| Security/eval pack subscription | $5k-$20k/month advisory | Sell one governance workshop |
+| Paid adoption workshop | Scope after buyer intake | Package 30/60/90 rollout |
+| Governance starter implementation | Scope after buyer intake | Create vertical-specific demos |
+| Security/eval pack subscription | Scope after buyer intake | Sell one governance workshop |
 
 ## Close Path
 

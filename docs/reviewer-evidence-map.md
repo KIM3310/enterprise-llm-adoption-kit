@@ -53,9 +53,9 @@ Use this page as the short path through the repository. It keeps the review grou
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Paid adoption workshop | $8k-$20k workshop |
-| Governance starter implementation | $25k-$80k implementation |
-| Security/eval pack subscription | $5k-$20k/month advisory |
+| Paid adoption workshop | Scope after buyer intake |
+| Governance starter implementation | Scope after buyer intake |
+| Security/eval pack subscription | Scope after buyer intake |
 
 ## Boundaries
 
