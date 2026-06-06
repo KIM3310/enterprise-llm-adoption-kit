@@ -3239,6 +3239,7 @@ export default function App() {
       </header>
 
       <main className="main-content">
+        <h1 className="sr-only">LLM Adoption Atelier</h1>
         {page === "home" && (
           <div className="page-view">
             <section className="hero-grid">
