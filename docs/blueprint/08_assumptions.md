@@ -8,5 +8,5 @@
 6) Evaluation scoring can be heuristic or manual; rubric defines expected review process.
 7) The UI is minimal by design to prioritize security, evals, and observability.
 8) Role model is limited to Employee/Ops/Admin for demo scope.
-9) Costs are estimated using heuristic token pricing; not authoritative.
+9) Costs are estimated using heuristic token scope; not authoritative.
 
