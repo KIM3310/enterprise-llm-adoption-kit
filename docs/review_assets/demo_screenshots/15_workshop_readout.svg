@@ -8,7 +8,7 @@
 
   <rect x="80" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#3B82F6"/>
   <text x="108" y="232" fill="#93C5FD" font-family="Arial, sans-serif" font-size="14" font-weight="700">DISCOVERY</text>
-  <text x="108" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Questionnaire + buyer map</text>
+  <text x="108" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Questionnaire + stakeholder map</text>
   <text x="108" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">docs/review_assets/discovery_questionnaire.md</text>
 
   <rect x="390" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#14B8A6"/>
@@ -52,7 +52,7 @@
 
   <rect x="940" y="620" width="380" height="180" rx="20" fill="#172036" stroke="#334155"/>
   <text x="968" y="664" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="22" font-weight="700">Outcome</text>
-  <text x="968" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">A buyer workshop can now end with a</text>
+  <text x="968" y="700" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">A stakeholder workshop can now end with a</text>
   <text x="968" y="732" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">pilot path, go/no-go logic, and shareable</text>
   <text x="968" y="764" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="17">visual evidence instead of narrative alone.</text>
 </svg>

@@ -28,7 +28,7 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - 범위를 현실적으로 제한했습니다: LLM은 stub adapter, 데이터는 synthetic, 한계는 명시적으로 적어 포트폴리오 신뢰도를 지켰습니다.
 
 ## 역할 및 범위
-- 백엔드 API, 프론트엔드 UI, eval harness, 프리세일즈 산출물을 단독 구현했습니다.
+- 백엔드 API, 프론트엔드 UI, eval harness, 기술 검토 산출물을 단독 구현했습니다.
 - 주장보다 재현을 우선했습니다: 모든 항목은 문서, 테스트, 또는 스크립트로 검증 가능합니다.
 - 신입 온보딩 관점으로 설계했습니다: 역할 분리, 간단한 실행 절차, 안전한 기본값을 유지했습니다.
 - GitHub Actions로 CI 체크(backend quality gate, frontend build, eval gate)를 추가했습니다.
@@ -39,10 +39,10 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - PII redaction 및 감사 로그(enterprise 모드 해시)
 - RAG-style retrieval (Chroma + deterministic hash embeddings)
 - Evals 리포트 + baseline diff
-- LLMOps 지표 (latency, token, cost, policy events)
+- LLMOps 지표 (latency, token, usage, policy events)
 - 통합 패턴: Slack/Jira 스타일 ingestion 엔드포인트(UI에서 시뮬레이션 가능)
 - Scenario Runner가 Markdown 리포트를 export하고, 로컬 run history(브라우저 localStorage)를 유지합니다
-- 프리세일즈 아티팩트: discovery wizard, ROI 계산기, 데모 스크립트, exec deck
+- 기술 검토 아티팩트: discovery wizard, Impact 계산기, 데모 스크립트, exec deck
 
 ## 아키텍처 요약 (로컬 데모)
 - FastAPI 백엔드: UC1/UC2 흐름, audit log, metrics, integrations
@@ -62,8 +62,8 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - 엔터프라이즈 discovery 결과를 아키텍처 결정으로 변환
 - LLM 통합 패턴(RBAC, audit logging, redaction, injection defense, tool allowlist)
 - 회귀 방지 evals + baseline diff
-- LLMOps 준비 상태(metrics, reliability controls, cost tracking)
-- 프리세일즈 아티팩트(데모 스크립트, objections, MAP, 30/60/90)
+- LLMOps 준비 상태(metrics, reliability controls, usage tracking)
+- 기술 검토 아티팩트(데모 스크립트, objections, MAP, 30/60/90)
 - LLM 도입 경로(API vs LLM Workspace) 및 하이브리드 롤아웃 계획
 
 ## 증빙 (확인 포인트)
@@ -85,7 +85,7 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 ```
 
 ## Runtime Surface
-- `GET /ops/service-brief`: 구매자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
+- `GET /ops/service-brief`: 이해관계자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
 - `GET /ops/summary-pack`: executive review surface, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
 - `GET /ops/summary-pack/schema`: review actions, test assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
@@ -147,7 +147,7 @@ make demo-local
 ```
 
 ## Ollama 빠른 시작 (권장)
-유료 API 키 없이 로컬 모델로 전체 흐름을 바로 체험할 수 있습니다.
+외부 API 키 없이 로컬 모델로 전체 흐름을 바로 체험할 수 있습니다.
 
 ```bash
 # Ollama 설치: https://ollama.com/download
@@ -208,7 +208,7 @@ make quality-backend
 
 ## Metrics
 - Prometheus endpoint: `GET /metrics`
-- Request counters, latency histogram, token usage, cost estimates, policy events
+- Request counters, latency histogram, token usage, usage estimates, policy events
 
 ## 프로덕션 런타임 옵션 (구현됨)
 - 인증 모드:
@@ -254,13 +254,13 @@ make quality-backend
 
 ## Swap-in 가이드
 - **OIDC/SAML**: `/auth/login`을 외부 IdP로 대체, IdP 공개키로 JWT 검증
-- **LLM API**: `LLMAdapter`에 provider SDK 연결, token usage + cost 매핑
+- **LLM API**: `LLMAdapter`에 provider SDK 연결, token usage + usage 매핑
 - **LLM Workspace**: SSO/SAML 및 enterprise governance 기준에 맞춘 정책 정렬
 - **Cloud storage**: local SQLite/file path를 managed DB/object store로 교체
 
 ## Pre-Sales Kit Extras
 - Discovery Wizard: `python3 app/backend/scripts/discovery_wizard.py`
-- ROI Calculator: `python3 app/backend/scripts/roi_calculator.py --handle-time-min 12 --tickets-per-week 800 --hourly-cost 35 --deflection-rate 0.25 --adoption-rate 0.6`
+- Impact Calculator: `python3 app/backend/scripts/impact_calculator.py --handle-time-min 12 --tickets-per-week 800 --deflection-rate 0.25 --adoption-rate 0.6`
 - PoC Success Generator: `python3 app/backend/scripts/poc_success_generator.py`
 - BYO Dataset Ingest: `python3 evals/runner/dataset_ingest.py --input evals/datasets/sample_dataset.csv`
 - Eval Gate: `make eval-gate`

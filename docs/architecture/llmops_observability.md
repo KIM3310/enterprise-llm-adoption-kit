@@ -5,7 +5,7 @@
 - request_latency_seconds{endpoint,use_case}
 - llm_tokens_in_total{use_case}
 - llm_tokens_out_total{use_case}
-- llm_cost_usd_total{use_case}
+- llm_usage_usd_total{use_case}
 - policy_events_total{event}
 
 ## Logs

@@ -2,7 +2,7 @@
 
 ## Objectives
 - Provide a step-by-step production readiness playbook.
-- Generate an exec value dashboard combining ROI + evals + ops signals.
+- Generate an exec value dashboard combining Impact + evals + ops signals.
 
 ## Deliverables
 - Playbook doc

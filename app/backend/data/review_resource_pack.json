@@ -1,28 +1,28 @@
 [
   {
     "scenario_id": "finance-discovery",
-    "buyer_team": "finance-operations",
+    "stakeholder_team": "finance-operations",
     "platform": "snowflake",
     "goal": "Translate discovery notes into a secure analytics copilot rollout plan.",
     "next_surface": "/ops/customer-architecture-pack?platform=snowflake"
   },
   {
     "scenario_id": "support-copilot-rollout",
-    "buyer_team": "customer-support",
+    "stakeholder_team": "customer-support",
     "platform": "aws",
     "goal": "Show how an operations-heavy pilot can move from workshop to governed production gate.",
     "next_surface": "/ops/workshop-readout-pack?platform=aws"
   },
   {
     "scenario_id": "hybrid-governance-board",
-    "buyer_team": "platform-governance",
+    "stakeholder_team": "platform-governance",
     "platform": "databricks",
     "goal": "Review rollout ownership, risk posture, and evaluation evidence before a hybrid deployment.",
     "next_surface": "/ops/rollout-gates"
   },
   {
     "scenario_id": "workspace-adoption-review",
-    "buyer_team": "business-transformation",
+    "stakeholder_team": "business-transformation",
     "platform": "mariadb",
     "goal": "Keep a workspace-first adoption path grounded in audit, metrics, and runtime proof.",
     "next_surface": "/ops/review-summary"

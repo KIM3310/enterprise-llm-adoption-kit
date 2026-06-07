@@ -1,8 +1,8 @@
 # Executive Value Dashboard (Template)
 
-## ROI Snapshot
-- Monthly savings: {{monthly_savings}}
-- Breakeven: {{breakeven_months}} months
+## Impact Snapshot
+- Monthly hours saved: {{monthly_hours saved}}
+- Review window: {{breakeven_months}} months
 
 ## Quality Snapshot
 - Accuracy: {{accuracy}}
@@ -13,4 +13,4 @@
 ## Ops Snapshot
 - P95 latency target: < 3.5s
 - Error rate target: < 2%
-- Cost guardrail: configurable per use case
+- Usage guardrail: configurable per use case

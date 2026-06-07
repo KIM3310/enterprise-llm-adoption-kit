@@ -1,7 +1,7 @@
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-OUT_DIR = BASE_DIR / "docs" / "sales" / "demo_screenshots"
+OUT_DIR = BASE_DIR / "docs" / "review_assets" / "demo_screenshots"
 
 PLACEHOLDERS = [
     ("00_rbac.txt", "RBAC proof: Employee vs Admin citations."),

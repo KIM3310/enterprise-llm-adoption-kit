@@ -10,4 +10,4 @@
 - Evals harness supports golden sets, rubric scoring, and baseline diff.
 
 ## "We need ops readiness"
-- Metrics, cost tracking, rate limiting, and retry/backoff are built in.
+- Metrics, usage tracking, rate limiting, and retry/backoff are built in.

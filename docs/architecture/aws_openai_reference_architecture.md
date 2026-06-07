@@ -23,7 +23,7 @@ flowchart LR
     ALB -->|8000| ECS[ECS Fargate: Backend API]
     ECS --> CW[(CloudWatch Logs)]
     ECS --> SM[Secrets Manager]
-    ECS --> RDS[(RDS Postgres: events/audit/cost)]
+    ECS --> RDS[(RDS Postgres: events/audit/usage)]
     ECS --> S3AUD[(S3: audit evidence / exports)]
     ECS --> VPCEndpoints[VPC Endpoints\n(S3/ECR/Logs/SM)]
     ECS --> NAT[NAT Gateway / Egress Proxy]
@@ -41,10 +41,10 @@ flowchart LR
 | Networking | VPC Endpoints | Reduce public egress | S3, ECR (api+dkr), CloudWatch Logs, Secrets Manager |
 | Compute | ECS Fargate | Run backend service | Private subnets, no public IP |
 | Compute | ECR | Store images | Built by CI, deployed to ECS |
-| Data | RDS Postgres | Durable event/audit/cost store | Replace SQLite for production |
+| Data | RDS Postgres | Durable event/audit/usage store | Replace SQLite for production |
 | Data | S3 (Audit/Exports) | Evidence packs / exports | Optional Object Lock for WORM |
 | Secrets | Secrets Manager + KMS | Store OpenAI key + JWT secrets | Key rotation policy + tight IAM |
-| Observability | CloudWatch | Logs + basic metrics | Add alarms (error rate, latency, cost) |
+| Observability | CloudWatch | Logs + basic metrics | Add alarms (error rate, latency, usage) |
 | Observability (optional) | AMP/Grafana or Datadog | Prometheus `/metrics` scraping | Keep `/metrics` behind auth in production |
 | Identity | Corporate IdP (OIDC) | SSO | Backend already supports `AUTH_MODE=oidc` |
 

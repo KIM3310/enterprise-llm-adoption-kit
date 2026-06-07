@@ -2,8 +2,8 @@ from pathlib import Path
 from typing import List
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-DECK_DIR = BASE_DIR / "docs" / "sales" / "deck"
-TALK_TRACK = BASE_DIR / "docs" / "sales" / "talk_track_exec.md"
+DECK_DIR = BASE_DIR / "docs" / "review_assets" / "deck"
+TALK_TRACK = BASE_DIR / "docs" / "review_assets" / "talk_track_exec.md"
 
 
 def _extract_sections(lines: List[str]) -> List[tuple]:

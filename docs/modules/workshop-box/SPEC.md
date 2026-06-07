@@ -2,7 +2,7 @@
 
 ## Objectives
 - Provide a 3-hour workshop agenda and hands-on labs.
-- Auto-generate workshop outputs: discovery brief, eval plan, ROI, PoC success criteria.
+- Auto-generate workshop outputs: discovery brief, eval plan, Impact, PoC success criteria.
 - Produce outputs into a single folder for easy sharing.
 
 ## Deliverables
@@ -12,4 +12,4 @@
 
 ## Constraints
 - No external dependencies.
-- Reuse existing discovery/ROI/PoC artifacts where possible.
+- Reuse existing discovery/Impact/PoC artifacts where possible.

@@ -25,7 +25,7 @@ Typical characteristics
 - Faster rollout for internal users
 - Lower engineering effort for initial access
 - Policy and governance managed at the admin layer
-- Useful for discovery, internal enablement, and early ROI
+- Useful for discovery, internal enablement, and early Impact
 
 Key controls to plan
 - Identity: SSO/SAML and user lifecycle (SCIM if available)

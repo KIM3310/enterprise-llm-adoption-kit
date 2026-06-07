@@ -5,7 +5,7 @@
 
 ## 흐름
 1) 포지셔닝 (20초)
-   - "본 키트는 한국 시장용 Applied AI 프리세일즈를 위한 엔터프라이즈 LLM 도입 레퍼런스입니다."
+   - "본 키트는 한국 시장용 Applied AI 기술 검토를 위한 엔터프라이즈 LLM 도입 레퍼런스입니다."
    - "두 가지 핵심 시나리오: Handover Copilot, DevOps Log Intelligence"
 
 2) 보안/거버넌스 (45초)

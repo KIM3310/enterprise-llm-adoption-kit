@@ -57,7 +57,7 @@ Goals
 
 Artifacts
 - PoC success criteria: `docs/review_assets/poc_success_criteria.md`
-- ROI model: `docs/review_assets/roi/`
+- Impact model: `docs/review_assets/impact_estimates/`
 - Exec demo: `docs/review_assets/demo_script_exec.md`
 - Executive summary: `docs/review_assets/executive_summary_template.md`
 

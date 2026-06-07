@@ -43,7 +43,7 @@ Because each layer produces its own policy events, the audit log records exactly
 The layers execute in a fixed order (RBAC -> Injection -> PII -> Safety). If RBAC denies access, the request never reaches injection detection, avoiding unnecessary computation. This also means a request that passes all four layers has a complete attestation chain.
 
 ### Extensibility
-Adding a new governance dimension (e.g., toxicity scoring, cost-budget enforcement) requires only adding a new module and inserting it into the pipeline sequence. No existing modules need modification.
+Adding a new governance dimension (e.g., toxicity scoring, usage-budget enforcement) requires only adding a new module and inserting it into the pipeline sequence. No existing modules need modification.
 
 ### ReDoS protection
 The safety module (`safety.py`) uses bounded wildcards (`.{0,200}`) instead of unbounded `.*` in all regex patterns, and truncates input to `_MAX_SCAN_LENGTH = 10_000` characters before scanning. This prevents catastrophic backtracking attacks that could DoS the governance layer itself.
@@ -60,7 +60,7 @@ The safety module (`safety.py`) uses bounded wildcards (`.{0,200}`) instead of u
 
 ### LLM-based content moderation (e.g., calling a moderation endpoint)
 - Pro: catches nuanced policy violations that regex cannot.
-- Con: adds LLM inference cost and latency to the governance layer itself. Creates a circular dependency where the governance system depends on LLM availability. Regex-based patterns provide deterministic, auditable, zero-cost-per-request enforcement.
+- Con: adds LLM inference usage and latency to the governance layer itself. Creates a circular dependency where the governance system depends on LLM availability. Regex-based patterns provide deterministic, auditable, zero-usage-per-request enforcement.
 
 ## Consequences
 

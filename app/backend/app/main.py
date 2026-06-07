@@ -153,7 +153,7 @@ LIVE_WORKSHOP_SCENARIOS = {
         "next_review_path": "/ops/customer-architecture-pack?platform=snowflake",
         "estimated_cost_usd": 0.012,
         "prompt": (
-            "A Snowflake-oriented buyer workshop needs a crisp rollout stance, architecture path, "
+            "A Snowflake-oriented stakeholder workshop needs a crisp rollout stance, architecture path, "
             "and next-step pack without exposing arbitrary customer text input."
         ),
     },
@@ -1101,7 +1101,7 @@ def ops_platform_proof_board() -> Dict[str, object]:
         "service": settings.app_name,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-platform-proof-board-v1",
-        "headline": "Compact platform proof board for mapping provider and data-platform posture before a buyer walkthrough.",
+        "headline": "Compact platform proof board for mapping provider and data-platform posture before a stakeholder walkthrough.",
         "platforms": {
             "openai": bool(getattr(settings, "llm_openai_api_key", "")),
             "bedrock": bool(os.getenv("AWS_REGION") or os.getenv("BEDROCK_REGION")),

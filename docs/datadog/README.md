@@ -1,6 +1,6 @@
 # Enterprise LLM Adoption Kit Datadog-Ready Pack
 
-This pack documents how the kit should look in Datadog when the buyer conversation is about governance, reliability, rollout control, and operational readiness.
+This pack documents how the kit should look in Datadog when the stakeholder conversation is about governance, reliability, rollout control, and operational readiness.
 
 The current repo posture is `Datadog-ready, currently disabled`.
 
@@ -36,7 +36,7 @@ That means the observability story is already architecturally expected, even tho
 
 - request count and latency for `/uc1/architecture` and `/uc2/log-intel`
 - refusal rate from prompt-injection and policy checks
-- token and cost trend by runtime mode
+- token and usage trend by runtime mode
 - auth and role distribution
 
 ### 2. Audit + Compliance Board

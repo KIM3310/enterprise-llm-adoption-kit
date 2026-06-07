@@ -63,7 +63,7 @@
 | test_aggregate_scores | PASSED |
 | test_dataset_ingest_adds_suggestions | PASSED |
 | test_kr_dataset_schema | PASSED |
-| test_compute_roi | PASSED |
+| test_compute_impact | PASSED |
 | test_generate_exec_dashboard | PASSED |
 
 ### UI and Frontend (6 tests)

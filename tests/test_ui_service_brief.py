@@ -17,7 +17,7 @@ def test_ui_includes_executive_summary_pack():
     assert "Executive Summary Pack" in content
     assert "Quality gate" in content
     assert "Fallback posture" in content
-    assert "Buyer promises" in content
+    assert "Stakeholder promises" in content
     assert "Rollout tracks" in content
     assert "Review actions" in content
     assert "Reviewer lanes" in content

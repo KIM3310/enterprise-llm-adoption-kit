@@ -16,7 +16,7 @@
     "latency_ms": 3,
     "tokens_in": 53,
     "tokens_out": 11,
-    "cost_estimate": 0.000324
+    "usage_estimate": 0.000324
   },
   {
     "request_id": "uc2-1769481653719",
@@ -35,7 +35,7 @@
     "latency_ms": 6,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc2-1769481653728",
@@ -54,7 +54,7 @@
     "latency_ms": 3,
     "tokens_in": 41,
     "tokens_out": 11,
-    "cost_estimate": 0.000288
+    "usage_estimate": 0.000288
   },
   {
     "request_id": "uc2-1769481653735",
@@ -73,7 +73,7 @@
     "latency_ms": 3,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc2-1769481653741",
@@ -92,7 +92,7 @@
     "latency_ms": 6,
     "tokens_in": 40,
     "tokens_out": 11,
-    "cost_estimate": 0.000285
+    "usage_estimate": 0.000285
   },
   {
     "request_id": "uc2-1769481653751",
@@ -111,7 +111,7 @@
     "latency_ms": 3,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   },
   {
     "request_id": "uc2-1769481653757",
@@ -130,7 +130,7 @@
     "latency_ms": 3,
     "tokens_in": 52,
     "tokens_out": 11,
-    "cost_estimate": 0.000321
+    "usage_estimate": 0.000321
   },
   {
     "request_id": "uc2-1769481653763",
@@ -149,7 +149,7 @@
     "latency_ms": 5,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   },
   {
     "request_id": "uc2-1769481653772",
@@ -168,7 +168,7 @@
     "latency_ms": 3,
     "tokens_in": 39,
     "tokens_out": 11,
-    "cost_estimate": 0.000282
+    "usage_estimate": 0.000282
   },
   {
     "request_id": "uc2-1769481653779",
@@ -187,7 +187,7 @@
     "latency_ms": 3,
     "tokens_in": 39,
     "tokens_out": 11,
-    "cost_estimate": 0.000282
+    "usage_estimate": 0.000282
   },
   {
     "request_id": "uc1-1769481720525",
@@ -206,7 +206,7 @@
     "latency_ms": 11,
     "tokens_in": 79,
     "tokens_out": 11,
-    "cost_estimate": 0.000402
+    "usage_estimate": 0.000402
   },
   {
     "request_id": "uc1-1769481720541",
@@ -225,7 +225,7 @@
     "latency_ms": 14,
     "tokens_in": 79,
     "tokens_out": 11,
-    "cost_estimate": 0.000402
+    "usage_estimate": 0.000402
   },
   {
     "request_id": "uc1-1769481720560",
@@ -244,7 +244,7 @@
     "latency_ms": 7,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc1-1769481720571",
@@ -263,7 +263,7 @@
     "latency_ms": 4,
     "tokens_in": 79,
     "tokens_out": 11,
-    "cost_estimate": 0.000402
+    "usage_estimate": 0.000402
   },
   {
     "request_id": "uc1-1769481720579",
@@ -282,7 +282,7 @@
     "latency_ms": 8,
     "tokens_in": 80,
     "tokens_out": 11,
-    "cost_estimate": 0.000405
+    "usage_estimate": 0.000405
   },
   {
     "request_id": "uc1-1769481720591",
@@ -301,7 +301,7 @@
     "latency_ms": 4,
     "tokens_in": 83,
     "tokens_out": 11,
-    "cost_estimate": 0.000414
+    "usage_estimate": 0.000414
   },
   {
     "request_id": "uc1-1769481720599",
@@ -320,7 +320,7 @@
     "latency_ms": 3,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481720607",
@@ -339,7 +339,7 @@
     "latency_ms": 6,
     "tokens_in": 81,
     "tokens_out": 11,
-    "cost_estimate": 0.000408
+    "usage_estimate": 0.000408
   },
   {
     "request_id": "uc1-1769481720616",
@@ -358,7 +358,7 @@
     "latency_ms": 4,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481720625",
@@ -377,7 +377,7 @@
     "latency_ms": 5,
     "tokens_in": 79,
     "tokens_out": 11,
-    "cost_estimate": 0.000402
+    "usage_estimate": 0.000402
   },
   {
     "request_id": "uc2-1769481720648",
@@ -396,7 +396,7 @@
     "latency_ms": 10,
     "tokens_in": 53,
     "tokens_out": 11,
-    "cost_estimate": 0.000324
+    "usage_estimate": 0.000324
   },
   {
     "request_id": "uc2-1769481720667",
@@ -415,7 +415,7 @@
     "latency_ms": 13,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc2-1769481720685",
@@ -434,7 +434,7 @@
     "latency_ms": 5,
     "tokens_in": 41,
     "tokens_out": 11,
-    "cost_estimate": 0.000288
+    "usage_estimate": 0.000288
   },
   {
     "request_id": "uc2-1769481720694",
@@ -453,7 +453,7 @@
     "latency_ms": 3,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc2-1769481720700",
@@ -472,7 +472,7 @@
     "latency_ms": 5,
     "tokens_in": 40,
     "tokens_out": 11,
-    "cost_estimate": 0.000285
+    "usage_estimate": 0.000285
   },
   {
     "request_id": "uc2-1769481720709",
@@ -491,7 +491,7 @@
     "latency_ms": 3,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   },
   {
     "request_id": "uc2-1769481720715",
@@ -510,7 +510,7 @@
     "latency_ms": 3,
     "tokens_in": 52,
     "tokens_out": 11,
-    "cost_estimate": 0.000321
+    "usage_estimate": 0.000321
   },
   {
     "request_id": "uc2-1769481720722",
@@ -529,7 +529,7 @@
     "latency_ms": 5,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   },
   {
     "request_id": "uc2-1769481720732",
@@ -548,7 +548,7 @@
     "latency_ms": 3,
     "tokens_in": 39,
     "tokens_out": 11,
-    "cost_estimate": 0.000282
+    "usage_estimate": 0.000282
   },
   {
     "request_id": "uc2-1769481720739",
@@ -567,7 +567,7 @@
     "latency_ms": 2,
     "tokens_in": 39,
     "tokens_out": 11,
-    "cost_estimate": 0.000282
+    "usage_estimate": 0.000282
   },
   {
     "request_id": "uc1-1769481961586",
@@ -586,7 +586,7 @@
     "latency_ms": 12,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481961605",
@@ -605,7 +605,7 @@
     "latency_ms": 14,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481961624",
@@ -624,7 +624,7 @@
     "latency_ms": 6,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481961634",
@@ -643,7 +643,7 @@
     "latency_ms": 4,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481961642",
@@ -662,7 +662,7 @@
     "latency_ms": 8,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481961654",
@@ -681,7 +681,7 @@
     "latency_ms": 4,
     "tokens_in": 62,
     "tokens_out": 11,
-    "cost_estimate": 0.000351
+    "usage_estimate": 0.000351
   },
   {
     "request_id": "uc1-1769481961663",
@@ -700,7 +700,7 @@
     "latency_ms": 3,
     "tokens_in": 77,
     "tokens_out": 11,
-    "cost_estimate": 0.000396
+    "usage_estimate": 0.000396
   },
   {
     "request_id": "uc1-1769481961670",
@@ -719,7 +719,7 @@
     "latency_ms": 7,
     "tokens_in": 78,
     "tokens_out": 11,
-    "cost_estimate": 0.000399
+    "usage_estimate": 0.000399
   },
   {
     "request_id": "uc1-1769481961681",
@@ -738,7 +738,7 @@
     "latency_ms": 4,
     "tokens_in": 77,
     "tokens_out": 11,
-    "cost_estimate": 0.000396
+    "usage_estimate": 0.000396
   },
   {
     "request_id": "uc1-1769481961688",
@@ -757,7 +757,7 @@
     "latency_ms": 3,
     "tokens_in": 77,
     "tokens_out": 11,
-    "cost_estimate": 0.000396
+    "usage_estimate": 0.000396
   },
   {
     "request_id": "uc2-1769481961694",
@@ -776,7 +776,7 @@
     "latency_ms": 3,
     "tokens_in": 53,
     "tokens_out": 11,
-    "cost_estimate": 0.000324
+    "usage_estimate": 0.000324
   },
   {
     "request_id": "uc2-1769481961701",
@@ -795,7 +795,7 @@
     "latency_ms": 6,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc2-1769481961711",
@@ -814,7 +814,7 @@
     "latency_ms": 4,
     "tokens_in": 41,
     "tokens_out": 11,
-    "cost_estimate": 0.000288
+    "usage_estimate": 0.000288
   },
   {
     "request_id": "uc2-1769481961718",
@@ -833,7 +833,7 @@
     "latency_ms": 3,
     "tokens_in": 51,
     "tokens_out": 11,
-    "cost_estimate": 0.000318
+    "usage_estimate": 0.000318
   },
   {
     "request_id": "uc2-1769481961724",
@@ -852,7 +852,7 @@
     "latency_ms": 5,
     "tokens_in": 40,
     "tokens_out": 11,
-    "cost_estimate": 0.000285
+    "usage_estimate": 0.000285
   },
   {
     "request_id": "uc2-1769481961733",
@@ -871,7 +871,7 @@
     "latency_ms": 3,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   },
   {
     "request_id": "uc2-1769481961739",
@@ -890,7 +890,7 @@
     "latency_ms": 3,
     "tokens_in": 52,
     "tokens_out": 11,
-    "cost_estimate": 0.000321
+    "usage_estimate": 0.000321
   },
   {
     "request_id": "uc2-1769481961745",
@@ -909,7 +909,7 @@
     "latency_ms": 5,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   },
   {
     "request_id": "uc2-1769481961754",
@@ -928,7 +928,7 @@
     "latency_ms": 3,
     "tokens_in": 39,
     "tokens_out": 11,
-    "cost_estimate": 0.000282
+    "usage_estimate": 0.000282
   },
   {
     "request_id": "uc2-1769481961760",
@@ -947,6 +947,6 @@
     "latency_ms": 3,
     "tokens_in": 38,
     "tokens_out": 11,
-    "cost_estimate": 0.000279
+    "usage_estimate": 0.000279
   }
 ]

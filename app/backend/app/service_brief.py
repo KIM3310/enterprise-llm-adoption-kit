@@ -359,7 +359,7 @@ def build_service_brief(
                 "title": "Run architecture diagnosis with citations",
                 "endpoint": "/uc1/architecture",
                 "evidence_path": "docs/review_assets/demo_script_exec.md",
-                "persona": "buyer",
+                "persona": "stakeholder",
             },
             {
                 "order": 3,
@@ -409,7 +409,7 @@ def build_service_summary_pack(
     startup_report: Optional[Dict[str, object]],
     circuit_snapshot: Dict[str, object],
 ) -> Dict[str, object]:
-    """Build the executive summary pack with buyer promises and evidence summarys."""
+    """Build the executive summary pack with stakeholder promises and evidence summarys."""
     brief = build_service_brief(
         startup_report=startup_report,
         circuit_snapshot=circuit_snapshot,
@@ -444,7 +444,7 @@ def build_service_summary_pack(
         {
             "label": "Inspect executive overview",
             "surface": "/ops/summary-pack",
-            "proof": "Use the summary pack to walk buyer promises, rollout tracks, and platform dialogue.",
+            "proof": "Use the summary pack to walk stakeholder promises, rollout tracks, and platform dialogue.",
         },
         {
             "label": "Verify governance signals",
@@ -466,7 +466,7 @@ def build_service_summary_pack(
         {
             "step": "2. Executive overview",
             "surface": "/ops/summary-pack",
-            "proof": "Use buyer promises, test assets, and rollout tracks to frame the system in one pass.",
+            "proof": "Use stakeholder promises, test assets, and rollout tracks to frame the system in one pass.",
         },
         {
             "step": "3. Built-in workshop pack",
@@ -498,8 +498,8 @@ def build_service_summary_pack(
         "service": brief["service"],
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-adoption-summary-pack-v1",
-        "headline": "Executive summary pack that ties buyer thesis, governance proof, and rollout tracks to one validation story.",
-        "buyer_promises": [
+        "headline": "Executive summary pack that ties stakeholder thesis, governance proof, and rollout tracks to one validation story.",
+        "stakeholder_promises": [
             "Show a secure adoption path before rollout by grounding every claim in tests, docs, or runtime endpoints.",
             "Keep the architecture conversation concrete across AWS, Snowflake, Palantir, Databricks, and MariaDB-flavored decisions.",
             "Move from discovery to proof with a runnable system, not a static deck.",
@@ -655,7 +655,7 @@ def build_service_rollout_board(
         track_name = str(item.get("track", ""))
         if track_name == "api-first validation":
             readiness = "ready" if bool(runtime.get("startup_ready", False)) else "attention"
-            why_now = "Use this when runtime posture, auth, and backend diagnostics are the main buyer concern."
+            why_now = "Use this when runtime posture, auth, and backend diagnostics are the main stakeholder concern."
         elif track_name == "workspace-first enablement":
             readiness = "ready" if int(evidence.get("application_artifacts", 0)) >= 1 else "attention"
             why_now = "Use this when adoption, enablement, and business-user rollout matter more than raw platform control."
@@ -682,7 +682,7 @@ def build_service_rollout_board(
         "service": brief["service"],
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-adoption-rollout-board-v1",
-        "headline": "Compact rollout board for matching runtime posture, governance proof, and buyer fit to the next delivery lane.",
+        "headline": "Compact rollout board for matching runtime posture, governance proof, and stakeholder fit to the next delivery lane.",
         "filters": {
             "track": track_filter,
         },
@@ -696,7 +696,7 @@ def build_service_rollout_board(
         "items": classified_tracks,
         "review_actions": [
             "Use the service brief to confirm runtime posture before choosing a rollout lane.",
-            "Use the summary pack to connect test assets and buyer promises to the selected track.",
+            "Use the summary pack to connect test assets and stakeholder promises to the selected track.",
             "Escalate to the ops runtime scorecard when startup readiness or circuit state needs attention.",
         ],
         "links": {
@@ -927,7 +927,7 @@ def build_service_rollout_gates(
                     "decision_rule": "security stage artifacts and executive review posture must both be ready",
                     "proof_surfaces": ["/ops/summary-pack", "/audit/summary", "/metrics"],
                     "next_action": (
-                        "Use the summary pack and audit summary as the buyer-facing trust boundary."
+                        "Use the summary pack and audit summary as the stakeholder-facing trust boundary."
                         if security_ready and review_gate_status == "ready"
                         else "Keep the rollout in review mode until governance evidence and review posture are both ready."
                     ),
@@ -985,7 +985,7 @@ def build_service_rollout_gates(
         "gates": gates,
         "review_actions": [
             "Use the rollout board to choose the candidate lane before reading any gate status.",
-            "Keep runtime, governance, evaluation, and rollback gates visible in the same buyer review.",
+            "Keep runtime, governance, evaluation, and rollback gates visible in the same stakeholder review.",
             "Treat a hold recommendation as the default until every required gate is explicit.",
         ],
         "links": {
@@ -1087,7 +1087,7 @@ def build_service_customer_architecture_pack(
         "snowflake": {
             "fit": "Good fit for governed analytics, semantic layers, and enterprise data-handling posture.",
             "primary_surface": "docs/architecture/reference_architectures.md",
-            "watchout": "Map buyer language to warehouse governance and rollout safety, not only model choice.",
+            "watchout": "Map stakeholder language to warehouse governance and rollout safety, not only model choice.",
         },
         "databricks": {
             "fit": "Good fit for data-engineering-led rollout, eval assets, and control-tower delivery planning.",
@@ -1129,7 +1129,7 @@ def build_service_customer_architecture_pack(
     architecture_stages = [
         {
             "stage": "discovery",
-            "goal": "Translate buyer ambiguity into platform, governance, and rollout constraints.",
+            "goal": "Translate stakeholder ambiguity into platform, governance, and rollout constraints.",
             "surface": "docs/blueprint/09_customer_journey.md",
             "exit_criteria": "Discovery outputs can be mapped into a target-platform story without losing trust boundaries.",
         },
@@ -1143,7 +1143,7 @@ def build_service_customer_architecture_pack(
             "stage": "pilot-path",
             "goal": "Choose the right delivery lane for the customer motion.",
             "surface": "/ops/summary-pack -> /ops/rollout-board",
-            "exit_criteria": "A visible pilot lane exists with buyer fit and why-now logic.",
+            "exit_criteria": "A visible pilot lane exists with stakeholder fit and why-now logic.",
         },
         {
             "stage": "go-live-gates",
@@ -1180,7 +1180,7 @@ def build_service_customer_architecture_pack(
         "platform_cards": platform_cards,
         "review_actions": [
             "Start here for customer-facing architecture review before diving into runtime endpoints.",
-            "Use the summary pack to keep buyer promises and test assets on the same path.",
+            "Use the summary pack to keep stakeholder promises and test assets on the same path.",
             "Use rollout gates to block hand-wavy go-live claims until runtime and rollback posture are visible.",
         ],
         "links": {
@@ -1299,7 +1299,7 @@ def build_service_workshop_readout_pack(
         },
         {
             "stage": "platform-fit-review",
-            "goal": "Choose the right buyer-facing platform story before implementation detail takes over.",
+            "goal": "Choose the right stakeholder-facing platform story before implementation detail takes over.",
             "surface": "/ops/customer-architecture-pack",
             "evidence": "docs/architecture/reference_architectures.md",
         },
@@ -1461,7 +1461,7 @@ def build_service_review_summary(
         "service": brief["service"],
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-adoption-review-summary-v1",
-        "headline": "Compact review summary for buyer, operator, and governance checks before a deeper walkthrough.",
+        "headline": "Compact review summary for stakeholder, operator, and governance checks before a deeper walkthrough.",
         "readiness": {
             "maturity_stage": brief.get("maturity_stage", ""),
             "focus_stage": stage_filter,
@@ -1572,7 +1572,7 @@ def build_service_summary_pack_schema() -> Dict[str, object]:
             "generated_at",
             "contract_version",
             "headline",
-            "buyer_promises",
+            "stakeholder_promises",
             "runtime_summary",
             "evidence_bundle",
             "review_actions",

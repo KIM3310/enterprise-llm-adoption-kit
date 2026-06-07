@@ -1,4 +1,4 @@
 # ASSUMPTIONS — Project 5
 
-- ROI inputs come from the ROI calculator outputs.
+- Impact inputs come from the Impact calculator outputs.
 - Latest eval report is available in `evals/reports/latest_report.json`.

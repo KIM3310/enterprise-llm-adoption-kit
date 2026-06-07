@@ -280,7 +280,7 @@ class ServiceBriefReviewStep(BaseModel):
     title: str
     endpoint: str
     evidence_path: Optional[str] = None
-    persona: str = Field(pattern="^(buyer|operator|security|platform|exec)$")
+    persona: str = Field(pattern="^(stakeholder|operator|security|platform|exec)$")
 
 
 class ServiceBriefRuntime(BaseModel):

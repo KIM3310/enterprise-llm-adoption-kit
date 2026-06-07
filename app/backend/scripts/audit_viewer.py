@@ -21,7 +21,7 @@ def main() -> None:
 
     print("Audit Viewer Summary")
     print(f"Requests: {summary['requests']}")
-    print(f"Total cost (USD): {summary['total_cost']}")
+    print(f"Total usage (USD): {summary['total_usage']}")
     print("Top users:")
     for user, count in summary["top_users"]:
         print(f"- {user}: {count}")

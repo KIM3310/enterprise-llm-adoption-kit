@@ -20,7 +20,7 @@ These are common patterns used in enterprise adoption. This doc is guidance only
 - Trigger downstream actions (tickets, alerts)
 - Capture audit trail and approvals
 
-## 5) Caching and cost controls
+## 5) Caching and usage controls
 - Cache repeated queries
 - Use policy-based routing by user role
 

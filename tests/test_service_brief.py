@@ -178,7 +178,7 @@ async def test_ops_live_workshop_preview_contract(monkeypatch) -> None:
         return {
             "rolloutStance": "pilot-now",
             "executiveSummary": "Governed Snowflake workshop is ready for a bounded pilot.",
-            "architectureSummary": "Keep rollout gates and summary pack visible during buyer handoff.",
+            "architectureSummary": "Keep rollout gates and summary pack visible during stakeholder handoff.",
             "nextAction": "open customer architecture pack",
             "proofAssets": ["/ops/workshop-readout-pack", "/ops/customer-architecture-pack"],
         }

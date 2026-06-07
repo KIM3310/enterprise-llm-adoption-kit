@@ -15,7 +15,7 @@
 - Validate tool allowlist and RBAC
 
 ## 4) Reliability & LLMOps
-- SLOs: latency, error rate, cost thresholds
+- SLOs: latency, error rate, usage thresholds
 - Alerting and escalation path
 - Eval gate in CI for regressions
 

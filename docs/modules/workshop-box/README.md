@@ -1,6 +1,6 @@
 # Module — Workshop-in-a-Box
 
-Goal: a 3-hour sample workshop with hands-on outputs (brief, eval plan, ROI, PoC success criteria). Outputs are synthetic.
+Goal: a 3-hour sample workshop with hands-on outputs (brief, eval plan, Impact, PoC success criteria). Outputs are synthetic.
 
 ## Run
 ```bash

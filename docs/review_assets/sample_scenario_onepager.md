@@ -17,6 +17,6 @@
 ## Evidence artifacts
 - Discovery brief
 - Eval framework + report
-- Exec summary + ROI model
+- Exec summary + Impact model
 
 Note: This is a fictional scenario for demonstration only (no real customers). Metrics are illustrative ranges and must be replaced with real data if used in production.

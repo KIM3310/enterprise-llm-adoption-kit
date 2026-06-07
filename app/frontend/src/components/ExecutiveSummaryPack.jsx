@@ -37,7 +37,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
   }
 
   const compact = variant === "compact";
-  const buyerPromises = Array.isArray(summaryPack.buyer_promises) ? summaryPack.buyer_promises : [];
+  const stakeholderPromises = Array.isArray(summaryPack.stakeholder_promises) ? summaryPack.stakeholder_promises : [];
   const rolloutTracks = Array.isArray(summaryPack.rollout_tracks) ? summaryPack.rollout_tracks : [];
   const platformDialogues = Array.isArray(summaryPack.platform_dialogues) ? summaryPack.platform_dialogues : [];
   const reviewSequence = Array.isArray(summaryPack.review_sequence) ? summaryPack.review_sequence : [];
@@ -69,13 +69,13 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
   const surfaceHints = {
     health: "Confirm startup posture and runtime state before discussing rollout.",
     service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
-    summary_pack: "Open the executive overview for buyer promises and rollout tracks.",
+    summary_pack: "Open the executive overview for stakeholder promises and rollout tracks.",
     summary_pack_schema: "Lock the explicit contract for review actions and test assets.",
     metrics: "Show runtime cost and latency visibility without leaving the evaluation path.",
     audit_summary: "Surface audit and governance signals before making enterprise-readiness claims.",
     customer_journey: "Tie the technical proof back to adoption sequence.",
     deployment_options: "Map API-first, workspace-first, and hybrid rollout options.",
-    exec_summary_template: "Keep the narrative anchored in buyer language.",
+    exec_summary_template: "Keep the narrative anchored in stakeholder language.",
     qbr_template: "Show how proof rolls forward into executive cadence.",
     proof_map: "Open the role-based evidence map when the user needs the shortest evidence path.",
   };
@@ -105,8 +105,8 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
     "",
-    "Buyer promises",
-    ...buyerPromises.slice(0, 4).map((item) => `- ${item}`),
+    "Stakeholder promises",
+    ...stakeholderPromises.slice(0, 4).map((item) => `- ${item}`),
     "",
     "Rollout tracks",
     ...rolloutTracks.slice(0, 4).map((track) => `- ${track.track}: ${track.milestone}`),
@@ -114,15 +114,15 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     "Platform dialogues",
     ...platformDialogues.slice(0, 3).map((item) => `- ${describePlatformDialogue(item)}`),
   ].join("\n");
-  const buyerThesisText = [
-    "Enterprise buyer thesis snapshot",
+  const stakeholderThesisText = [
+    "Enterprise stakeholder thesis snapshot",
     `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
     `Review assets: ${evidenceBundle.review_assets_count || reviewAssets.length || 0}`,
     `Endpoints: ${Array.isArray(evidenceBundle.review_endpoints) ? evidenceBundle.review_endpoints.length : 0}`,
     "",
-    "Buyer promises",
-    ...buyerPromises.slice(0, 3).map((item) => `- ${item}`),
+    "Stakeholder promises",
+    ...stakeholderPromises.slice(0, 3).map((item) => `- ${item}`),
     "",
     "Fast review surfaces",
     ...fastReviewSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
@@ -178,9 +178,9 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     setCopyStatus(ok ? "Copied rollout snapshot." : "Failed to copy rollout snapshot.");
   };
 
-  const handleCopyBuyerThesis = async () => {
-    const ok = await copyTextToClipboard(buyerThesisText);
-    setCopyStatus(ok ? "Copied buyer thesis snapshot." : "Failed to copy buyer thesis snapshot.");
+  const handleCopyStakeholderThesis = async () => {
+    const ok = await copyTextToClipboard(stakeholderThesisText);
+    setCopyStatus(ok ? "Copied stakeholder thesis snapshot." : "Failed to copy stakeholder thesis snapshot.");
   };
 
   const handleCopyRolloutDecisionBrief = async () => {
@@ -193,7 +193,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
       <div className="service-brief-head">
         <div className="service-brief-copy">
           <p className="eyebrow">Executive Summary Pack</p>
-          <h3>Buyer thesis, governance proof, and deployment narrative</h3>
+          <h3>Stakeholder thesis, governance proof, and deployment narrative</h3>
           <p>{summaryPack.headline}</p>
         </div>
         <div className="service-chip-row">
@@ -254,8 +254,8 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
         <button type="button" onClick={() => void handleCopyRolloutSnapshot()}>
           Copy Rollout Snapshot
         </button>
-        <button type="button" onClick={() => void handleCopyBuyerThesis()}>
-          Copy Buyer Thesis
+        <button type="button" onClick={() => void handleCopyStakeholderThesis()}>
+          Copy Stakeholder Thesis
         </button>
         <button type="button" onClick={() => void handleCopyRolloutDecisionBrief()}>
           Copy Rollout Decision Brief
@@ -279,9 +279,9 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
 
       <div className="summary-pack-grid">
         <article className="service-brief-card">
-          <p className="service-card-label">Buyer promises</p>
+          <p className="service-card-label">Stakeholder promises</p>
           <ul className="service-brief-list">
-            {buyerPromises.slice(0, compact ? 2 : 3).map((item) => (
+            {stakeholderPromises.slice(0, compact ? 2 : 3).map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>

@@ -1,7 +1,7 @@
 # LLMOps Plan
 
 ## Objectives
-- Provide observability for latency, usage, reliability, and cost
+- Provide observability for latency, usage, reliability, and usage
 - Enforce reliability controls (rate limiting, retries)
 - Track policy events and compliance
 
@@ -9,7 +9,7 @@
 - **Request Counters**: total by use_case, role, status
 - **Latency Histogram**: p50/p95/p99 by endpoint
 - **LLM Tokens**: tokens_in/out by use_case
-- **Cost Estimate**: USD per request and daily aggregates
+- **Cost Estimate**: per request and daily aggregates
 - **Policy Events**: redaction_applied, injection_detected, allowlist_denied
 
 ## SLO Targets

@@ -2,15 +2,15 @@ import re
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-ROI_DIR = BASE_DIR / "docs" / "sales" / "roi"
+Impact_DIR = BASE_DIR / "docs" / "review_assets" / "impact_estimates"
 EVAL_REPORT = BASE_DIR / "evals" / "reports" / "latest_report.json"
-OUTPUT_DIR = BASE_DIR / "docs" / "sales" / "exec_value_dashboard"
+OUTPUT_DIR = BASE_DIR / "docs" / "review_assets" / "exec_value_dashboard"
 
 
-def _latest_roi() -> dict:
-    if not ROI_DIR.exists():
+def _latest_impact() -> dict:
+    if not Impact_DIR.exists():
         return {}
-    files = list(ROI_DIR.glob("*.md"))
+    files = list(Impact_DIR.glob("*.md"))
     if not files:
         return {}
     latest = max(files, key=lambda p: p.stat().st_mtime)
@@ -19,8 +19,8 @@ def _latest_roi() -> dict:
         match = re.search(rf"{label}:\s*([0-9\.]+)", text)
         return match.group(1) if match else "N/A"
     return {
-        "monthly_savings": _find(r"Monthly savings \(USD\)"),
-        "breakeven_months": _find(r"Breakeven \(months\)"),
+        "monthly_hours_saved": _find(r"Monthly hours saved"),
+        "reviewed_requests_per_week": _find(r"Reviewed requests per week"),
         "source": str(latest),
     }
 
@@ -46,17 +46,17 @@ def _latest_eval() -> dict:
 
 
 def generate_dashboard() -> Path:
-    roi = _latest_roi()
+    impact = _latest_impact()
     evals = _latest_eval()
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     out_path = OUTPUT_DIR / "latest.md"
 
     content = """# Executive Value Dashboard (Snapshot)
 
-## ROI Snapshot
-- Monthly savings: {monthly_savings}
-- Breakeven: {breakeven_months} months
-- Source: {roi_source}
+## Impact Snapshot
+- Monthly hours saved: {monthly_hours_saved}
+- Reviewed requests per week: {reviewed_requests_per_week}
+- Source: {impact_source}
 
 ## Quality Snapshot
 - Accuracy: {accuracy}
@@ -68,11 +68,11 @@ def generate_dashboard() -> Path:
 ## Ops Snapshot
 - P95 latency target: < 3.5s
 - Error rate target: < 2%
-- Cost guardrail: configurable per use case
+- Usage guardrail: configurable per use case
 """.format(
-        monthly_savings=roi.get("monthly_savings", "N/A"),
-        breakeven_months=roi.get("breakeven_months", "N/A"),
-        roi_source=roi.get("source", "N/A"),
+        monthly_hours_saved=impact.get("monthly_hours_saved", "N/A"),
+        reviewed_requests_per_week=impact.get("reviewed_requests_per_week", "N/A"),
+        impact_source=impact.get("source", "N/A"),
         accuracy=evals.get("accuracy", "N/A"),
         groundedness=evals.get("groundedness", "N/A"),
         safety=evals.get("safety", "N/A"),

@@ -32,7 +32,7 @@
 
 ## Exec‑Ready Story
 - Demo scripts: `docs/review_assets/demo_script_exec.md`, `docs/review_assets/demo_script_eng.md`
-- ROI + success criteria: `docs/review_assets/roi/`, `docs/review_assets/poc_output/`
+- Impact + success criteria: `docs/review_assets/impact_estimates/`, `docs/review_assets/poc_output/`
 - Exec dashboard: `docs/review_assets/exec_value_dashboard/latest.md`
 - Executive summary template: `docs/review_assets/executive_summary_template.md`
 - Technical deep dive outline: `docs/review_assets/technical_deep_dive_outline.md`

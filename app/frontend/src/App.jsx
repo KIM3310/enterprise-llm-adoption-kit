@@ -185,7 +185,7 @@ const homeLenses = {
   executive: {
     label: "Executive",
     eyebrow: "Executive lens",
-    headline: "Tie buyer promises to rollout decisions",
+    headline: "Tie stakeholder promises to rollout decisions",
     description:
       "Use this when the audience wants rollout confidence, test assets, and a fast answer to what ships first versus what waits for deeper validation.",
     nextStep: {
@@ -199,7 +199,7 @@ const homeLenses = {
       "Copy the export summary only after the readiness board makes the shipping posture feel like an explicit executive call.",
     cards: [
       ["01 · Readiness board", "Explain maturity stage, evidence depth, and what is still demo-safe."],
-      ["02 · Summary pack", "Turn technical proof into buyer promises, rollout tracks, and trust boundaries."],
+      ["02 · Summary pack", "Turn technical proof into stakeholder promises, rollout tracks, and trust boundaries."],
       ["03 · Decision brief", "End with the export summary so the next step feels like a deliberate rollout call."],
     ],
     actions: [
@@ -442,7 +442,7 @@ function buildStaticServiceBrief() {
         title: "Run architecture diagnosis with citations",
         endpoint: "/uc1/architecture",
         evidence_path: "docs/review_assets/demo_script_exec.md",
-        persona: "buyer",
+        persona: "stakeholder",
       },
       {
         order: 3,
@@ -527,8 +527,8 @@ function buildStaticSummaryPack() {
     generated_at: new Date().toISOString(),
     contract_version: "enterprise-adoption-summary-pack-v1",
     headline:
-      "Executive summary pack that ties buyer thesis, governance proof, and rollout tracks to one validation story.",
-    buyer_promises: [
+      "Executive summary pack that ties stakeholder thesis, governance proof, and rollout tracks to one validation story.",
+    stakeholder_promises: [
       "Show a secure adoption path before rollout by grounding every claim in tests, docs, or runtime endpoints.",
       "Keep the architecture conversation concrete across AWS, Snowflake, Palantir, Databricks, and MariaDB-flavored decisions.",
       "Move from discovery to proof with a runnable system, not a static deck.",
@@ -606,7 +606,7 @@ function buildStaticSummaryPack() {
       {
         label: "Inspect executive overview",
         surface: "/ops/summary-pack",
-        proof: "Use the summary pack to walk buyer promises, rollout tracks, and platform dialogue.",
+        proof: "Use the summary pack to walk stakeholder promises, rollout tracks, and platform dialogue.",
       },
       {
         label: "Verify governance signals",
@@ -628,7 +628,7 @@ function buildStaticSummaryPack() {
       {
         step: "2. Executive overview",
         surface: "/ops/summary-pack",
-        proof: "Use buyer promises, test assets, and rollout tracks to frame the system in one pass.",
+        proof: "Use stakeholder promises, test assets, and rollout tracks to frame the system in one pass.",
       },
       {
         step: "3. Governance path",
@@ -1259,7 +1259,7 @@ export default function App() {
       reviewRoutes,
       reviewActions: Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.slice(0, 3) : [],
       rolloutTracks: Array.isArray(summaryPack?.rollout_tracks) ? summaryPack.rollout_tracks.slice(0, 3) : [],
-      buyerPromises: Array.isArray(summaryPack?.buyer_promises) ? summaryPack.buyer_promises.slice(0, 2) : [],
+      stakeholderPromises: Array.isArray(summaryPack?.stakeholder_promises) ? summaryPack.stakeholder_promises.slice(0, 2) : [],
       maturityStage: serviceBrief?.maturity_stage || "pre-production validation system",
     };
   }, [summaryPack, serviceBrief]);
@@ -2700,7 +2700,7 @@ export default function App() {
       {
         key: "governance",
         title: "Governance and Observability",
-        text: "Review audit + cost signals to decide if the system is production-ready.",
+        text: "Review audit + runtime usage signals to decide if the system is production-ready.",
         endpoint: "/audit/summary",
         status: "idle"
       },
@@ -3106,7 +3106,7 @@ export default function App() {
     {
       title: "Reviewer handoff",
       value: `${reviewerEndpointCount} endpoints · ${reviewAssetCount} test assets`,
-      detail: "Solution architects can move from runtime posture to buyer thesis without leaving the product surface.",
+      detail: "Solution architects can move from runtime posture to stakeholder thesis without leaving the product surface.",
     },
   ];
 
@@ -3231,8 +3231,8 @@ export default function App() {
                     <span>Runtime review routes</span>
                   </article>
                 </div>
-                <div className="hero-proof-strip" aria-label="buyer promises">
-                  {homeFrontDoor.buyerPromises.map((promise) => (
+                <div className="hero-proof-strip" aria-label="stakeholder promises">
+                  {homeFrontDoor.stakeholderPromises.map((promise) => (
                     <article key={promise} className="hero-proof-pill">
                       {promise}
                     </article>
@@ -3245,7 +3245,7 @@ export default function App() {
                   <div className="media-proof-head">
                     <div>
                       <p className="eyebrow">Decision theater</p>
-                      <h2>Show what ships first, what stays gated, and why the buyer should trust the path.</h2>
+                      <h2>Show what ships first, what stays gated, and why the stakeholder should trust the path.</h2>
                     </div>
                     <div className="media-proof-stage">{homeFrontDoor.maturityStage}</div>
                   </div>
@@ -4102,7 +4102,7 @@ export default function App() {
 
                   <div className="result-card">
                     <h4>Governance Summary</h4>
-                    <p>Aggregate requests, policy events, tool usage, and cost signals into one summary.</p>
+                    <p>Aggregate requests, policy events, tool usage, and runtime usage signals into one summary.</p>
                     <button className="cta-primary" onClick={loadGovernanceSummary}>
                       Load Governance Summary
                     </button>
@@ -4110,7 +4110,7 @@ export default function App() {
                     {governanceSummary && (
                       <div>
                         <p>Requests: {governanceSummary.requests}</p>
-                        <p>Total cost (USD): {governanceSummary.total_cost}</p>
+                        <p>Total usage estimate: {governanceSummary.total_cost}</p>
                         <h5>Top Users</h5>
                         <ul>
                           {governanceSummary.top_users?.map((user, index) => (
@@ -4535,7 +4535,7 @@ export default function App() {
                       <div className="runtime-stack">
                         <p>Startup status: {runtimeSnapshot.startup_status}</p>
                         <p>Requests: {runtimeSnapshot.audit_summary?.requests ?? 0}</p>
-                        <p>Daily cost (USD): {runtimeSnapshot.daily_cost_usd}</p>
+                        <p>Daily usage estimate: {runtimeSnapshot.daily_cost_usd}</p>
                         {runtimeLastLoadedAt && <p>Last refresh: {runtimeLastLoadedAt}</p>}
                         <p>
                           Visible: alerts {runtimeView.alerts.length}/{runtimeView.baseAlerts.length} | events{" "}

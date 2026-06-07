@@ -13,8 +13,8 @@
 - Response: "Adapter pattern, mock JWT, and local vector DB let teams validate quickly; swap guides for OIDC/SAML and LLM API are included."
 
 ## Cost Predictability
-- Objection: "LLM costs are unpredictable."
-- Response: "Per-request cost tracking, aggregated daily totals, and ROI calculator are included."
+- Objection: "LLM usages are unpredictable."
+- Response: "Per-request usage tracking, aggregated daily totals, and Impact calculator are included."
 
 ## Security Governance
 - Objection: "Security team will block it."

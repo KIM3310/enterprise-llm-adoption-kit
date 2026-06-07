@@ -233,7 +233,7 @@ def _parse_prometheus_snapshot(text: str) -> Dict[str, Any]:
         "policy_events_total": [],
         "llm_tokens_in_total": [],
         "llm_tokens_out_total": [],
-        "llm_cost_usd_total": [],
+        "llm_usage_usd_total": [],
     }
 
     patterns = {
@@ -241,7 +241,7 @@ def _parse_prometheus_snapshot(text: str) -> Dict[str, Any]:
         "policy_events_total": re.compile(r'^policy_events_total\\{([^}]+)\\}\\s+([0-9.]+)$'),
         "llm_tokens_in_total": re.compile(r'^llm_tokens_in_total\\{([^}]+)\\}\\s+([0-9.]+)$'),
         "llm_tokens_out_total": re.compile(r'^llm_tokens_out_total\\{([^}]+)\\}\\s+([0-9.]+)$'),
-        "llm_cost_usd_total": re.compile(r'^llm_cost_usd_total\\{([^}]+)\\}\\s+([0-9.]+)$'),
+        "llm_usage_usd_total": re.compile(r'^llm_usage_usd_total\\{([^}]+)\\}\\s+([0-9.]+)$'),
     }
 
     for raw_line in text.splitlines():
@@ -325,10 +325,10 @@ def _render_markdown_report(
     lines.append(f"- Audit requests (recent): `{audit_summary.get('requests', 0)}`")
     lines.append(f"- Audit policy events: `{audit_summary.get('policy_events', [])}`")
     lines.append(f"- Tools used: `{audit_summary.get('tools_used', [])}`")
-    lines.append(f"- Estimated total cost: `${audit_summary.get('total_cost', 0.0)}`")
+    lines.append(f"- Estimated total usage: `${audit_summary.get('total_usage', 0.0)}`")
     lines.append("")
     lines.append("### /metrics (trimmed)")
-    for key in ["requests_total", "policy_events_total", "llm_tokens_in_total", "llm_tokens_out_total", "llm_cost_usd_total"]:
+    for key in ["requests_total", "policy_events_total", "llm_tokens_in_total", "llm_tokens_out_total", "llm_usage_usd_total"]:
         items = metrics_snapshot.get(key) or []
         lines.append(f"- `{key}`: {len(items)} lines")
         for item in items[:8]:

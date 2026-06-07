@@ -10,7 +10,7 @@
 - BYO dataset ingestion (sample)
 - Safety guardrails review
 
-## Hour 3 — PoC Success & ROI
+## Hour 3 — PoC Success & Impact
 - PoC success criteria (SLOs + security gates)
-- ROI calculator inputs and outputs
+- Impact calculator inputs and outputs
 - Wrap-up: next steps for pilot

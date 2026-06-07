@@ -5,7 +5,7 @@ Deliver an enterprise-style reference implementation for **Applied AI (Pre-Sales
 - Enterprise discovery translated into architecture decisions
 - Safe enterprise LLM integration (RBAC/SSO concept, audit, PII redaction, injection defense, tool allowlist)
 - Evaluation harness (golden set, rubric, regression, report + baseline diff)
-- Ops readiness (metrics, reliability controls, cost tracking)
+- Ops readiness (metrics, reliability controls, usage tracking)
 - Technical review assets (demo scripts, objections, MAP, 30/60/90)
 
 ## Target Personas

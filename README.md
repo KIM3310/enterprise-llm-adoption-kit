@@ -86,7 +86,7 @@ flowchart TB
 
     subgraph Observability["Observability + Persistence"]
         AUDIT["Audit Logger<br/><i>SHA-256 enterprise hashing</i>"]
-        PROM["Prometheus Metrics<br/><i>latency, tokens, cost, policy</i>"]
+        PROM["Prometheus Metrics<br/><i>latency, tokens, usage, policy</i>"]
         OTEL["OpenTelemetry<br/><i>OTLP traces</i>"]
         DD["Datadog Integration"]
     end
@@ -186,7 +186,7 @@ kubectl apply -f infra/k8s/
 | **Audit Logging** | Structured JSON logs with SHA-256 hashing in enterprise mode and auto-retention pruning | [`app/backend/app/audit.py`](app/backend/app/audit.py) |
 | **RAG Retrieval** | ChromaDB + deterministic hash embeddings with RBAC-filtered document access | [`app/backend/app/rag.py`](app/backend/app/rag.py) |
 | **Eval Harness** | Accuracy, groundedness, helpfulness, safety scoring with baseline diffs and red-team datasets | [`evals/runner/`](evals/runner/) |
-| **LLMOps Metrics** | Request latency, token counts, cost tracking, policy events via Prometheus | [`app/backend/app/metrics.py`](app/backend/app/metrics.py) |
+| **LLMOps Metrics** | Request latency, token counts, usage tracking, policy events via Prometheus | [`app/backend/app/metrics.py`](app/backend/app/metrics.py) |
 | **Circuit Breaker** | LLM provider failure isolation with configurable threshold and cooldown | [`app/backend/app/llm_adapter.py`](app/backend/app/llm_adapter.py) |
 | **Multi-provider LLM** | Hot-swappable runtime config across OpenAI, Ollama, Bedrock, and stub backends | [`app/backend/app/llm_adapter.py`](app/backend/app/llm_adapter.py) |
 | **Snowflake Integration** | Eval results and audit logs persisted to Snowflake (env-var gated) | [`app/backend/app/snowflake_adapter.py`](app/backend/app/snowflake_adapter.py) |
@@ -203,7 +203,7 @@ kubectl apply -f infra/k8s/
 | `POST /uc1/architecture` | LLM-assisted architecture query (RBAC-gated RAG) |
 | `POST /uc2/log-intel` | Log intelligence and root cause generation |
 | `GET /audit/summary` | Governance and audit log summary |
-| `GET /metrics` | Prometheus metrics (requests, latency, tokens, cost, policy events) |
+| `GET /metrics` | Prometheus metrics (requests, latency, tokens, usage, policy events) |
 | `GET /health` | Runtime posture and diagnostics |
 | `GET /ops/service-brief` | Operational service brief and readiness summary |
 | `GET /ops/resource-pack` | Resource pack for review and evidence |
@@ -314,4 +314,4 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 
 ## Service Architecture
 
-- [Service architecture](docs/service-architecture.md) defines the cloud resources, account information, cost controls, and production guardrails needed to turn this repo into a scoped service without publishing public financial assumptions.
+- [Service architecture](docs/service-architecture.md) defines the cloud resources, account information, usage controls, and production guardrails needed to turn this repo into a scoped service without publishing public financial assumptions.

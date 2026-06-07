@@ -19,7 +19,7 @@ Operating model: stateless runtimes, provider adapters, queue-aware execution, t
 - Infrastructure-as-code entrypoint with explicit variables, outputs, and provider boundaries
 - Containerized runtime path suitable for repeatable local, staging, or managed service deployment
 - Edge-first deployment model with server-side AI adapters and public-safe secrets handling
-- Stateless agent gateway with provider abstraction, retries, cost controls, and trace capture
+- Stateless agent gateway with provider abstraction, retries, usage controls, and trace capture
 
 ### Landing-zone controls
 
@@ -34,16 +34,16 @@ Operating model: stateless runtimes, provider adapters, queue-aware execution, t
 - bounded retries with explicit failure states
 - health/readiness checks before operator-facing flows are trusted
 - idempotent data or artifact writes where repeat execution is possible
-- cost and quota guardrails for hosted services and model adapters
+- usage and quota guardrails for hosted services and model adapters
 
 ## AI Engineering
 
-Operating model: tool calling, retrieval, eval gates, prompt/version control, cost accounting, and deterministic fallback paths.
+Operating model: tool calling, retrieval, eval gates, prompt/version control, usage accounting, and deterministic fallback paths.
 
 ### Engineering patterns
 
 - Treat tool calls as typed contracts with retries, timeouts, validation, and trace identifiers
-- Evaluate agent behavior with replay fixtures, golden traces, and cost/latency accounting
+- Evaluate agent behavior with replay fixtures, golden traces, and usage/latency accounting
 - Separate deterministic checks from model-generated output so the system remains testable without external credentials
 - Capture prompts, inputs, outputs, and decision metadata as inspectable artifacts instead of hidden side effects
 - Gate model-assisted actions with policy, confidence, and fallback states before they reach an operator path

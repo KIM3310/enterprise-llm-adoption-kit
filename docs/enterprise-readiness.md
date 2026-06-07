@@ -22,7 +22,7 @@ This note defines what an enterprise reviewer, public-sector reviewer, serious u
 | Data boundary | Customer documents require approved storage, document-rights checks, redaction policy, and reviewable retrieval/evaluation logs. |
 | Identity and access | Production pilots should add SSO/OIDC, RBAC, scoped service accounts, secret rotation, and admin-visible access reviews. |
 | Auditability | Keep decision logs, generated reports, CI results, eval outputs, and operator handoff artifacts reviewable. |
-| Observability | Track health checks, latency, error budget, cost, eval pass rate, audit-log completeness, and handoff/report generation status. |
+| Observability | Track health checks, latency, error budget, usage, eval pass rate, audit-log completeness, and handoff/report generation status. |
 | Release gate | Full local gate: make verify |
 | Support handoff | Name the owner, escalation path, rollback path, known limits, and review cadence before a production testing. |
 

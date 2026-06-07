@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-OUTPUT_DIR = BASE_DIR / "docs" / "sales" / "poc_output"
+OUTPUT_DIR = BASE_DIR / "docs" / "review_assets" / "poc_output"
 
 
 def generate_poc_success(

@@ -41,7 +41,7 @@
     "name": "{{PREFIX}} Enterprise LLM Circuit Opened",
     "type": "query alert",
     "query": "sum(last_30m):sum:llm_circuit_events_total{event:opened}.as_count() > 0",
-    "message": "An LLM circuit breaker opened in the last 30 minutes. Check provider stability, fallback behavior, and cost-control posture before continuing rollout.",
+    "message": "An LLM circuit breaker opened in the last 30 minutes. Check provider stability, fallback behavior, and usage-control posture before continuing rollout.",
     "tags": [
       "service:{{SERVICE}}",
       "env:{{ENV}}",

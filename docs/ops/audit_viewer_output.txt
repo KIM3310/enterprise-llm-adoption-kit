@@ -1,6 +1,6 @@
 Audit Viewer Summary
 Requests: 167
-Total cost (USD): 0.056388
+Total usage (USD): 0.056388
 Top users:
 - eval-ops: 56
 - eval-admin: 42

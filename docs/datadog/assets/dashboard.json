@@ -45,7 +45,7 @@
         "show_legend": true,
         "requests": [
           {
-            "q": "sum:llm_cost_usd_total{*} by {use_case}"
+            "q": "sum:llm_usage_usd_total{*} by {use_case}"
           }
         ]
       }

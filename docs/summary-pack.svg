@@ -64,7 +64,7 @@
     API-first / Workspace-first / Hybrid
   </text>
   <text x="674" y="283" fill="#7d5833" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
-    mapped to one buyer story
+    mapped to one stakeholder story
   </text>
 
   <rect x="56" y="326" width="868" height="84" rx="18" fill="#f6f5ff" stroke="#dbd7f6" />
@@ -80,6 +80,6 @@
     Key Signal
   </text>
   <text x="78" y="494" fill="#375671" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
-    One repo ties buyer narrative, governance proof, eval evidence, and runtime surfaces into a integrated review flow.
+    One repo ties stakeholder narrative, governance proof, eval evidence, and runtime surfaces into a integrated review flow.
   </text>
 </svg>
