@@ -1,6 +1,6 @@
 # Modules Index
 
-## Module 1 — Pre-Sales PoC Kit (Core)
+## Module 1 — Review PoC Kit (Core)
 - Core repo (root)
 - Proof: README `Proof` section
 

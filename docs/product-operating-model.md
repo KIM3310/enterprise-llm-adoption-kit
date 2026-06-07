@@ -14,7 +14,7 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 | Area | Position |
 | --- | --- |
 | Target reviewer | Enterprises adopting LLMs under governance pressure |
-| Service wedge | Paid adoption workshop and implementation kit |
+| Service wedge | Adoption workshop and implementation kit |
 | Review signal | RBAC, audit logging, evals, redaction, rollout controls |
 | Delivery shape | Fixed-scope pilot, integration sprint, and handoff-ready operating pack |
 | Expansion path | Add customer-specific adapters, policy controls, observability, and support SLAs after the pilot proves value |
@@ -47,4 +47,4 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 
 ## Service Next Step
 
-Turn the repo into a customer-facing offer by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.
+Turn the repo into a reviewer-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.

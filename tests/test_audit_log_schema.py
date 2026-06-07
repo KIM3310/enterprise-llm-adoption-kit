@@ -21,7 +21,7 @@ def test_sample_audit_schema():
         "latency_ms",
         "tokens_in",
         "tokens_out",
-        "usage_estimate",
+        "cost_estimate",
         "policy_events",
     ]
     for key in required:

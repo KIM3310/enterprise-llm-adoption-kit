@@ -1,10 +1,10 @@
-# Customer Success RACI (Pre-Sales -> Deployment)
+# Deployment RACI (Review -> Deployment)
 
 This RACI is a hypothetical template for reference.
 
 Legend: R=Responsible, A=Accountable, C=Consulted, I=Informed
 
-| Activity | AE | Applied AI | Eng | Product | Security | Customer Sponsor |
+| Activity | Account owner | Applied AI | Eng | Product | Security | Customer Sponsor |
 |---|---|---|---|---|---|---|
 | Discovery workshop | A | R | C | I | C | R |
 | Use case selection | A | R | C | I | C | R |

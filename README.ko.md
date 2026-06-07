@@ -258,7 +258,7 @@ make quality-backend
 - **LLM Workspace**: SSO/SAML 및 enterprise governance 기준에 맞춘 정책 정렬
 - **Cloud storage**: local SQLite/file path를 managed DB/object store로 교체
 
-## Pre-Sales Kit Extras
+## Review Kit Extras
 - Discovery Wizard: `python3 app/backend/scripts/discovery_wizard.py`
 - Impact Calculator: `python3 app/backend/scripts/impact_calculator.py --handle-time-min 12 --tickets-per-week 800 --deflection-rate 0.25 --adoption-rate 0.6`
 - PoC Success Generator: `python3 app/backend/scripts/poc_success_generator.py`

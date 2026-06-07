@@ -325,7 +325,7 @@ def _render_markdown_report(
     lines.append(f"- Audit requests (recent): `{audit_summary.get('requests', 0)}`")
     lines.append(f"- Audit policy events: `{audit_summary.get('policy_events', [])}`")
     lines.append(f"- Tools used: `{audit_summary.get('tools_used', [])}`")
-    lines.append(f"- Estimated total usage: `${audit_summary.get('total_usage', 0.0)}`")
+    lines.append(f"- Estimated total cost: `${audit_summary.get('total_cost', 0.0)}`")
     lines.append("")
     lines.append("### /metrics (trimmed)")
     for key in ["requests_total", "policy_events_total", "llm_tokens_in_total", "llm_tokens_out_total", "llm_usage_usd_total"]:

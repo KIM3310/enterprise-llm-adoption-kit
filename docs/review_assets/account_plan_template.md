@@ -1,11 +1,11 @@
-# Account Plan Template (Pre-Sales)
+# Stakeholder Alignment Template
 
 Use this template to align on goals, stakeholders, and delivery plan. This is a hypothetical template for reference.
 
 ## 1) Account overview
 - Company / industry:
 - Region / office:
-- AE owner:
+- Delivery owner:
 - Technical sponsor:
 - Executive sponsor:
 

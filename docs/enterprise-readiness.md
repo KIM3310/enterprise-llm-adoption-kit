@@ -9,7 +9,7 @@ This note defines what an enterprise reviewer, public-sector reviewer, serious u
 | Field | Notes |
 |---|---|
 | Repository | `enterprise-llm-adoption-kit` |
-| Lane | B2B enterprise AI governance |
+| Lane | Enterprise AI governance |
 | Primary reader or reviewer | Enterprise AI, IT governance, security, platform, and operations teams. |
 | Core wedge | Governance toolkit with RBAC, redaction, prompt-injection checks, evals, and rollout controls. |
 | Stack | Terraform, Docker |
@@ -63,7 +63,7 @@ This note defines what an enterprise reviewer, public-sector reviewer, serious u
 ## Proof Points
 
 - make verify passes
-- Sales docs are current
+- Review assets are current
 - Governance controls are demonstrable
 
 ## Operating Metrics

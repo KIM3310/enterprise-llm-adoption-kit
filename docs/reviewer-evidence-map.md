@@ -8,7 +8,7 @@ Use this page as the short path through the repository. It keeps the review grou
 
 | Field | Notes |
 |---|---|
-| Lane | B2B enterprise AI governance |
+| Lane | Enterprise AI governance |
 | Core idea | Governance toolkit with RBAC, redaction, prompt-injection checks, evals, and rollout controls. |
 | Primary reader | Enterprise AI, IT governance, security, platform, and operations teams. |
 | Stack | Terraform, Docker |
@@ -46,16 +46,16 @@ Use this page as the short path through the repository. It keeps the review grou
 - infrastructure-as-code review surface
 - containerized delivery path
 - make verify passes
-- Sales docs are current
+- Review assets are current
 - Governance controls are demonstrable
 
 ## Review Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Paid adoption workshop | Scope after reviewer intake |
+| Adoption workshop | Scope after reviewer intake |
 | Governance starter implementation | Scope after reviewer intake |
-| Security/eval pack subscription | Scope after reviewer intake |
+| Security/eval pack | Scope after reviewer intake |
 
 ## Boundaries
 
