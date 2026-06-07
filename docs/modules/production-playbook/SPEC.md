@@ -7,4 +7,4 @@
 ## Deliverables
 - Playbook doc
 - Exec value dashboard generator
-- Output template in `docs/sales/exec_value_dashboard/`
+- Output template in `docs/review_assets/exec_value_dashboard/`

@@ -158,7 +158,7 @@ async def test_ops_workshop_readout_pack_contract() -> None:
     assert any(item["kind"] == "image" for item in body["visual_evidence"])
     assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
-    assert body["links"]["workshop_visual"] == "docs/sales/demo_screenshots/15_workshop_readout.svg"
+    assert body["links"]["workshop_visual"] == "docs/review_assets/demo_screenshots/15_workshop_readout.svg"
 
 
 @pytest.mark.anyio

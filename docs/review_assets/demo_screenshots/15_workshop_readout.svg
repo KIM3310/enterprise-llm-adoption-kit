@@ -9,7 +9,7 @@
   <rect x="80" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#3B82F6"/>
   <text x="108" y="232" fill="#93C5FD" font-family="Arial, sans-serif" font-size="14" font-weight="700">DISCOVERY</text>
   <text x="108" y="270" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="26" font-weight="700">Questionnaire + buyer map</text>
-  <text x="108" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">docs/sales/discovery_questionnaire.md</text>
+  <text x="108" y="302" fill="#CBD5E1" font-family="Arial, sans-serif" font-size="16">docs/review_assets/discovery_questionnaire.md</text>
 
   <rect x="390" y="190" width="280" height="130" rx="20" fill="#172036" stroke="#14B8A6"/>
   <text x="418" y="232" fill="#99F6E4" font-family="Arial, sans-serif" font-size="14" font-weight="700">PLATFORM FIT</text>

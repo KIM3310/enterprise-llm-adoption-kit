@@ -8,7 +8,7 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - YouTube: https://youtu.be/yMq03b0js0E
 
 ## 스냅샷
-![Executive value dashboard snapshot](docs/sales/exec_value_dashboard/snapshot.svg)
+![Executive value dashboard snapshot](docs/review_assets/exec_value_dashboard/snapshot.svg)
 
 ## Summary Pack 한눈에 보기
 - 리뷰어 API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
@@ -71,12 +71,12 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - Audit 로그: [app/backend/data/sample_audit.json](app/backend/data/sample_audit.json)
 - Eval 리포트: [evals/reports/latest_report.md](evals/reports/latest_report.md)
 - Metrics: [docs/blueprint/05_llmops_plan.md](docs/blueprint/05_llmops_plan.md) 및 `GET /metrics`
-- 데모 스크립트: [docs/sales/demo_script_exec.md](docs/sales/demo_script_exec.md), [docs/sales/demo_script_eng.md](docs/sales/demo_script_eng.md)
+- 데모 스크립트: [docs/review_assets/demo_script_exec.md](docs/review_assets/demo_script_exec.md), [docs/review_assets/demo_script_eng.md](docs/review_assets/demo_script_eng.md)
 
 빠른 검증:
 ```bash
 make quality-check
-ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/sales/demo_script_exec.md docs/sales/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
+ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/review_assets/demo_script_exec.md docs/review_assets/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/summary-pack | python3 -m json.tool | head -n 60
@@ -96,14 +96,14 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 - Deployment options (API vs Workspace): `docs/architecture/llm_deployment_options.md`
 - Eval framework template: `docs/evals/eval_framework_template.md`
 - Eval report template: `docs/evals/customer_eval_report_template.md`
-- Executive summary template: `docs/sales/executive_summary_template.md`
-- Technical deep dive outline: `docs/sales/technical_deep_dive_outline.md`
+- Executive summary template: `docs/review_assets/executive_summary_template.md`
+- Technical deep dive outline: `docs/review_assets/technical_deep_dive_outline.md`
 - Capability alignment: `docs/technical_review/capability_alignment.md`
-- Security & compliance packet: `docs/sales/security_compliance_packet.md`
-- LLM Workspace checklist: `docs/sales/llm_workspace_checklist.md`
+- Security & compliance packet: `docs/review_assets/security_compliance_packet.md`
+- LLM Workspace checklist: `docs/review_assets/llm_workspace_checklist.md`
 - RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`
-- QBR template: `docs/sales/qbr_template.md`
-- Sample scenario (one-pager): `docs/sales/sample_scenario_onepager.md`
+- QBR template: `docs/review_assets/qbr_template.md`
+- Sample scenario (one-pager): `docs/review_assets/sample_scenario_onepager.md`
 
 ## 로컬 실행
 1) Backend
@@ -267,9 +267,9 @@ make quality-backend
 - Audit Viewer: `python3 app/backend/scripts/audit_viewer.py --log app/backend/data/audit.log` (런타임 생성)
 - Exec Deck: `python3 app/backend/scripts/generate_exec_deck.py`
 - Modules index: `docs/modules/README.md`
-- Integration demo checklist: `docs/sales/integration_demo_checklist.md`
+- Integration demo checklist: `docs/review_assets/integration_demo_checklist.md`
 - Red-team summary: `docs/evals/redteam_summary.md`
-- Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
+- Exec dashboard snapshot: `docs/review_assets/exec_value_dashboard/snapshot.svg`
 이 증빙/데모 스크립트는 discovery 및 PoC 정렬 대화에서 재현 가능한 근거로 사용하도록 설계되었습니다.
 
 ## UI 둘러보기 (로컬)

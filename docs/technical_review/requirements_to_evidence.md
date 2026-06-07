@@ -2,14 +2,14 @@
 
 ## Discovery → Architecture Translation
 - Evidence: `docs/blueprint/01_scope.md`, `docs/blueprint/02_architecture.md`
-- Account plan: `docs/sales/account_plan_template.md`
-- Workshop guide: `docs/sales/workshop_facilitator_guide.md`
+- Account plan: `docs/review_assets/account_plan_template.md`
+- Workshop guide: `docs/review_assets/workshop_facilitator_guide.md`
 
 ## Security/Governance
 - RBAC/SSO concepts: `docs/architecture/security_governance.md`
 - Audit logging: `app/backend/data/sample_audit.json`
 - Redaction + injection defense: `docs/architecture/safety_guardrails.md`
-- Security/Compliance packet: `docs/sales/security_compliance_packet.md`
+- Security/Compliance packet: `docs/review_assets/security_compliance_packet.md`
 
 ## Evals & Regression Gates
 - Eval design: `docs/evals/eval_design.md`
@@ -23,21 +23,21 @@
 
 ## Enterprise Integration
 - OIDC/Slack/Jira: `docs/modules/integration-pack/`
-- Demo checklist: `docs/sales/integration_demo_checklist.md`
+- Demo checklist: `docs/review_assets/integration_demo_checklist.md`
 
 ## LLM API vs Workspace
 - Deployment options: `docs/architecture/llm_deployment_options.md`
 - Customer journey: `docs/blueprint/09_customer_journey.md`
-- LLM Workspace checklist: `docs/sales/llm_workspace_checklist.md`
+- LLM Workspace checklist: `docs/review_assets/llm_workspace_checklist.md`
 
 ## Exec‑Ready Story
-- Demo scripts: `docs/sales/demo_script_exec.md`, `docs/sales/demo_script_eng.md`
-- ROI + success criteria: `docs/sales/roi/`, `docs/sales/poc_output/`
-- Exec dashboard: `docs/sales/exec_value_dashboard/latest.md`
-- Executive summary template: `docs/sales/executive_summary_template.md`
-- Technical deep dive outline: `docs/sales/technical_deep_dive_outline.md`
-- Sample scenario: `docs/sales/sample_scenario_onepager.md`
-- QBR template: `docs/sales/qbr_template.md`
+- Demo scripts: `docs/review_assets/demo_script_exec.md`, `docs/review_assets/demo_script_eng.md`
+- ROI + success criteria: `docs/review_assets/roi/`, `docs/review_assets/poc_output/`
+- Exec dashboard: `docs/review_assets/exec_value_dashboard/latest.md`
+- Executive summary template: `docs/review_assets/executive_summary_template.md`
+- Technical deep dive outline: `docs/review_assets/technical_deep_dive_outline.md`
+- Sample scenario: `docs/review_assets/sample_scenario_onepager.md`
+- QBR template: `docs/review_assets/qbr_template.md`
 
 ## Cross-functional coordination
 - Customer success RACI: `docs/ops/customer_success_raci.md`

@@ -3,7 +3,7 @@
 ## ROI Snapshot
 - Monthly savings: 3637.2
 - Breakeven: 13.75 months
-- Source: docs/sales/roi/20260127_071747.md
+- Source: docs/review_assets/roi/20260127_071747.md
 
 ## Quality Snapshot
 - Accuracy: 3

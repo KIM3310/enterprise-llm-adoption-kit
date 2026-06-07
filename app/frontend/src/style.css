@@ -1355,19 +1355,7 @@ textarea {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.sponsored-section {
-  padding-top: 0;
-}
 
-.sponsored-card {
-  display: grid;
-  gap: 10px;
-}
-
-.sponsored-panel .adsense-box,
-.sponsored-panel .adsense-placeholder {
-  min-height: 120px;
-}
 
 .admin-note {
   font-size: 0.86rem;
@@ -2056,28 +2044,6 @@ textarea {
   background: rgba(255, 255, 255, 0.85);
 }
 
-.footer-ad p {
-  margin: 0 0 6px;
-  font-weight: 600;
-}
-
-.adsense-box {
-  min-height: 96px;
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.adsense-placeholder {
-  min-height: 96px;
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 10px;
-}
 
 .reveal {
   opacity: 0;

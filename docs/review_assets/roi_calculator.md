@@ -15,5 +15,5 @@ python3 app/backend/scripts/roi_calculator.py \
 ```
 
 ## Output
-- Writes to `docs/sales/roi/<timestamp>.md`
+- Writes to `docs/review_assets/roi/<timestamp>.md`
 

@@ -9,23 +9,23 @@
 - Eval framework template: `docs/evals/eval_framework_template.md`
 - Eval report template: `docs/evals/customer_eval_report_template.md`
 - Capability alignment: `docs/technical_review/capability_alignment.md`
-- Security & compliance packet: `docs/sales/security_compliance_packet.md`
-- LLM Workspace checklist: `docs/sales/llm_workspace_checklist.md`
+- Security & compliance packet: `docs/review_assets/security_compliance_packet.md`
+- LLM Workspace checklist: `docs/review_assets/llm_workspace_checklist.md`
 - RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`
-- Exec demo script: `docs/sales/demo_script_exec.md`
-- Eng demo script: `docs/sales/demo_script_eng.md`
-- Executive summary template: `docs/sales/executive_summary_template.md`
-- Executive summary (KR): `docs/sales/executive_summary_template_kr.md`
-- Technical deep dive outline: `docs/sales/technical_deep_dive_outline.md`
-- Account plan template: `docs/sales/account_plan_template.md`
-- Account plan (KR): `docs/sales/account_plan_template_kr.md`
-- Workshop facilitator guide: `docs/sales/workshop_facilitator_guide.md`
-- Workshop facilitator guide (KR): `docs/sales/workshop_facilitator_guide_kr.md`
+- Exec demo script: `docs/review_assets/demo_script_exec.md`
+- Eng demo script: `docs/review_assets/demo_script_eng.md`
+- Executive summary template: `docs/review_assets/executive_summary_template.md`
+- Executive summary (KR): `docs/review_assets/executive_summary_template_kr.md`
+- Technical deep dive outline: `docs/review_assets/technical_deep_dive_outline.md`
+- Account plan template: `docs/review_assets/account_plan_template.md`
+- Account plan (KR): `docs/review_assets/account_plan_template_kr.md`
+- Workshop facilitator guide: `docs/review_assets/workshop_facilitator_guide.md`
+- Workshop facilitator guide (KR): `docs/review_assets/workshop_facilitator_guide_kr.md`
 - Customer success RACI: `docs/ops/customer_success_raci.md`
-- QBR template: `docs/sales/qbr_template.md`
-- Sample scenario (one-pager): `docs/sales/sample_scenario_onepager.md`
-- Integration checklist: `docs/sales/integration_demo_checklist.md`
-- Exec value dashboard: `docs/sales/exec_value_dashboard/latest.md`
-- Exec dashboard snapshot: `docs/sales/exec_value_dashboard/snapshot.svg`
+- QBR template: `docs/review_assets/qbr_template.md`
+- Sample scenario (one-pager): `docs/review_assets/sample_scenario_onepager.md`
+- Integration checklist: `docs/review_assets/integration_demo_checklist.md`
+- Exec value dashboard: `docs/review_assets/exec_value_dashboard/latest.md`
+- Exec dashboard snapshot: `docs/review_assets/exec_value_dashboard/snapshot.svg`
 - Redteam summary: `docs/evals/redteam_summary.md`
 - Verification report: `docs/verification_report.md`

@@ -49,13 +49,13 @@ Use this page as the short path through the repository. It keeps the review grou
 - Sales docs are current
 - Governance controls are demonstrable
 
-## Commercial Notes
+## Review Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Paid adoption workshop | Scope after buyer intake |
-| Governance starter implementation | Scope after buyer intake |
-| Security/eval pack subscription | Scope after buyer intake |
+| Paid adoption workshop | Scope after reviewer intake |
+| Governance starter implementation | Scope after reviewer intake |
+| Security/eval pack subscription | Scope after reviewer intake |
 
 ## Boundaries
 

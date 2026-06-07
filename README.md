@@ -18,42 +18,38 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ## Three-Minute Proof
 
-1. Open [`docs/sales/poc_success_criteria.md`](docs/sales/poc_success_criteria.md) to see the paid pilot boundary.
+1. Open [`docs/review_assets/poc_success_criteria.md`](docs/review_assets/poc_success_criteria.md) to see the production test boundary.
 2. Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.
 3. Run `make verify` to cover backend quality, smoke checks, and frontend build.
-4. Keep synthetic data and environment-gated live providers explicit in any buyer read.
+4. Keep synthetic data and environment-gated live providers explicit in any reviewer read.
 
 ## Product and Review Surface
 
 | Lens | Current answer |
 |---|---|
-| Buyer or user | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
-| Commercial route | Paid adoption workshop, governance template pack, implementation starter, and optional observability/data-platform integration. |
+| Audience | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
+| Review path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
 | Review signal | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
 | Safety boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
-| Fast proof | `make verify`, [`docs/technical-review-pack.md`](docs/technical-review-pack.md), and [`docs/sales/poc_success_criteria.md`](docs/sales/poc_success_criteria.md). |
+| Fast proof | `make verify`, [`docs/technical-review-pack.md`](docs/technical-review-pack.md), and [`docs/review_assets/poc_success_criteria.md`](docs/review_assets/poc_success_criteria.md). |
 
 ## Reviewer Fast Path
 
 - **First minute:** Open the governance layers, eval gate, and PoC success criteria before the full architecture.
 - **Local demo:** Run the backend and frontend quick-start commands, then open `http://localhost:8000` and `http://localhost:5173`.
 - **Verification:** Run `make verify`; it covers backend quality, smoke checks, and frontend build.
-- **Commercial read:** Sell it as an enterprise LLM adoption workshop and governance starter kit.
 
 ---
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to buyer segments, offer ladder, proof gates, proof gates, and risk boundaries.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to review audiences, offer ladder, proof gates, proof gates, and risk boundaries.
 
 ## Review Notes
 
 - [Review guide](docs/reviewer-evidence-map.md) summarizes the project angle, first files to inspect, verification commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
-- [Service growth model](docs/service-growth-model.md) maps the project to an ethical service path, activation loop, scope logic, and growth experiments.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
-- [Conversion UX model](docs/conversion-ux-model.md) maps the buyer path, behavioral design, UI/UX direction, scope frame, and ethical conversion guardrails.
-- [Commercial offer](docs/commercial-offer.md) packages the repository into a buyer-ready offer ladder, proof gate, outreach angle, and close path.
 
 ## Architecture
 
@@ -314,7 +310,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the buyer, paid wedge, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the reviewer, trust boundary, trust boundary, operating checks, and service path for this repository.
 
 ## Service Architecture
 

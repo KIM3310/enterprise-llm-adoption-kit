@@ -153,7 +153,7 @@ def build_service_brief(
 
     discovery_artifacts = _artifacts(
         [
-            ("Discovery questionnaire", "docs/sales/discovery_questionnaire.md", "doc"),
+            ("Discovery questionnaire", "docs/review_assets/discovery_questionnaire.md", "doc"),
             ("Customer journey blueprint", "docs/blueprint/09_customer_journey.md", "doc"),
             ("Capability alignment", "docs/technical_review/capability_alignment.md", "doc"),
         ]
@@ -185,7 +185,7 @@ def build_service_brief(
     operations_artifacts = _artifacts(
         [
             ("Ops runtime endpoint", "app/backend/app/main.py", "endpoint"),
-            ("Exec value dashboard", "docs/sales/exec_value_dashboard/latest.md", "doc"),
+            ("Exec value dashboard", "docs/review_assets/exec_value_dashboard/latest.md", "doc"),
             ("Audit viewer guide", "docs/ops/audit_viewer.md", "doc"),
             ("Executive dashboard test", "tests/test_exec_dashboard.py", "test"),
         ]
@@ -246,8 +246,8 @@ def build_service_brief(
             "follow_up": "/audit/summary -> /ops/runtime -> /metrics",
             "proof_assets": [
                 "docs/architecture/llm_deployment_options.md",
-                "docs/sales/demo_script_exec.md",
-                "docs/sales/exec_value_dashboard/latest.md",
+                "docs/review_assets/demo_script_exec.md",
+                "docs/review_assets/exec_value_dashboard/latest.md",
             ],
         },
     ]
@@ -358,7 +358,7 @@ def build_service_brief(
                 "order": 2,
                 "title": "Run architecture diagnosis with citations",
                 "endpoint": "/uc1/architecture",
-                "evidence_path": "docs/sales/demo_script_exec.md",
+                "evidence_path": "docs/review_assets/demo_script_exec.md",
                 "persona": "buyer",
             },
             {
@@ -372,7 +372,7 @@ def build_service_brief(
                 "order": 4,
                 "title": "Verify audit, metrics, and ops runtime",
                 "endpoint": "/audit/summary -> /ops/runtime -> /metrics",
-                "evidence_path": "docs/sales/exec_value_dashboard/latest.md",
+                "evidence_path": "docs/review_assets/exec_value_dashboard/latest.md",
                 "persona": "exec",
             },
         ],
@@ -426,9 +426,9 @@ def build_service_summary_pack(
     ]
     review_assets = _artifacts(
         [
-            ("Executive dashboard markdown", "docs/sales/exec_value_dashboard/latest.md", "doc"),
-            ("Executive dashboard snapshot", "docs/sales/exec_value_dashboard/snapshot.svg", "doc"),
-            ("Security compliance packet", "docs/sales/security_compliance_packet.md", "doc"),
+            ("Executive dashboard markdown", "docs/review_assets/exec_value_dashboard/latest.md", "doc"),
+            ("Executive dashboard snapshot", "docs/review_assets/exec_value_dashboard/snapshot.svg", "doc"),
+            ("Security compliance packet", "docs/review_assets/security_compliance_packet.md", "doc"),
             ("Latest eval report", "evals/reports/latest_report.md", "report"),
             ("Customer journey blueprint", "docs/blueprint/09_customer_journey.md", "doc"),
             ("Review resource pack", "app/backend/data/review_resource_pack.json", "dataset"),
@@ -437,7 +437,7 @@ def build_service_summary_pack(
     resource_pack = build_review_resource_pack()
     review_actions = [
         {
-            "label": "Check buyer-ready runtime posture",
+            "label": "Check review-ready runtime posture",
             "surface": "/ops/service-brief",
             "proof": "Review maturity stage, runtime posture, and stage evidence before the demo.",
         },
@@ -579,12 +579,12 @@ def build_service_summary_pack(
             {
                 "track": "workspace-first enablement",
                 "fit_for": ["business user pilot", "low-code adoption", "change management"],
-                "evidence": "docs/sales/llm_workspace_checklist.md",
+                "evidence": "docs/review_assets/llm_workspace_checklist.md",
             },
             {
                 "track": "hybrid control tower",
                 "fit_for": ["platform governance", "evaluation gate", "quarterly business review"],
-                "evidence": "docs/sales/qbr_template.md",
+                "evidence": "docs/review_assets/qbr_template.md",
             },
         ],
         "platform_dialogues": [
@@ -615,8 +615,8 @@ def build_service_summary_pack(
             "audit_summary": "/audit/summary",
             "customer_journey": "docs/blueprint/09_customer_journey.md",
             "deployment_options": "docs/architecture/llm_deployment_options.md",
-            "exec_summary_template": "docs/sales/executive_summary_template.md",
-            "qbr_template": "docs/sales/qbr_template.md",
+            "exec_summary_template": "docs/review_assets/executive_summary_template.md",
+            "qbr_template": "docs/review_assets/qbr_template.md",
             "proof_map": "docs/architecture/llm_deployment_options.md",
         },
     }
@@ -1264,12 +1264,12 @@ def build_service_workshop_readout_pack(
 
     workshop_artifacts = _artifacts(
         [
-            ("Workshop facilitator guide", "docs/sales/workshop_facilitator_guide.md", "doc"),
-            ("Discovery questionnaire", "docs/sales/discovery_questionnaire.md", "doc"),
-            ("Technical deep dive outline", "docs/sales/technical_deep_dive_outline.md", "doc"),
-            ("Security compliance packet", "docs/sales/security_compliance_packet.md", "doc"),
-            ("Executive dashboard snapshot", "docs/sales/exec_value_dashboard/snapshot.svg", "image"),
-            ("Workshop readout board", "docs/sales/demo_screenshots/15_workshop_readout.svg", "image"),
+            ("Workshop facilitator guide", "docs/review_assets/workshop_facilitator_guide.md", "doc"),
+            ("Discovery questionnaire", "docs/review_assets/discovery_questionnaire.md", "doc"),
+            ("Technical deep dive outline", "docs/review_assets/technical_deep_dive_outline.md", "doc"),
+            ("Security compliance packet", "docs/review_assets/security_compliance_packet.md", "doc"),
+            ("Executive dashboard snapshot", "docs/review_assets/exec_value_dashboard/snapshot.svg", "image"),
+            ("Workshop readout board", "docs/review_assets/demo_screenshots/15_workshop_readout.svg", "image"),
         ]
     )
     visual_evidence = [
@@ -1294,7 +1294,7 @@ def build_service_workshop_readout_pack(
         {
             "stage": "discovery-readout",
             "goal": "Translate stakeholder ambiguity into explicit architecture and trust-boundary questions.",
-            "surface": "docs/sales/discovery_questionnaire.md",
+            "surface": "docs/review_assets/discovery_questionnaire.md",
             "evidence": "docs/blueprint/09_customer_journey.md",
         },
         {
@@ -1318,8 +1318,8 @@ def build_service_workshop_readout_pack(
         {
             "stage": "handoff-assets",
             "goal": "Leave the workshop with artifacts that support the next technical or executive review.",
-            "surface": "docs/sales/demo_screenshots/15_workshop_readout.svg",
-            "evidence": "docs/sales/exec_value_dashboard/snapshot.svg",
+            "surface": "docs/review_assets/demo_screenshots/15_workshop_readout.svg",
+            "evidence": "docs/review_assets/exec_value_dashboard/snapshot.svg",
         },
     ]
 
@@ -1359,8 +1359,8 @@ def build_service_workshop_readout_pack(
             "rollout_board": "/ops/rollout-board",
             "rollout_gates": "/ops/rollout-gates",
             "rollout_drill": "/ops/rollout-drill",
-            "exec_dashboard_snapshot": "docs/sales/exec_value_dashboard/snapshot.svg",
-            "workshop_visual": "docs/sales/demo_screenshots/15_workshop_readout.svg",
+            "exec_dashboard_snapshot": "docs/review_assets/exec_value_dashboard/snapshot.svg",
+            "workshop_visual": "docs/review_assets/demo_screenshots/15_workshop_readout.svg",
         },
     }
 

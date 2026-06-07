@@ -25,7 +25,7 @@ bash scripts/package_technical_review.sh
 - `app/backend/` — FastAPI backend, contracts, tests, runtime diagnostics
 - `app/frontend/` — user-facing control-tower UI
 - `docs/technical_review/` — technical review bundle and evidence map
-- `docs/architecture/`, `docs/blueprint/`, `docs/sales/` — project depth by audience
+- `docs/architecture/`, `docs/blueprint/`, `docs/review_assets/` — project depth by audience
 - `tests/` — contract and regression protection
 
 ## Pull request bar

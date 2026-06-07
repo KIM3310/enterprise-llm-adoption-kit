@@ -6,7 +6,7 @@ Deliver an enterprise-style reference implementation for **Applied AI (Pre-Sales
 - Safe enterprise LLM integration (RBAC/SSO concept, audit, PII redaction, injection defense, tool allowlist)
 - Evaluation harness (golden set, rubric, regression, report + baseline diff)
 - Ops readiness (metrics, reliability controls, cost tracking)
-- Pre-sales assets (demo scripts, objections, MAP, 30/60/90)
+- Technical review assets (demo scripts, objections, MAP, 30/60/90)
 
 ## Target Personas
 - Pre-Sales Architect (primary)
@@ -48,5 +48,5 @@ Deliver an enterprise-style reference implementation for **Applied AI (Pre-Sales
 
 ## Deliverables
 - Full repo with backend + frontend + evals + docs + infra
-- Pre-sales artifacts
+- Technical review artifacts
 - Blueprint docs and acceptance criteria

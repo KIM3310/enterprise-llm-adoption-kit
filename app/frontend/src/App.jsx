@@ -16,9 +16,6 @@ const GISCUS_REPO = String(import.meta.env.VITE_GISCUS_REPO || "").trim();
 const GISCUS_REPO_ID = String(import.meta.env.VITE_GISCUS_REPO_ID || "").trim();
 const GISCUS_CATEGORY = String(import.meta.env.VITE_GISCUS_CATEGORY || "").trim();
 const GISCUS_CATEGORY_ID = String(import.meta.env.VITE_GISCUS_CATEGORY_ID || "").trim();
-const ADSENSE_CLIENT = String(import.meta.env.VITE_ADSENSE_CLIENT || "ca-pub-4973160293737562").trim();
-const DEFAULT_ADSENSE_SLOT = String(import.meta.env.VITE_ADSENSE_SLOT || "").trim();
-
 const APP_NAME = "LLM Adoption Atelier";
 const APP_TAGLINE = "Enterprise LLM Readiness Control Tower";
 
@@ -290,8 +287,8 @@ function buildStaticServiceBrief() {
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
           "docs/technical_review/evidence_map.md",
-          "docs/sales/demo_script_exec.md",
-          "docs/sales/exec_value_dashboard/latest.md",
+          "docs/review_assets/demo_script_exec.md",
+          "docs/review_assets/exec_value_dashboard/latest.md",
         ],
       },
     ],
@@ -304,7 +301,7 @@ function buildStaticServiceBrief() {
         highlights: [
           {
             label: "Discovery questionnaire",
-            path: "docs/sales/discovery_questionnaire.md",
+            path: "docs/review_assets/discovery_questionnaire.md",
             kind: "doc",
           },
           {
@@ -416,7 +413,7 @@ function buildStaticServiceBrief() {
           },
           {
             label: "Exec value dashboard",
-            path: "docs/sales/exec_value_dashboard/latest.md",
+            path: "docs/review_assets/exec_value_dashboard/latest.md",
             kind: "doc",
           },
           {
@@ -444,7 +441,7 @@ function buildStaticServiceBrief() {
         order: 2,
         title: "Run architecture diagnosis with citations",
         endpoint: "/uc1/architecture",
-        evidence_path: "docs/sales/demo_script_exec.md",
+        evidence_path: "docs/review_assets/demo_script_exec.md",
         persona: "buyer",
       },
       {
@@ -458,7 +455,7 @@ function buildStaticServiceBrief() {
         order: 4,
         title: "Verify audit, metrics, and ops runtime",
         endpoint: "/audit/summary -> /ops/runtime -> /metrics",
-        evidence_path: "docs/sales/exec_value_dashboard/latest.md",
+        evidence_path: "docs/review_assets/exec_value_dashboard/latest.md",
         persona: "exec",
       },
     ],
@@ -554,17 +551,17 @@ function buildStaticSummaryPack() {
       review_assets: [
         {
           label: "Executive dashboard markdown",
-          path: "docs/sales/exec_value_dashboard/latest.md",
+          path: "docs/review_assets/exec_value_dashboard/latest.md",
           kind: "doc",
         },
         {
           label: "Executive dashboard snapshot",
-          path: "docs/sales/exec_value_dashboard/snapshot.svg",
+          path: "docs/review_assets/exec_value_dashboard/snapshot.svg",
           kind: "doc",
         },
         {
           label: "Security compliance packet",
-          path: "docs/sales/security_compliance_packet.md",
+          path: "docs/review_assets/security_compliance_packet.md",
           kind: "doc",
         },
         {
@@ -602,7 +599,7 @@ function buildStaticSummaryPack() {
     },
     review_actions: [
       {
-        label: "Check buyer-ready runtime posture",
+        label: "Check review-ready runtime posture",
         surface: "/ops/service-brief",
         proof: "Review maturity stage, runtime posture, and stage evidence before the demo.",
       },
@@ -674,8 +671,8 @@ function buildStaticSummaryPack() {
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
           "docs/technical_review/evidence_map.md",
-          "docs/sales/demo_script_exec.md",
-          "docs/sales/exec_value_dashboard/latest.md",
+          "docs/review_assets/demo_script_exec.md",
+          "docs/review_assets/exec_value_dashboard/latest.md",
         ],
       },
     ],
@@ -688,12 +685,12 @@ function buildStaticSummaryPack() {
       {
         track: "workspace-first enablement",
         fit_for: ["business user pilot", "low-code adoption", "change management"],
-        evidence: "docs/sales/llm_workspace_checklist.md",
+        evidence: "docs/review_assets/llm_workspace_checklist.md",
       },
       {
         track: "hybrid control tower",
         fit_for: ["platform governance", "evaluation gate", "quarterly business review"],
-        evidence: "docs/sales/qbr_template.md",
+        evidence: "docs/review_assets/qbr_template.md",
       },
     ],
     platform_dialogues: [
@@ -732,8 +729,8 @@ function buildStaticSummaryPack() {
       audit_summary: "/audit/summary",
       customer_journey: "docs/blueprint/09_customer_journey.md",
       deployment_options: "docs/architecture/llm_deployment_options.md",
-      exec_summary_template: "docs/sales/executive_summary_template.md",
-      qbr_template: "docs/sales/qbr_template.md",
+      exec_summary_template: "docs/review_assets/executive_summary_template.md",
+      qbr_template: "docs/review_assets/qbr_template.md",
       proof_map: "docs/technical_review/evidence_map.md",
     },
   };
@@ -778,48 +775,6 @@ const SAMPLE_ARCHITECTURE_JSONL = [
   })
 ].join("\n");
 
-function isValidAdSenseSlot(value) {
-  return /^\d{8,20}$/.test(String(value || "").trim()) && String(value || "").trim() !== "1234567890";
-}
-
-function AdSenseSlot({ slot = "" }) {
-  const pushedRef = useRef(false);
-  const activeSlot = String(slot || "").trim();
-  const adsReady = isValidAdSenseSlot(activeSlot);
-
-  useEffect(() => {
-    if (!adsReady || pushedRef.current) {
-      return;
-    }
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-      pushedRef.current = true;
-    } catch (_err) {
-      // no-op
-    }
-  }, [adsReady, activeSlot]);
-
-  if (!adsReady) {
-    return (
-      <div className="adsense-placeholder">
-        Sponsored slot is in standby mode. Set a valid AdSense slot ID in the Sponsored panel or{" "}
-        <code>VITE_ADSENSE_SLOT</code>.
-      </div>
-    );
-  }
-
-  return (
-    <ins
-      className="adsbygoogle adsense-box"
-      style={{ display: "block" }}
-      data-ad-client={ADSENSE_CLIENT}
-      data-ad-slot={activeSlot}
-      data-ad-format="auto"
-      data-full-width-responsive="true"
-    />
-  );
-}
-
 function getPageFromHash() {
   const hash = window.location.hash.replace("#", "").trim().toLowerCase();
   return pages.includes(hash) ? hash : "home";
@@ -829,8 +784,7 @@ const STORAGE_KEYS = {
   userId: "atelier.user_id",
   role: "atelier.role",
   loginCode: "atelier.login_code",
-  scenarioHistory: "atelier.scenario_history.v1",
-  adsenseSlot: "atelier.adsense_slot.v1"
+  scenarioHistory: "atelier.scenario_history.v1"
 };
 
 function safeStorageGet(key, fallback = "") {
@@ -1199,11 +1153,6 @@ export default function App() {
     const stored = readJsonStorage(STORAGE_KEYS.scenarioHistory, []);
     return Array.isArray(stored) ? stored : [];
   });
-  const [adsenseSlotInput, setAdsenseSlotInput] = useState(() =>
-    safeStorageGet(STORAGE_KEYS.adsenseSlot, DEFAULT_ADSENSE_SLOT)
-  );
-  const activeAdSenseSlot = String(adsenseSlotInput || "").trim();
-  const adSenseSlotReady = isValidAdSenseSlot(activeAdSenseSlot);
 
   useEffect(() => {
     safeStorageSet(STORAGE_KEYS.userId, userId);
@@ -1221,9 +1170,6 @@ export default function App() {
     writeJsonStorage(STORAGE_KEYS.scenarioHistory, scenarioHistory);
   }, [scenarioHistory]);
 
-  useEffect(() => {
-    safeStorageSet(STORAGE_KEYS.adsenseSlot, activeAdSenseSlot);
-  }, [activeAdSenseSlot]);
 
   const [diagnosisQuery, setDiagnosisQuery] = useState(
     "Prioritize the top security and reliability risks in our LLM adoption architecture. Provide evidence-backed mitigation steps."
@@ -3401,18 +3347,6 @@ export default function App() {
                 <ExecutiveSummaryPack summaryPack={summaryPack} />
               </Reveal>
             </section>
-
-            <section className="section-block sponsored-section">
-              <Reveal className="sponsored-card" delay={90}>
-                <p className="eyebrow">Sponsored</p>
-                <h3>AdSense Slot</h3>
-                <p>
-                  Ad placement area. Configure the slot ID in Console and this slot will render automatically.
-                </p>
-                <AdSenseSlot key={activeAdSenseSlot || "home-empty-slot"} slot={activeAdSenseSlot} />
-              </Reveal>
-            </section>
-
             <section className="section-block">
               <Reveal className="section-head">
                 <p className="eyebrow">What You Can Validate</p>
@@ -4033,25 +3967,6 @@ export default function App() {
                   </p>
                 </div>
               )}
-            </section>
-
-            <section className="panel sponsored-panel">
-              <h3 className="panel-title">Sponsored</h3>
-              <p className="admin-note">
-                Set your AdSense slot ID here. Values are stored in local browser storage for this device.
-              </p>
-              <div className="form-grid byok-grid">
-                <label>
-                  AdSense Slot ID
-                  <input
-                    placeholder="1234567890"
-                    value={adsenseSlotInput}
-                    onChange={(event) => setAdsenseSlotInput(event.target.value)}
-                  />
-                </label>
-              </div>
-              <p className="admin-note">Slot status: {adSenseSlotReady ? "valid" : "invalid or missing"}</p>
-              <AdSenseSlot key={activeAdSenseSlot || "console-empty-slot"} slot={activeAdSenseSlot} />
             </section>
 
             <section className="panel workbench-panel">
@@ -4849,10 +4764,6 @@ export default function App() {
             Links: <a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> ·{" "}
             <a href="/contact.html">Contact</a> · <a href="/compliance.html">Compliance</a>
           </p>
-        </div>
-        <div className="footer-ad">
-          <p>Sponsored</p>
-          <AdSenseSlot key={activeAdSenseSlot || "footer-empty-slot"} slot={activeAdSenseSlot} />
         </div>
       </footer>
     </div>

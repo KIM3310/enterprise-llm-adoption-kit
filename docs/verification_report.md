@@ -14,8 +14,8 @@ Note: Local dev verification only. No production environments or real customer d
 
 ## Outputs Generated
 - Workshop snapshot: `docs/samples/workshop_output/latest/snapshot.md`
-- ROI report: `docs/sales/roi/*.md`
-- Exec dashboard: `docs/sales/exec_value_dashboard/latest.md`
+- ROI report: `docs/review_assets/roi/*.md`
+- Exec dashboard: `docs/review_assets/exec_value_dashboard/latest.md`
 - Redteam report: `evals/reports/redteam_report.json` + `.md`
 - Redteam baseline: `evals/reports/redteam_baseline.json` + `.md`
 
