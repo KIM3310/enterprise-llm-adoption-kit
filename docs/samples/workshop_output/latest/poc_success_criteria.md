@@ -1,6 +1,6 @@
 # PoC Success Criteria (Exec Summary, Sample Output)
 
-Note: Synthetic, synthetic criteria for demonstration.
+Note: Synthetic success criteria for demonstration only.
 
 ## Reliability SLOs
 - P95 latency < 3.5s

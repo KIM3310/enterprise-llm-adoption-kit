@@ -19,10 +19,13 @@ def main() -> None:
         path.write_text(desc)
     index = OUT_DIR / "README.md"
     index.write_text(
-        "# Demo Screenshot Placeholders\n\n"
-        "Replace these placeholder files with real screenshots.\n"
+        "# Demo Screenshot Capture Notes\n\n"
+        "This folder is reserved for reviewer-safe demo screenshots captured from the local or staged governance workflow.\n\n"
+        "Do not add customer data, tenant identifiers, API keys, or screenshots from private environments. "
+        "Capture public-safe flows only after the relevant verification command passes, and record the source "
+        "branch, command, and capture date next to any new asset.\n"
     )
-    print(f"Placeholders written: {OUT_DIR}")
+    print(f"Demo screenshot notes written: {OUT_DIR}")
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ def generate_poc_success(
 
     content = f"""# PoC Success Criteria (Exec Summary)
 
-Note: This is a synthetic, synthetic output. No real customer data is included.
+Note: This is a synthetic sample output. No real customer data is included.
 
 ## Company / Use Case
 - Company: {company}

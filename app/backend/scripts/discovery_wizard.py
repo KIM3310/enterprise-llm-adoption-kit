@@ -37,7 +37,7 @@ def generate_brief(inputs: DiscoveryInputs) -> Path:
 
     content = f"""# Discovery Brief (Sample Output)
 
-Note: This is a synthetic, synthetic output. No real customer data is included.
+Note: This is a synthetic sample output. No real customer data is included.
 
 ## Overview
 - Company: {inputs.company}

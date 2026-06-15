@@ -1,3 +1,5 @@
-# Demo Screenshot Placeholders
+# Demo Screenshot Capture Notes
 
-Replace these placeholder files with real screenshots.
+This folder is reserved for reviewer-safe demo screenshots captured from the local or staged governance workflow.
+
+Do not add customer data, tenant identifiers, API keys, or screenshots from private environments. Capture public-safe flows only after the relevant verification command passes, and record the source branch, command, and capture date next to any new asset.
