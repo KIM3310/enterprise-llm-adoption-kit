@@ -2,7 +2,7 @@
   {
     "check_id": "confirm-runtime",
     "surface": "/health",
-    "why_it_matters": "Reviewers should confirm startup, auth mode, and live-lane posture before any rollout claim."
+    "why_it_matters": "Operators should confirm startup, auth mode, and live-lane posture before any rollout claim."
   },
   {
     "check_id": "open-resource-pack",
@@ -17,6 +17,6 @@
   {
     "check_id": "inspect-scorecard",
     "surface": "/ops/runtime/scorecard",
-    "why_it_matters": "Observability and audit posture need to stay inspectable before any production-style discussion."
+    "why_it_matters": "Observability and operating posture need to stay inspectable before any production-style discussion."
   }
 ]

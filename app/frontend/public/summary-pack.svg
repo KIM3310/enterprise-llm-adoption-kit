@@ -69,7 +69,7 @@
 
   <rect x="56" y="326" width="868" height="84" rx="18" fill="#f6f5ff" stroke="#dbd7f6" />
   <text x="78" y="360" fill="#3c3471" font-family="IBM Plex Sans, Arial, sans-serif" font-size="18" font-weight="700">
-    Review Actions
+    Architecture Actions
   </text>
   <text x="78" y="389" fill="#534b81" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
     1. Check runtime posture -> 2. Inspect overview -> 3. Verify governance -> 4. Map deployment path
@@ -80,6 +80,6 @@
     Key Signal
   </text>
   <text x="78" y="494" fill="#375671" font-family="IBM Plex Sans, Arial, sans-serif" font-size="14">
-    One repo ties stakeholder narrative, governance proof, eval evidence, and runtime surfaces into a integrated review flow.
+    One repo ties stakeholder narrative, governance proof, eval evidence, and runtime surfaces into a integrated architecture flow.
   </text>
 </svg>

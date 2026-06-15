@@ -6,7 +6,7 @@ function normalizeSearch(search) {
   return search.startsWith("?") ? search.slice(1) : search;
 }
 
-export function parseReviewerUrlState(search, hash = "") {
+export function parseArchitectureUrlState(search, hash = "") {
   const params = new URLSearchParams(normalizeSearch(search));
   const next = {};
   const page = String(hash || "").replace("#", "").trim().toLowerCase();
@@ -26,21 +26,21 @@ export function parseReviewerUrlState(search, hash = "") {
   return next;
 }
 
-export function buildReviewerUrlSearch(state) {
+export function buildArchitectureUrlSearch(state) {
   const params = new URLSearchParams();
   if (state.tab && state.tab !== "architecture") params.set("tab", state.tab);
   if (state.role && state.role !== "Employee") params.set("role", state.role);
   return params.toString();
 }
 
-export function replaceReviewerUrlState({ page, tab, role }) {
+export function replaceArchitectureUrlState({ page, tab, role }) {
   if (typeof window === "undefined") return;
-  const search = buildReviewerUrlSearch({ tab, role });
+  const search = buildArchitectureUrlSearch({ tab, role });
   const nextUrl = `${window.location.pathname}${search ? `?${search}` : ""}#${page || "home"}`;
   window.history.replaceState(window.history.state, "", nextUrl);
 }
 
-export function buildReviewerShareUrl(
+export function buildArchitectureShareUrl(
   { page, tab, role },
   options = {}
 ) {
@@ -50,6 +50,6 @@ export function buildReviewerShareUrl(
   const pathname =
     options.pathname ??
     (typeof window !== "undefined" ? window.location.pathname : "/");
-  const search = buildReviewerUrlSearch({ tab, role });
+  const search = buildArchitectureUrlSearch({ tab, role });
   return `${origin}${pathname}${search ? `?${search}` : ""}#${page || "home"}`;
 }

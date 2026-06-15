@@ -1,6 +1,6 @@
 """Operations runtime scorecard for startup readiness and governance pressure.
 
-Produces a compact operations view suitable for pre-review posture
+Produces a compact operations view suitable for pre-architecture posture
 checks, combining startup diagnostics, circuit-breaker state, audit
 summaries, alerts, and recent decisions.
 """
@@ -52,7 +52,7 @@ def build_ops_runtime_scorecard(
         "service": service_name,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-ops-runtime-scorecard-v1",
-        "headline": "Compact operations scorecard for startup readiness, governance pressure, and runtime review posture.",
+        "headline": "Compact operations scorecard for startup readiness, governance pressure, and runtime architecture posture.",
         "runtime": {
             "auth_mode": auth_mode,
             "storage_backend": storage_backend,
@@ -84,7 +84,7 @@ def build_ops_runtime_scorecard(
         "recommendations": [
             "Refresh diagnostics if startup readiness is degraded before deeper technical walkthroughs.",
             "Use ops runtime when the scorecard shows alerts, circuit pressure, or event spikes.",
-            "Keep audit summary, runtime scorecard, and summary pack paired during architecture reviews.",
+            "Keep audit summary, runtime scorecard, and summary pack paired during architectures.",
         ],
         "links": {
             "health": "/health",

@@ -4,7 +4,7 @@ This pack documents how the kit should look in Datadog when the stakeholder conv
 
 The current repo posture is `Datadog-ready, currently disabled`.
 
-It is intentionally review-friendly: the repo keeps the Datadog story explicit without forcing a live Datadog account into the local demo path. It also ships asset JSON and a sync helper so the same board can be created in a real tenant later if credentials are available again.
+It is intentionally architecture-friendly: the repo keeps the Datadog story explicit without forcing a live Datadog account into the local demo path. It also ships asset JSON and a sync helper so the same board can be created in a real tenant later if credentials are available again.
 
 ## Why this repo is a strong Datadog fit
 
@@ -22,7 +22,7 @@ That means the observability story is already architecturally expected, even tho
 ## Service map
 
 - `enterprise-llm-frontend`
-  - reviewer and operator UI
+  - technical reader and operator UI
 - `enterprise-llm-api`
   - FastAPI governance and runtime endpoints
 - `enterprise-llm-evals`

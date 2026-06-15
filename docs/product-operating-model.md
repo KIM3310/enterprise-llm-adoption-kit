@@ -1,28 +1,28 @@
 # Product Operating Model
 
 Repository: `enterprise-llm-adoption-kit`
-Last reviewed: 2026-06-03 KST
+Last updated: 2026-06-03 KST
 
 ## Enterprise Product Position
 
 ![CI](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/ci.yml)
 
-This repository is packaged as a concrete system surface, not a loose code sample. The enterprise value is a narrow proof that can be inspected, run, tested, and converted into a reviewed implementation motion.
+This repository is packaged as a concrete system surface, not a loose code sample. The enterprise value is a narrow proof that can be inspected, run, tested, and converted into a scoped implementation motion.
 
 ## Stakeholder And Service Path
 
 | Area | Position |
 | --- | --- |
-| Target reviewer | Enterprises adopting LLMs under governance pressure |
+| Target users | Enterprises adopting LLMs under governance pressure |
 | Service wedge | Adoption workshop and implementation kit |
-| Review signal | RBAC, audit logging, evals, redaction, rollout controls |
+| System signal | RBAC, audit logging, evals, redaction, rollout controls |
 | Delivery shape | Fixed-scope pilot, integration sprint, and handoff-ready operating pack |
 | Expansion path | Add customer-specific adapters, policy controls, observability, and support SLAs after the pilot proves value |
 
 ## Enterprise Trust Boundary
 
 - Keep credentials out of the repository and require environment-based configuration for live integrations.
-- Treat generated screenshots, fixtures, and sample data as non-customer proof assets unless explicitly reviewed.
+- Treat generated screenshots, fixtures, and sample data as non-customer proof assets unless explicitly approved.
 - Keep CI, repository-surface validation, architecture manifest checks, and secret scanning green before presenting the repo externally.
 - Use the architecture blueprint as the source of truth for cloud, AI, data, and operational boundaries.
 - Document any unsupported production assumption before a customer or evaluator sees the demo.
@@ -47,4 +47,4 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 
 ## Service Next Step
 
-Turn the repo into a reviewer-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.
+Turn the repo into a architecture-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.

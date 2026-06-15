@@ -2,8 +2,8 @@
 
 ## Impact Snapshot
 - Monthly hours saved: 3637.2
-- Review window: 13.75 months
-- Source: docs/review_assets/impact_estimates/20260127_071747.md
+- Architecture window: 13.75 months
+- Source: docs/architecture_assets/impact_estimates/20260127_071747.md
 
 ## Quality Snapshot
 - Accuracy: 3

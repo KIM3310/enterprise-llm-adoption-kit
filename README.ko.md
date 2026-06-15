@@ -8,7 +8,7 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - YouTube: https://youtu.be/yMq03b0js0E
 
 ## 스냅샷
-![Executive value dashboard snapshot](docs/review_assets/exec_value_dashboard/snapshot.svg)
+![Executive value dashboard snapshot](docs/architecture_assets/exec_value_dashboard/snapshot.svg)
 
 ## Summary Pack 한눈에 보기
 - 리뷰어 API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
@@ -16,8 +16,8 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - 플랫폼 대화: AWS, Databricks, Snowflake, Palantir, MariaDB 롤아웃 매핑을 한 팩에 압축
 
 ## Quick Start
-- **AI engineer 면접관:** `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`
-- **솔루션 아키텍트 면접관:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/summary-pack`
+- **AI engineer 기술 검토자:** `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`
+- **솔루션 아키텍트 기술 검토자:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/summary-pack`
 - **운영 / 플랫폼 리뷰어:** `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`
 
 ![Enterprise summary pack](docs/summary-pack.svg)
@@ -71,12 +71,12 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - Audit 로그: [app/backend/data/sample_audit.json](app/backend/data/sample_audit.json)
 - Eval 리포트: [evals/reports/latest_report.md](evals/reports/latest_report.md)
 - Metrics: [docs/blueprint/05_llmops_plan.md](docs/blueprint/05_llmops_plan.md) 및 `GET /metrics`
-- 데모 스크립트: [docs/review_assets/demo_script_exec.md](docs/review_assets/demo_script_exec.md), [docs/review_assets/demo_script_eng.md](docs/review_assets/demo_script_eng.md)
+- 데모 스크립트: [docs/architecture_assets/demo_script_exec.md](docs/architecture_assets/demo_script_exec.md), [docs/architecture_assets/demo_script_eng.md](docs/architecture_assets/demo_script_eng.md)
 
 빠른 검증:
 ```bash
 make quality-check
-ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/review_assets/demo_script_exec.md docs/review_assets/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
+ls app/backend/data/sample_audit.json evals/reports/latest_report.md docs/architecture_assets/demo_script_exec.md docs/architecture_assets/demo_script_eng.md docs/blueprint/06_acceptance_tests.md
 curl -fsS http://localhost:8000/metrics | head -n 20
 curl -fsS http://localhost:8000/ops/service-brief | python3 -m json.tool | head -n 60
 curl -fsS http://localhost:8000/ops/summary-pack | python3 -m json.tool | head -n 60
@@ -86,24 +86,24 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 
 ## Runtime Surface
 - `GET /ops/service-brief`: 이해관계자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
-- `GET /ops/summary-pack`: executive review surface, rollout tracks, platform dialogue, review sequence를 한 번에 보여주는 계약
-- `GET /ops/summary-pack/schema`: review actions, test assets, runtime surfaces에 대한 명시적 계약 표면
+- `GET /ops/summary-pack`: executive architecture surface, rollout tracks, platform dialogue, architecture sequence를 한 번에 보여주는 계약
+- `GET /ops/summary-pack/schema`: architecture actions, test assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
-- Home/Readiness UI에 `Executive Readiness Board`와 `Executive Summary Pack`을 추가해 review actions, test assets, runtime surfaces까지 정적 fallback으로 유지합니다
+- Home/Readiness UI에 `Executive Readiness Board`와 `Executive Summary Pack`을 추가해 architecture actions, test assets, runtime surfaces까지 정적 fallback으로 유지합니다
 
 ## 고객 여정 (Discovery -> Production)
 - Blueprint: `docs/blueprint/09_customer_journey.md`
 - Deployment options (API vs Workspace): `docs/architecture/llm_deployment_options.md`
 - Eval framework template: `docs/evals/eval_framework_template.md`
 - Eval report template: `docs/evals/customer_eval_report_template.md`
-- Executive summary template: `docs/review_assets/executive_summary_template.md`
-- Technical deep dive outline: `docs/review_assets/technical_deep_dive_outline.md`
-- Capability alignment: `docs/technical_review/capability_alignment.md`
-- Security & compliance packet: `docs/review_assets/security_compliance_packet.md`
-- LLM Workspace checklist: `docs/review_assets/llm_workspace_checklist.md`
-- RFP requirements matrix: `docs/technical_review/rfp_requirements_matrix.md`
-- QBR template: `docs/review_assets/qbr_template.md`
-- Sample scenario (one-pager): `docs/review_assets/sample_scenario_onepager.md`
+- Executive summary template: `docs/architecture_assets/executive_summary_template.md`
+- Technical deep dive outline: `docs/architecture_assets/technical_deep_dive_outline.md`
+- Capability alignment: `docs/architecture_pack/capability_alignment.md`
+- Security & compliance packet: `docs/architecture_assets/security_compliance_packet.md`
+- LLM Workspace checklist: `docs/architecture_assets/llm_workspace_checklist.md`
+- RFP requirements matrix: `docs/architecture_pack/rfp_requirements_matrix.md`
+- QBR template: `docs/architecture_assets/qbr_template.md`
+- Sample scenario (one-pager): `docs/architecture_assets/sample_scenario_onepager.md`
 
 ## 로컬 실행
 1) Backend
@@ -258,7 +258,7 @@ make quality-backend
 - **LLM Workspace**: SSO/SAML 및 enterprise governance 기준에 맞춘 정책 정렬
 - **Cloud storage**: local SQLite/file path를 managed DB/object store로 교체
 
-## Review Kit Extras
+## Architecture Kit Extras
 - Discovery Wizard: `python3 app/backend/scripts/discovery_wizard.py`
 - Impact Calculator: `python3 app/backend/scripts/impact_calculator.py --handle-time-min 12 --tickets-per-week 800 --deflection-rate 0.25 --adoption-rate 0.6`
 - PoC Success Generator: `python3 app/backend/scripts/poc_success_generator.py`
@@ -267,9 +267,9 @@ make quality-backend
 - Audit Viewer: `python3 app/backend/scripts/audit_viewer.py --log app/backend/data/audit.log` (런타임 생성)
 - Exec Deck: `python3 app/backend/scripts/generate_exec_deck.py`
 - Modules index: `docs/modules/README.md`
-- Integration demo checklist: `docs/review_assets/integration_demo_checklist.md`
+- Integration demo checklist: `docs/architecture_assets/integration_demo_checklist.md`
 - Red-team summary: `docs/evals/redteam_summary.md`
-- Exec dashboard snapshot: `docs/review_assets/exec_value_dashboard/snapshot.svg`
+- Exec dashboard snapshot: `docs/architecture_assets/exec_value_dashboard/snapshot.svg`
 이 증빙/데모 스크립트는 discovery 및 PoC 정렬 대화에서 재현 가능한 근거로 사용하도록 설계되었습니다.
 
 ## UI 둘러보기 (로컬)

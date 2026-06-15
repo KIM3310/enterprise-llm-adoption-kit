@@ -48,10 +48,10 @@ Key controls to plan
 - Reuse evals and safety policies across both paths to keep standards consistent
 
 ## Evidence in this repo
-- Discovery artifacts: `docs/review_assets/discovery_questionnaire.md`, `docs/review_assets/korea_stakeholder_map.md`
+- Discovery artifacts: `docs/architecture_assets/discovery_questionnaire.md`, `docs/architecture_assets/korea_stakeholder_map.md`
 - Architecture + security: `docs/blueprint/02_architecture.md`, `docs/blueprint/03_security_threat_model.md`
 - Evals: `docs/blueprint/04_evals_plan.md`, `docs/evals/eval_design.md`
 - Integration patterns: `docs/modules/integration-pack/README.md`
-- Workspace checklist: `docs/review_assets/llm_workspace_checklist.md`
+- Workspace checklist: `docs/architecture_assets/llm_workspace_checklist.md`
 
 Note: This doc is a decision and planning guide. It does not claim any live integration.

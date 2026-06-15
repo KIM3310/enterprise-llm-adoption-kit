@@ -9,6 +9,6 @@ python3 app/backend/scripts/generate_exec_deck.py
 ```
 
 ## Output
-- `docs/review_assets/deck/exec_deck.pdf`
-- `docs/review_assets/deck/exec_deck.html` (source)
+- `docs/architecture_assets/deck/exec_deck.pdf`
+- `docs/architecture_assets/deck/exec_deck.html` (source)
 

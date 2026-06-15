@@ -1,6 +1,6 @@
 # Security & Compliance Packet (FAQ)
 
-Use this packet for enterprise security reviews. This is a template for hypothetical scenarios (no real customers or compliance attestations).
+Use this packet for enterprise security architectures. This is a template for hypothetical scenarios (no real customers or compliance attestations).
 
 ## Data handling & privacy
 - What data is sent to the model?

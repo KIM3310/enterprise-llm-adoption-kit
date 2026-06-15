@@ -2,9 +2,9 @@ import re
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-Impact_DIR = BASE_DIR / "docs" / "review_assets" / "impact_estimates"
+Impact_DIR = BASE_DIR / "docs" / "architecture_assets" / "impact_estimates"
 EVAL_REPORT = BASE_DIR / "evals" / "reports" / "latest_report.json"
-OUTPUT_DIR = BASE_DIR / "docs" / "review_assets" / "exec_value_dashboard"
+OUTPUT_DIR = BASE_DIR / "docs" / "architecture_assets" / "exec_value_dashboard"
 
 
 def _latest_impact() -> dict:

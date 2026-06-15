@@ -25,7 +25,7 @@ Notes:
 - Terraform >= 1.5
 - AWS credentials configured locally (or via `AWS_PROFILE`)
 
-## Quick Start (For Review Only)
+## Quick Start (For Architecture Only)
 ```bash
 cd infra/aws/terraform
 terraform init

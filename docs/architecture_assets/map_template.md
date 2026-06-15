@@ -8,9 +8,9 @@
 
 ## Milestones
 1) Discovery workshop (Week 1)
-2) Data access and security review (Week 2)
+2) Data access and security architecture (Week 2)
 3) PoC implementation (Weeks 3-4)
-4) Evals and acceptance review (Week 5)
+4) Evals and acceptance architecture (Week 5)
 5) Go/No-Go decision (Week 6)
 
 ## Dependencies

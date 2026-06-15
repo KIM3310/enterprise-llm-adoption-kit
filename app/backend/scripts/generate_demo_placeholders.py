@@ -1,7 +1,7 @@
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-OUT_DIR = BASE_DIR / "docs" / "review_assets" / "demo_screenshots"
+OUT_DIR = BASE_DIR / "docs" / "architecture_assets" / "demo_screenshots"
 
 PLACEHOLDERS = [
     ("00_rbac.txt", "RBAC proof: Employee vs Admin citations."),
@@ -20,7 +20,7 @@ def main() -> None:
     index = OUT_DIR / "README.md"
     index.write_text(
         "# Demo Screenshot Capture Notes\n\n"
-        "This folder is reserved for reviewer-safe demo screenshots captured from the local or staged governance workflow.\n\n"
+        "This folder is reserved for public-safe demo screenshots captured from the local or staged governance workflow.\n\n"
         "Do not add customer data, tenant identifiers, API keys, or screenshots from private environments. "
         "Capture public-safe flows only after the relevant verification command passes, and record the source "
         "branch, command, and capture date next to any new asset.\n"

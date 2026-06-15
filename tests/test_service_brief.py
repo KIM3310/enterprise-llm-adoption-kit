@@ -66,7 +66,7 @@ async def test_ops_summary_pack_contract() -> None:
     assert body["contract_version"] == "enterprise-adoption-summary-pack-v1"
     assert body["runtime_summary"]["llm_provider"] == "stub"
     assert body["evidence_bundle"]["tests"] >= 20
-    assert body["evidence_bundle"]["review_assets_count"] >= 4
+    assert body["evidence_bundle"]["architecture_assets_count"] >= 4
     assert len(body["role_paths"]) >= 3
     assert any(item["role"] == "Solution Architect" for item in body["role_paths"])
     assert "/ops/rollout-board" in body["evidence_bundle"]["runtime_surfaces"]
@@ -158,7 +158,7 @@ async def test_ops_workshop_readout_pack_contract() -> None:
     assert any(item["kind"] == "image" for item in body["visual_evidence"])
     assert body["links"]["workshop_readout_pack"] == "/ops/workshop-readout-pack"
     assert body["links"]["customer_architecture_pack"] == "/ops/customer-architecture-pack"
-    assert body["links"]["workshop_visual"] == "docs/review_assets/demo_screenshots/15_workshop_readout.svg"
+    assert body["links"]["workshop_visual"] == "docs/architecture_assets/demo_screenshots/15_workshop_readout.svg"
 
 
 @pytest.mark.anyio
@@ -260,7 +260,7 @@ async def test_ops_summary_pack_schema_contract() -> None:
     assert "review_actions" in body["required_fields"]
     assert "two_minute_review" in body["required_fields"]
     assert "role_paths" in body["required_fields"]
-    assert "review_assets" in body["evidence_bundle_required_fields"]
+    assert "architecture_assets" in body["evidence_bundle_required_fields"]
     assert "surface" in body["review_action_required_fields"]
     assert "step" in body["two_minute_review_required_fields"]
     assert "proof_assets" in body["role_path_required_fields"]

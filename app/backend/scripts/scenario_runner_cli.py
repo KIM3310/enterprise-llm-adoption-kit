@@ -5,7 +5,7 @@ Scenario Runner (CLI)
 Purpose:
 - Run a repeatable end-to-end validation against a running backend:
   auth -> UC1 -> UC2 -> governance -> metrics
-- Export a shareable Markdown report + an evidence pack (zip) reviewers can inspect.
+- Export a shareable Markdown report + an evidence pack (zip) operators can inspect.
 
 This script works with both stub/offline mode and local Ollama mode.
 """
@@ -335,7 +335,7 @@ def _render_markdown_report(
             lines.append(f"  - {item['labels']} = {item['value']}")
     lines.append("")
 
-    lines.append("## Notes for Reviewers")
+    lines.append("## Notes for Operators")
     lines.append("- This run was executed against a local backend; in production, swap storage and enable OIDC.")
     lines.append("- RBAC is enforced at retrieval time; the report includes a role-by-role citation sanity check.")
     lines.append("")

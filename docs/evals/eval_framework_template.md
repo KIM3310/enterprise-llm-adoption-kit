@@ -39,9 +39,9 @@ Use this template to define how a hypothetical customer could measure LLM perfor
 - Baseline report:
 - Regression gate thresholds:
 
-## 7) Review and sign-off
+## 7) Architecture and sign-off
 - Stakeholders:
-- Review cadence:
+- Architecture cadence:
 - Final approval owner:
 
 References

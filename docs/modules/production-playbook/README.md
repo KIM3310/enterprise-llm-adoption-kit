@@ -7,4 +7,4 @@ Goal: a production transition planning playbook plus an exec-ready value dashboa
 python3 app/backend/scripts/generate_exec_dashboard.py
 ```
 
-Outputs to `docs/review_assets/exec_value_dashboard/latest.md`.
+Outputs to `docs/architecture_assets/exec_value_dashboard/latest.md`.

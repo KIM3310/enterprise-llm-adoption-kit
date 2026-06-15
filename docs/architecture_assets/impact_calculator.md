@@ -15,5 +15,5 @@ python3 app/backend/scripts/impact_calculator.py \
 ```
 
 ## Output
-- Writes to `docs/review_assets/impact_estimates/<timestamp>.md`
+- Writes to `docs/architecture_assets/impact_estimates/<timestamp>.md`
 

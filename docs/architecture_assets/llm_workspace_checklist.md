@@ -25,4 +25,4 @@ This is a hypothetical checklist for reference.
 ## Transition to API (if needed)
 - [ ] Use cases prioritized
 - [ ] Evals framework drafted
-- [ ] Security review scheduled
+- [ ] Security architecture scheduled

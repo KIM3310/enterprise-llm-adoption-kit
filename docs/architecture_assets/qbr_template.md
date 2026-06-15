@@ -1,4 +1,4 @@
-# QBR Template (Quarterly Business Review)
+# QBR Template (Quarterly Business Architecture)
 
 This is a hypothetical template for reference (no real customer data).
 

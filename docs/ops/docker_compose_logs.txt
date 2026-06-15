@@ -14,7 +14,7 @@ frontend-1  | 78 |            <div className="badge">Enterprise LLM Adoption Kit
 frontend-1  | 79 |            <h1>Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps</h1>
 frontend-1  |    |                           ^
 frontend-1  | 80 |            <p>
-frontend-1  | 81 |              Technical review demo for Applied AI (Korea). Minimal UI, maximum enterprise controls.
+frontend-1  | 81 |              Architecture walkthrough for Applied AI (Korea). Minimal UI, maximum enterprise controls.
 frontend-1  | 
 frontend-1  |   Plugin: vite:esbuild
 frontend-1  |   File: /app/src/App.jsx
@@ -24,7 +24,7 @@ frontend-1  | 78 |            <div className="badge">Enterprise LLM Adoption Kit
 frontend-1  | 79 |            <h1>Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps</h1>
 frontend-1  |    |                                                  ^
 frontend-1  | 80 |            <p>
-frontend-1  | 81 |              Technical review demo for Applied AI (Korea). Minimal UI, maximum enterprise controls.
+frontend-1  | 81 |              Architecture walkthrough for Applied AI (Korea). Minimal UI, maximum enterprise controls.
 frontend-1  | 
 frontend-1  |   Plugin: vite:esbuild
 frontend-1  |   File: /app/src/App.jsx
@@ -34,7 +34,7 @@ frontend-1  | 78 |            <div className="badge">Enterprise LLM Adoption Kit
 frontend-1  | 79 |            <h1>Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps</h1>
 frontend-1  |    |                                                           ^
 frontend-1  | 80 |            <p>
-frontend-1  | 81 |              Technical review demo for Applied AI (Korea). Minimal UI, maximum enterprise controls.
+frontend-1  | 81 |              Architecture walkthrough for Applied AI (Korea). Minimal UI, maximum enterprise controls.
 frontend-1  | 
 frontend-1  |   Plugin: vite:esbuild
 frontend-1  |   File: /app/src/App.jsx

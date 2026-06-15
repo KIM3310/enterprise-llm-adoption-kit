@@ -41,7 +41,7 @@ Use this template to align on goals, stakeholders, and delivery plan. This is a 
 ## 7) Timeline
 - Discovery workshop:
 - PoC start:
-- PoC review:
+- PoC architecture:
 - Decision date:
 
 ## 8) Risks & mitigations

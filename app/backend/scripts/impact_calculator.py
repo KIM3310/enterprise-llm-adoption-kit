@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-OUTPUT_DIR = BASE_DIR / "docs" / "review_assets" / "impact_estimates"
+OUTPUT_DIR = BASE_DIR / "docs" / "architecture_assets" / "impact_estimates"
 
 
 @dataclass

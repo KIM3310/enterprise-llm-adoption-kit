@@ -18,6 +18,6 @@ def test_demo_placeholders_created():
     )
     module.main()
 
-    out_dir = ROOT_DIR / "docs/review_assets/demo_screenshots"
+    out_dir = ROOT_DIR / "docs/architecture_assets/demo_screenshots"
     assert (out_dir / "00_rbac.txt").exists()
     assert (out_dir / "04_metrics.txt").exists()

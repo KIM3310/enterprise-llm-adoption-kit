@@ -3,11 +3,11 @@ This document is a **reference architecture** for running the Enterprise LLM Ado
 
 Note:
 - This repo **implements** only the local demo architecture (FastAPI + Vite + Chroma + SQLite).
-- The AWS design below is **conceptual** and provided for project / interview discussion.
+- The AWS design below is **conceptual** and provided for project / architecture discussion.
 - All datasets and scenarios remain synthetic/hypothetical.
 
 ## Goals
-- Keep LLM adoption **reviewable** (RBAC, auditability, evals, metrics).
+- Keep LLM adoption **inspectable** (RBAC, auditability, evals, metrics).
 - Ship a PoC that can graduate to production with minimal redesign.
 - Make data handling explicit (demo vs enterprise mode).
 - Avoid “magic” architecture: every trust boundary has an owner and a control.
@@ -15,7 +15,7 @@ Note:
 ## High-Level Diagram
 ```mermaid
 flowchart LR
-  U[Reviewer / Operator] -->|HTTPS| CF[CloudFront]
+  U[Technical reader / Operator] -->|HTTPS| CF[CloudFront]
   CF -->|static assets| S3FE[(S3: Frontend)]
   CF -->|/api| ALB[ALB + AWS WAF]
 

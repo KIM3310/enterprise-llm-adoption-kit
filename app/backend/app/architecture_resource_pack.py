@@ -15,7 +15,7 @@ EXTERNAL_DIR = DATA_DIR / "external" / "customer_support"
 
 def data_files() -> dict[str, Path]:
     return {
-        "workshop_scenarios": DATA_DIR / "review_resource_pack.json",
+        "workshop_scenarios": DATA_DIR / "architecture_resource_pack.json",
         "operator_checks": DATA_DIR / "review_operator_checks.json",
         "validation_cases": DATA_DIR / "review_validation_cases.json",
         "rollout_playbooks": DATA_DIR / "review_playbooks.json",
@@ -55,11 +55,11 @@ def resource_pack_summary() -> dict[str, int]:
     }
 
 
-def build_review_resource_pack() -> dict[str, object]:
+def build_architecture_resource_pack() -> dict[str, object]:
     external_ticket_path = EXTERNAL_DIR / "customer_support_tickets.csv"
     return {
-        "service": "enterprise-adoption-review-resource-pack",
-        "contract_version": "enterprise-adoption-review-resource-pack-v1",
+        "service": "enterprise-adoption-architecture-resource-pack",
+        "contract_version": "enterprise-adoption-architecture-resource-pack-v1",
         "intended_use": "reviewable enterprise rollout and workshop proof without customer data",
         "summary": resource_pack_summary(),
         "external_data": {
@@ -75,7 +75,7 @@ def build_review_resource_pack() -> dict[str, object]:
         "operator_checks": list(load_operator_checks()),
         "validation_cases": list(load_validation_cases()),
         "rollout_playbooks": list(load_rollout_playbooks()),
-        "reviewer_fast_path": [
+        "architecture_fast_path": [
             "/health",
             "/ops/service-brief",
             "/ops/resource-pack",

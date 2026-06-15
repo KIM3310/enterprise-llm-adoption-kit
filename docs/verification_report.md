@@ -14,8 +14,8 @@ Note: Local dev verification only. No production environments or real customer d
 
 ## Outputs Generated
 - Workshop snapshot: `docs/samples/workshop_output/latest/snapshot.md`
-- Impact report: `docs/review_assets/impact_estimates/*.md`
-- Exec dashboard: `docs/review_assets/exec_value_dashboard/latest.md`
+- Impact report: `docs/architecture_assets/impact_estimates/*.md`
+- Exec dashboard: `docs/architecture_assets/exec_value_dashboard/latest.md`
 - Redteam report: `evals/reports/redteam_report.json` + `.md`
 - Redteam baseline: `evals/reports/redteam_baseline.json` + `.md`
 

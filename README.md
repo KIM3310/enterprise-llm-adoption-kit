@@ -8,9 +8,9 @@
 
 **Production-grade governance toolkit for enterprise LLM deployments** -- RBAC, prompt-injection detection, PII redaction, audit logging, eval harness, and multi-cloud LLM routing, all wired into a single FastAPI + React application with Kubernetes-ready infrastructure.
 
-> All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.
+> All rollout data and architecture scenarios are synthetic. The goal is a inspectable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.
 
-Technical review pack: [`docs/technical-review-pack.md`](docs/technical-review-pack.md)
+Architecture pack: [`docs/architecture-pack.md`](docs/architecture-pack.md)
 
 Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
@@ -18,22 +18,22 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ## Three-Minute Proof
 
-1. Open [`docs/review_assets/poc_success_criteria.md`](docs/review_assets/poc_success_criteria.md) to see the production test boundary.
+1. Open [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md) to see the production test boundary.
 2. Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.
 3. Run `make verify` to cover backend quality, smoke checks, and frontend build.
-4. Keep synthetic data and environment-gated live providers explicit in any reviewer read.
+4. Keep synthetic data and environment-gated live providers explicit in any technical reader read.
 
-## Product and Review Surface
+## Product and System Surface
 
 | Lens | Current answer |
 |---|---|
 | Audience | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
-| Review path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
-| Architecture signal | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
+| Architecture path | Validate the demo, README, architecture notes, and quality gate before deeper workflow architecture. |
+| System signal | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
 | Safety boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
-| Fast proof | `make verify`, [`docs/technical-review-pack.md`](docs/technical-review-pack.md), and [`docs/review_assets/poc_success_criteria.md`](docs/review_assets/poc_success_criteria.md). |
+| Fast path | `make verify`, [`docs/architecture-pack.md`](docs/architecture-pack.md), and [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md). |
 
-## Reviewer Fast Path
+## System Fast Path
 
 - **First minute:** Open the governance layers, eval gate, and PoC success criteria before the full architecture.
 - **Local demo:** Run the backend and frontend quick-start commands, then open `http://localhost:8000` and `http://localhost:5173`.
@@ -43,11 +43,11 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to review audiences, proof gates, operating boundaries, and risk controls.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to architecture audiences, operating gates, operating boundaries, and risk controls.
 
-## Review Notes
+## Architecture Notes
 
-- [Review guide](docs/reviewer-evidence-map.md) summarizes the project angle, first files to inspect, verification commands, and known boundaries.
+- [Architecture guide](docs/architecture-evidence-map.md) summarizes the project angle, first files to inspect, runtime commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
 
@@ -206,7 +206,7 @@ kubectl apply -f infra/k8s/
 | `GET /metrics` | Prometheus metrics (requests, latency, tokens, usage, policy events) |
 | `GET /health` | Runtime posture and diagnostics |
 | `GET /ops/service-brief` | Operational service brief and readiness summary |
-| `GET /ops/resource-pack` | Resource pack for review and evidence |
+| `GET /ops/resource-pack` | Resource pack for architecture and evidence |
 
 ---
 
@@ -273,7 +273,7 @@ enterprise-llm-adoption-kit/
 - **Primary architecture lane:** enterprise LLM governance, applied AI controls, and platform integration
 - **Strongest proof surface:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
 - **What is real here:** RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding
-- **What is bounded here:** review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
+- **What is bounded here:** architecture cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
 
 ---
 
@@ -310,7 +310,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the reviewer, trust boundary, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the technical reader, trust boundary, trust boundary, operating checks, and service path for this repository.
 
 ## System Architecture
 

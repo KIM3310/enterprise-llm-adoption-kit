@@ -97,7 +97,7 @@ from .rag import (
 )
 from .rate_limit import RateLimiter
 from .redaction import redact_text
-from .review_resource_pack import build_review_resource_pack
+from .architecture_resource_pack import build_architecture_resource_pack
 from .snowflake_adapter import is_enabled as snowflake_enabled
 from .runtime_scorecard import (
     build_ops_runtime_scorecard,
@@ -1010,7 +1010,7 @@ def health(request: Request) -> Dict[str, object]:
             "version": 1,
             "required_fields": ["service", "status", "diagnostics.next_action"],
         },
-        "reviewer_fast_path": [
+        "architecture_fast_path": [
             "/health",
             "/ops/service-brief",
             "/ops/resource-pack",
@@ -1089,9 +1089,9 @@ def ops_customer_architecture_pack_schema() -> Dict[str, object]:
     return build_service_customer_architecture_pack_schema()
 
 
-@app.get("/ops/resource-pack", tags=["ops"], summary="Review resource pack")
+@app.get("/ops/resource-pack", tags=["ops"], summary="Architecture resource pack")
 def ops_resource_pack() -> Dict[str, object]:
-    return build_review_resource_pack()
+    return build_architecture_resource_pack()
 
 
 @app.get("/ops/platform-proof-board", tags=["ops"], summary="Platform proof board")

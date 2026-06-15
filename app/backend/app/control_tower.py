@@ -230,7 +230,7 @@ def _load_spec_from_disk(path: Path) -> Tuple[Dict, bool, str]:
 
 
 def get_control_tower_spec_snapshot() -> Tuple[Dict, bool, str]:
-    """Return the cached spec, validation status, and any validation error message."""
+    """Return the cached spec, validation details, and any validation error message."""
     path = Path(settings.control_tower_spec_path)
     mtime = path.stat().st_mtime if path.exists() else None
     cache_hit = (

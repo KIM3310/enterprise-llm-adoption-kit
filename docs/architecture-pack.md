@@ -1,4 +1,4 @@
-# Technical Review Pack
+# Architecture Pack
 
 ## System Boundary
 
@@ -47,7 +47,7 @@ For a quick code read, inspect:
 
 - Unit and integration tests cover auth, redaction, injection checks, eval execution, data handling mode, and UI metadata.
 - CI runs on every main update.
-- Secret scanning and dependency review are configured in `.github/workflows/`.
+- Secret scanning and dependency architecture are configured in `.github/workflows/`.
 - The app includes synthetic fixtures so the governance path can be exercised without private data.
 
 ## Threat Model
@@ -57,7 +57,7 @@ For a quick code read, inspect:
 | Prompt-injection attempt | pre-generation heuristic checks and refusal path |
 | Sensitive input leakage | redaction layer and audit-safe output shape |
 | Live provider dependency | stub mode and deterministic tests |
-| Unreviewed tool execution | allowlisted tool executor |
+| Unapproved tool execution | allowlisted tool executor |
 | Audit drift | schema tests and replayable evaluation fixtures |
 
 ## Maintenance Notes

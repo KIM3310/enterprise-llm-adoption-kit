@@ -3,9 +3,9 @@ import heroTower from "./assets/hero-tower.svg";
 import ExecutiveSummaryPack from "./components/ExecutiveSummaryPack.jsx";
 import ServiceBriefBoard from "./components/ServiceBriefBoard.jsx";
 import {
-  buildReviewerShareUrl,
-  parseReviewerUrlState,
-  replaceReviewerUrlState,
+  buildArchitectureShareUrl,
+  parseArchitectureUrlState,
+  replaceArchitectureUrlState,
 } from "./urlState.js";
 
 const API_BASE = String(import.meta.env.VITE_API_BASE || "").trim();
@@ -104,9 +104,9 @@ const scenarioSteps = [
 ];
 
 const homeLenses = {
-  reviewer: {
-    label: "Reviewer",
-    eyebrow: "Reviewer quick path",
+  architecture: {
+    label: "Architecture",
+    eyebrow: "Architecture quick path",
     headline: "See the proof in three moves",
     description:
       "Start with the readiness board, jump to the scenario runner, then copy a compact export summary when the story is clear.",
@@ -148,7 +148,7 @@ const homeLenses = {
     cards: [
       ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
       ["02 · Platform fit", "Capabilities and rollout tracks show how the same stack maps to platform conversations."],
-      ["03 · Review routes", "A shareable review link keeps the architecture discussion grounded in real evidence surfaces."],
+      ["03 · Architecture routes", "A shareable review link keeps the architecture discussion grounded in real evidence surfaces."],
     ],
     actions: [
       { label: "Open Capabilities", type: "page", value: "capabilities" },
@@ -250,7 +250,7 @@ function buildStaticServiceBrief() {
       "One repo ties discovery, governance, evals, runtime diagnostics, and executive review together.",
       "Scenario Runner and ops surfaces make the project feel like a working service instead of a static deck.",
       "Platform mapping speaks directly to AWS, Snowflake, and Palantir-flavored deployment conversations.",
-      "Static fallback keeps the review surface readable even when the backend is not running.",
+      "Static fallback keeps the architecture surface readable even when the backend is not running.",
     ],
     watchouts: [
       "Static mode is active until the backend serves /ops/service-brief.",
@@ -264,8 +264,8 @@ function buildStaticServiceBrief() {
         first_surface: "/ops/service-brief",
         follow_up: "/ops/summary-pack",
         proof_assets: [
-          "docs/technical_review/evidence_map.md",
-          "docs/technical_review/project_one_pager_en.md",
+          "docs/architecture_pack/evidence_map.md",
+          "docs/architecture_pack/project_one_pager_en.md",
           "docs/verification_report.md",
         ],
       },
@@ -286,9 +286,9 @@ function buildStaticServiceBrief() {
         first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
-          "docs/technical_review/evidence_map.md",
-          "docs/review_assets/demo_script_exec.md",
-          "docs/review_assets/exec_value_dashboard/latest.md",
+          "docs/architecture_pack/evidence_map.md",
+          "docs/architecture_assets/demo_script_exec.md",
+          "docs/architecture_assets/exec_value_dashboard/latest.md",
         ],
       },
     ],
@@ -301,7 +301,7 @@ function buildStaticServiceBrief() {
         highlights: [
           {
             label: "Discovery questionnaire",
-            path: "docs/review_assets/discovery_questionnaire.md",
+            path: "docs/architecture_assets/discovery_questionnaire.md",
             kind: "doc",
           },
           {
@@ -311,7 +311,7 @@ function buildStaticServiceBrief() {
           },
           {
             label: "Capability alignment",
-            path: "docs/technical_review/capability_alignment.md",
+            path: "docs/architecture_pack/capability_alignment.md",
             kind: "doc",
           },
         ],
@@ -413,7 +413,7 @@ function buildStaticServiceBrief() {
           },
           {
             label: "Exec value dashboard",
-            path: "docs/review_assets/exec_value_dashboard/latest.md",
+            path: "docs/architecture_assets/exec_value_dashboard/latest.md",
             kind: "doc",
           },
           {
@@ -441,7 +441,7 @@ function buildStaticServiceBrief() {
         order: 2,
         title: "Run architecture diagnosis with citations",
         endpoint: "/uc1/architecture",
-        evidence_path: "docs/review_assets/demo_script_exec.md",
+        evidence_path: "docs/architecture_assets/demo_script_exec.md",
         persona: "stakeholder",
       },
       {
@@ -455,7 +455,7 @@ function buildStaticServiceBrief() {
         order: 4,
         title: "Verify audit, metrics, and ops runtime",
         endpoint: "/audit/summary -> /ops/runtime -> /metrics",
-        evidence_path: "docs/review_assets/exec_value_dashboard/latest.md",
+        evidence_path: "docs/architecture_assets/exec_value_dashboard/latest.md",
         persona: "exec",
       },
     ],
@@ -471,8 +471,8 @@ function buildStaticServiceBrief() {
       ops_runtime: "/ops/runtime",
       control_tower_spec: "/v1/control-tower/spec",
       customer_journey: "docs/blueprint/09_customer_journey.md",
-      capability_alignment: "docs/technical_review/capability_alignment.md",
-      proof_map: "docs/technical_review/evidence_map.md",
+      capability_alignment: "docs/architecture_pack/capability_alignment.md",
+      proof_map: "docs/architecture_pack/evidence_map.md",
     },
   };
 }
@@ -547,21 +547,21 @@ function buildStaticSummaryPack() {
       module_packs: 4,
       eval_assets: 14,
       application_artifacts: 9,
-      review_assets_count: 5,
-      review_assets: [
+      architecture_assets_count: 5,
+      architecture_assets: [
         {
           label: "Executive dashboard markdown",
-          path: "docs/review_assets/exec_value_dashboard/latest.md",
+          path: "docs/architecture_assets/exec_value_dashboard/latest.md",
           kind: "doc",
         },
         {
           label: "Executive dashboard snapshot",
-          path: "docs/review_assets/exec_value_dashboard/snapshot.svg",
+          path: "docs/architecture_assets/exec_value_dashboard/snapshot.svg",
           kind: "doc",
         },
         {
           label: "Security compliance packet",
-          path: "docs/review_assets/security_compliance_packet.md",
+          path: "docs/architecture_assets/security_compliance_packet.md",
           kind: "doc",
         },
         {
@@ -586,7 +586,7 @@ function buildStaticSummaryPack() {
         "/ops/runtime",
         "/metrics",
       ],
-      review_endpoints: [
+      architecture_endpoints: [
         "/health",
         "/ops/service-brief",
         "/ops/summary-pack",
@@ -648,8 +648,8 @@ function buildStaticSummaryPack() {
         first_surface: "/ops/service-brief",
         follow_up: "/ops/summary-pack",
         proof_assets: [
-          "docs/technical_review/evidence_map.md",
-          "docs/technical_review/project_one_pager_en.md",
+          "docs/architecture_pack/evidence_map.md",
+          "docs/architecture_pack/project_one_pager_en.md",
           "docs/verification_report.md",
         ],
       },
@@ -670,27 +670,27 @@ function buildStaticSummaryPack() {
         first_surface: "/auth/login -> /uc1/architecture -> /uc2/log-intel",
         follow_up: "/audit/summary -> /ops/runtime -> /metrics",
         proof_assets: [
-          "docs/technical_review/evidence_map.md",
-          "docs/review_assets/demo_script_exec.md",
-          "docs/review_assets/exec_value_dashboard/latest.md",
+          "docs/architecture_pack/evidence_map.md",
+          "docs/architecture_assets/demo_script_exec.md",
+          "docs/architecture_assets/exec_value_dashboard/latest.md",
         ],
       },
     ],
     rollout_tracks: [
       {
         track: "api-first validation",
-        fit_for: ["solution architecture review", "security pilot", "ops workshop"],
+        fit_for: ["solution architecture", "security pilot", "ops workshop"],
         evidence: "docs/architecture/llm_deployment_options.md",
       },
       {
         track: "workspace-first enablement",
         fit_for: ["business user pilot", "low-code adoption", "change management"],
-        evidence: "docs/review_assets/llm_workspace_checklist.md",
+        evidence: "docs/architecture_assets/llm_workspace_checklist.md",
       },
       {
         track: "hybrid control tower",
         fit_for: ["platform governance", "evaluation gate", "quarterly business review"],
-        evidence: "docs/review_assets/qbr_template.md",
+        evidence: "docs/architecture_assets/qbr_template.md",
       },
     ],
     platform_dialogues: [
@@ -729,9 +729,9 @@ function buildStaticSummaryPack() {
       audit_summary: "/audit/summary",
       customer_journey: "docs/blueprint/09_customer_journey.md",
       deployment_options: "docs/architecture/llm_deployment_options.md",
-      exec_summary_template: "docs/review_assets/executive_summary_template.md",
-      qbr_template: "docs/review_assets/qbr_template.md",
-      proof_map: "docs/technical_review/evidence_map.md",
+      exec_summary_template: "docs/architecture_assets/executive_summary_template.md",
+      qbr_template: "docs/architecture_assets/qbr_template.md",
+      proof_map: "docs/architecture_pack/evidence_map.md",
     },
   };
 }
@@ -1098,10 +1098,10 @@ function Icon({ name = "default" }) {
 }
 
 export default function App() {
-  const initialReviewerUrlState =
+  const initialArchitectureUrlState =
     typeof window === "undefined"
       ? {}
-      : parseReviewerUrlState(window.location.search, window.location.hash);
+      : parseArchitectureUrlState(window.location.search, window.location.hash);
 
   useEffect(() => {
     document.body.dataset.appMounted = "true";
@@ -1113,18 +1113,18 @@ export default function App() {
     };
   }, []);
 
-  const [page, setPage] = useState(() => initialReviewerUrlState.page || getPageFromHash());
+  const [page, setPage] = useState(() => initialArchitectureUrlState.page || getPageFromHash());
   const [userId, setUserId] = useState(() => safeStorageGet(STORAGE_KEYS.userId, "acme-demo"));
   const [role, setRole] = useState(() => {
-    if (initialReviewerUrlState.role && roles.includes(initialReviewerUrlState.role)) {
-      return initialReviewerUrlState.role;
+    if (initialArchitectureUrlState.role && roles.includes(initialArchitectureUrlState.role)) {
+      return initialArchitectureUrlState.role;
     }
     const stored = safeStorageGet(STORAGE_KEYS.role, "Employee");
     return roles.includes(stored) ? stored : "Employee";
   });
   const [loginCode, setLoginCode] = useState(() => safeStorageGet(STORAGE_KEYS.loginCode, ""));
   const [token, setToken] = useState("");
-  const [activeTab, setActiveTab] = useState(() => initialReviewerUrlState.tab || "architecture");
+  const [activeTab, setActiveTab] = useState(() => initialArchitectureUrlState.tab || "architecture");
   const [status, setStatus] = useState("Ready");
   const [lastRequestId, setLastRequestId] = useState("");
   const [health, setHealth] = useState({
@@ -1243,19 +1243,19 @@ export default function App() {
   const giscusContainerRef = useRef(null);
   const homeFrontDoor = useMemo(() => {
     const evidenceBundle = summaryPack?.evidence_bundle || {};
-    const reviewAssets =
-      Number(evidenceBundle.review_assets_count || 0) ||
-      (Array.isArray(evidenceBundle.review_assets) ? evidenceBundle.review_assets.length : 0) ||
+    const architectureAssets =
+      Number(evidenceBundle.architecture_assets_count || 0) ||
+      (Array.isArray(evidenceBundle.architecture_assets) ? evidenceBundle.architecture_assets.length : 0) ||
       (Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.length : 0) ||
       5;
     const reviewRoutes =
-      (Array.isArray(evidenceBundle.review_endpoints) ? evidenceBundle.review_endpoints.length : 0) ||
+      (Array.isArray(evidenceBundle.architecture_endpoints) ? evidenceBundle.architecture_endpoints.length : 0) ||
       (Array.isArray(evidenceBundle.runtime_surfaces) ? evidenceBundle.runtime_surfaces.length : 0) ||
       Object.values(summaryPack?.links || {}).filter((value) => String(value || "").startsWith("/")).length ||
       8;
     return {
       readinessStages: Array.isArray(serviceBrief?.stages) ? serviceBrief.stages.length : 5,
-      reviewAssets,
+      architectureAssets,
       reviewRoutes,
       reviewActions: Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.slice(0, 3) : [],
       rolloutTracks: Array.isArray(summaryPack?.rollout_tracks) ? summaryPack.rollout_tracks.slice(0, 3) : [],
@@ -1275,7 +1275,7 @@ export default function App() {
   }, [page]);
 
   useEffect(() => {
-    replaceReviewerUrlState({ page, tab: activeTab, role });
+    replaceArchitectureUrlState({ page, tab: activeTab, role });
   }, [activeTab, page, role]);
 
   useEffect(() => {
@@ -1509,12 +1509,12 @@ export default function App() {
   }
 
   async function copyCurrentReviewLink() {
-    const url = buildReviewerShareUrl({ page, tab: activeTab, role });
+    const url = buildArchitectureShareUrl({ page, tab: activeTab, role });
     const ok = await copyTextToClipboard(url);
     setStatus(ok ? "Current review link copied" : "Failed to copy current review link");
   }
 
-  async function copyReviewerBundle() {
+  async function copyArchitectureBundle() {
     const reviewRoutes =
       summaryPack?.review_routes?.length
         ? summaryPack.review_routes
@@ -1526,10 +1526,10 @@ export default function App() {
       `Role: ${role}`,
       `Console tab: ${activeTab}`,
       `Backend: ${health.status || "unknown"}`,
-      `Share link: ${buildReviewerShareUrl({ page, tab: activeTab, role })}`,
+      `Share link: ${buildArchitectureShareUrl({ page, tab: activeTab, role })}`,
       "",
-      "Review routes",
-      ...(reviewRoutes.length > 0 ? reviewRoutes.map((item) => `- ${item}`) : ["- Review routes unavailable."]),
+      "Architecture routes",
+      ...(reviewRoutes.length > 0 ? reviewRoutes.map((item) => `- ${item}`) : ["- Architecture routes unavailable."]),
       "",
       "Proof assets",
       ...(proofAssets.length > 0
@@ -1547,7 +1547,7 @@ export default function App() {
       `Role: ${role}`,
       `Console tab: ${activeTab}`,
       `Backend: ${health.status || "unknown"}`,
-      `Share link: ${buildReviewerShareUrl({ page, tab: activeTab, role })}`,
+      `Share link: ${buildArchitectureShareUrl({ page, tab: activeTab, role })}`,
     ].join("\n");
     const ok = await copyTextToClipboard(text);
     setStatus(ok ? "Console snapshot copied" : "Failed to copy console snapshot");
@@ -1559,7 +1559,7 @@ export default function App() {
       return;
     }
     if (action.type === "bundle") {
-      await copyReviewerBundle();
+      await copyArchitectureBundle();
       return;
     }
     if (action.type === "snapshot") {
@@ -1615,7 +1615,7 @@ export default function App() {
 
       if (event.shiftKey && event.key.toLowerCase() === "b") {
         event.preventDefault();
-        void copyReviewerBundle();
+        void copyArchitectureBundle();
         return;
       }
 
@@ -3088,10 +3088,10 @@ export default function App() {
 
   const deploymentArtifacts =
     serviceBrief.stages?.find((stage) => stage.key === "deployment")?.highlights?.map((item) => item.label) || [];
-  const reviewerEndpointCount = Array.isArray(summaryPack?.evidence_bundle?.review_endpoints)
-    ? summaryPack.evidence_bundle.review_endpoints.length
+  const architectureEndpointCount = Array.isArray(summaryPack?.evidence_bundle?.architecture_endpoints)
+    ? summaryPack.evidence_bundle.architecture_endpoints.length
     : 0;
-  const reviewAssetCount = summaryPack?.evidence_bundle?.review_assets_count || summaryPack?.evidence_bundle?.review_assets?.length || 0;
+  const architectureAssetCount = summaryPack?.evidence_bundle?.architecture_assets_count || summaryPack?.evidence_bundle?.architecture_assets?.length || 0;
   const heroCredibilityCards = [
     {
       title: "Governance signal",
@@ -3104,8 +3104,8 @@ export default function App() {
       detail: deploymentArtifacts.slice(0, 2).join(" · ") || "Deployment options and reference architecture stay in-view.",
     },
     {
-      title: "Reviewer handoff",
-      value: `${reviewerEndpointCount} endpoints · ${reviewAssetCount} test assets`,
+      title: "Architecture handoff",
+      value: `${architectureEndpointCount} endpoints · ${architectureAssetCount} test assets`,
       detail: "Solution architects can move from runtime posture to stakeholder thesis without leaving the product surface.",
     },
   ];
@@ -3172,7 +3172,7 @@ export default function App() {
           <span className="chip">
             {page === "console" ? `Tab: ${activeTab}` : `Page: ${page}`}
           </span>
-          <button className="cta-light" onClick={() => void copyReviewerBundle()}>
+          <button className="cta-light" onClick={() => void copyArchitectureBundle()}>
             Copy Export Summary
           </button>
           <button className="cta-light" onClick={() => navigate("console")}>
@@ -3191,7 +3191,7 @@ export default function App() {
             <section className="hero-grid">
               <Reveal className="hero-copy" eager>
                 <p className="eyebrow">Discovery → Governance → Rollout</p>
-                <h1>Answer what ships first before the architecture review drifts into theory.</h1>
+                <h1>Answer what ships first before the architecture drifts into theory.</h1>
                 <p className="lead">
                   {APP_NAME} turns enterprise LLM adoption into one readable evidence path: confirm runtime posture on
                   the readiness board, run one role-aware scenario, then hand over an executive bundle with rollout
@@ -3199,12 +3199,12 @@ export default function App() {
                 </p>
                 <div className="hero-actions">
                   <button className="cta-primary" onClick={() => navigate("validation")}>
-                    Start 2-Minute Proof Path
+                    Start 2-Minute Walkthrough
                   </button>
                   <button className="cta-ghost" onClick={() => navigate("scenario")}>
                     Run Scenario Runner
                   </button>
-                  <button className="cta-ghost" onClick={() => void copyReviewerBundle()}>
+                  <button className="cta-ghost" onClick={() => void copyArchitectureBundle()}>
                     Copy Executive Brief
                   </button>
                 </div>
@@ -3223,12 +3223,12 @@ export default function App() {
                     <span>Validation stages</span>
                   </article>
                   <article className="kpi-item">
-                    <p>{String(homeFrontDoor.reviewAssets).padStart(2, "0")}</p>
-                    <span>Review assets</span>
+                    <p>{String(homeFrontDoor.architectureAssets).padStart(2, "0")}</p>
+                    <span>Architecture assets</span>
                   </article>
                   <article className="kpi-item">
                     <p>{String(homeFrontDoor.reviewRoutes).padStart(2, "0")}</p>
-                    <span>Runtime review routes</span>
+                    <span>Runtime architecture routes</span>
                   </article>
                 </div>
                 <div className="hero-proof-strip" aria-label="stakeholder promises">
@@ -3545,7 +3545,7 @@ export default function App() {
                   </ul>
                   <p className="lead" style={{ marginTop: 0 }}>
                     The goal is not a pretty demo, but a repeatable validation loop that produces evidence you can
-                    share with reviewers.
+                    share with operators.
                   </p>
                 </Reveal>
               </div>
@@ -3561,7 +3561,7 @@ export default function App() {
                 <h2>Run a repeatable end-to-end validation</h2>
                 <p>
                   Issue a token, execute UC1/UC2, review governance signals, and export a report you can share with
-                  reviewers.
+                  operators.
                 </p>
               </Reveal>
 

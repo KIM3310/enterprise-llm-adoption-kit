@@ -17,5 +17,5 @@ python3 app/backend/scripts/poc_success_generator.py \
 ```
 
 ## Output
-- Writes to `docs/review_assets/poc_output/<timestamp>_success_criteria.md`
+- Writes to `docs/architecture_assets/poc_output/<timestamp>_success_criteria.md`
 

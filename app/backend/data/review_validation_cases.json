@@ -16,7 +16,7 @@
   },
   {
     "case_id": "resource-pack-review-summary",
-    "goal": "Reviewer handoff should stay grounded in the same rollout board and summary-pack signals.",
+    "goal": "Architecture handoff should stay grounded in the same rollout board and summary-pack signals.",
     "proof_surface": "/ops/review-summary"
   }
 ]

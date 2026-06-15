@@ -2,7 +2,7 @@
 
 Note: This is a hypothetical template for a personal personal project. It does not represent any real customer engagement.
 
-This blueprint maps the end-to-end technical review journey and the evidence artifacts produced at each stage.
+This blueprint maps the end-to-end architecture walkthrough and the evidence artifacts produced at each stage.
 
 ## Phase 1: Discovery
 Goals
@@ -10,11 +10,11 @@ Goals
 - Clarify stakeholders and decision criteria
 
 Artifacts
-- Discovery questionnaire: `docs/review_assets/discovery_questionnaire.md`
-- Stakeholder map: `docs/review_assets/korea_stakeholder_map.md`
-- MAP template: `docs/review_assets/map_template.md`
-- Account plan: `docs/review_assets/account_plan_template.md`
-- Workshop guide: `docs/review_assets/workshop_facilitator_guide.md`
+- Discovery questionnaire: `docs/architecture_assets/discovery_questionnaire.md`
+- Stakeholder map: `docs/architecture_assets/korea_stakeholder_map.md`
+- MAP template: `docs/architecture_assets/map_template.md`
+- Account plan: `docs/architecture_assets/account_plan_template.md`
+- Workshop guide: `docs/architecture_assets/workshop_facilitator_guide.md`
 
 Exit criteria
 - Use case short list and priority ranking
@@ -28,7 +28,7 @@ Goals
 Artifacts
 - Architecture: `docs/blueprint/02_architecture.md`
 - Threat model: `docs/blueprint/03_security_threat_model.md`
-- Security questionnaire: `docs/review_assets/security_questionnaire_kr.md`
+- Security questionnaire: `docs/architecture_assets/security_questionnaire_kr.md`
 
 Exit criteria
 - Approved architecture choice
@@ -56,10 +56,10 @@ Goals
 - Produce exec-facing summary
 
 Artifacts
-- PoC success criteria: `docs/review_assets/poc_success_criteria.md`
-- Impact model: `docs/review_assets/impact_estimates/`
-- Exec demo: `docs/review_assets/demo_script_exec.md`
-- Executive summary: `docs/review_assets/executive_summary_template.md`
+- PoC success criteria: `docs/architecture_assets/poc_success_criteria.md`
+- Impact model: `docs/architecture_assets/impact_estimates/`
+- Exec demo: `docs/architecture_assets/demo_script_exec.md`
+- Executive summary: `docs/architecture_assets/executive_summary_template.md`
 
 Exit criteria
 - Measured value and decision to expand

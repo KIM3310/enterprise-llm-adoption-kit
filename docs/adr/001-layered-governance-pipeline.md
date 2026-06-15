@@ -37,7 +37,7 @@ Each layer:
 Each governance module has its own test file (`test_rbac.py`, `test_injection.py`, `test_redaction.py`, `test_safety_guardrails.py`). This allows targeted regression testing when modifying a single policy dimension without running the full integration suite.
 
 ### Audit granularity
-Because each layer produces its own policy events, the audit log records exactly which governance layer triggered a refusal. This is critical for enterprise compliance reviews where auditors need to know whether a request was blocked for access control reasons vs. content policy reasons.
+Because each layer produces its own policy events, the audit log records exactly which governance layer triggered a refusal. This is critical for enterprise compliance architectures where auditors need to know whether a request was blocked for access control reasons vs. content policy reasons.
 
 ### Short-circuit efficiency
 The layers execute in a fixed order (RBAC -> Injection -> PII -> Safety). If RBAC denies access, the request never reaches injection detection, avoiding unnecessary computation. This also means a request that passes all four layers has a complete attestation chain.

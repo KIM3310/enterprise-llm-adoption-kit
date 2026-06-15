@@ -1,0 +1,31 @@
+# Links (local paths)
+
+- Main repo README: `README.md`
+- Validation data map: `docs/architecture_pack/evidence_map.md`
+- Modules index: `docs/modules/README.md`
+- Customer journey: `docs/blueprint/09_customer_journey.md`
+- LLM deployment options: `docs/architecture/llm_deployment_options.md`
+- Integration patterns: `docs/architecture/integration_patterns.md`
+- Eval framework template: `docs/evals/eval_framework_template.md`
+- Eval report template: `docs/evals/customer_eval_report_template.md`
+- Capability alignment: `docs/architecture_pack/capability_alignment.md`
+- Security & compliance packet: `docs/architecture_assets/security_compliance_packet.md`
+- LLM Workspace checklist: `docs/architecture_assets/llm_workspace_checklist.md`
+- RFP requirements matrix: `docs/architecture_pack/rfp_requirements_matrix.md`
+- Exec demo script: `docs/architecture_assets/demo_script_exec.md`
+- Eng demo script: `docs/architecture_assets/demo_script_eng.md`
+- Executive summary template: `docs/architecture_assets/executive_summary_template.md`
+- Executive summary (KR): `docs/architecture_assets/executive_summary_template_kr.md`
+- Technical deep dive outline: `docs/architecture_assets/technical_deep_dive_outline.md`
+- Account plan template: `docs/architecture_assets/account_plan_template.md`
+- Account plan (KR): `docs/architecture_assets/account_plan_template_kr.md`
+- Workshop facilitator guide: `docs/architecture_assets/workshop_facilitator_guide.md`
+- Workshop facilitator guide (KR): `docs/architecture_assets/workshop_facilitator_guide_kr.md`
+- Customer success RACI: `docs/ops/customer_success_raci.md`
+- QBR template: `docs/architecture_assets/qbr_template.md`
+- Sample scenario (one-pager): `docs/architecture_assets/sample_scenario_onepager.md`
+- Integration checklist: `docs/architecture_assets/integration_demo_checklist.md`
+- Exec value dashboard: `docs/architecture_assets/exec_value_dashboard/latest.md`
+- Exec dashboard snapshot: `docs/architecture_assets/exec_value_dashboard/snapshot.svg`
+- Redteam summary: `docs/evals/redteam_summary.md`
+- Verification report: `docs/verification_report.md`
