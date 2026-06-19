@@ -175,8 +175,8 @@ def test_rbac_runtime_safety_and_tools_helpers(monkeypatch, tmp_path) -> None:
         service_events=[],
         recent_decisions=[],
     )
-    assert scorecard["review_gate"]["status"] == "attention"
-    assert scorecard["review_gate"]["blocker"] is None
+    assert scorecard["architecture_gate"]["status"] == "attention"
+    assert scorecard["architecture_gate"]["blocker"] is None
     assert scorecard["summary"]["daily_cost_usd"] == 4.56789
     assert runtime_scorecard.build_ops_runtime_scorecard_schema()["schema"] == (
         "enterprise-ops-runtime-scorecard-v1"

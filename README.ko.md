@@ -1,6 +1,6 @@
-# Enterprise LLM Adoption Kit (Korea) - 포트폴리오
+# Enterprise LLM Adoption Kit (Korea)
 Tagline: Discovery -> Secure Architecture -> Evals -> Deployment/LLMOps
-Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프로젝트입니다. 실제 고객/프로덕션 배포는 없으며 모든 데이터와 시나리오는 합성 또는 가정된 내용입니다.
+Note: 로컬에서 재현 가능한 엔터프라이즈 LLM 도입 검증 키트입니다. 실제 고객/프로덕션 배포는 없으며 모든 데이터와 시나리오는 합성 또는 가정된 내용입니다.
 
 영문 버전: `README.md`
 
@@ -11,26 +11,26 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 ![Executive value dashboard snapshot](docs/architecture_assets/exec_value_dashboard/snapshot.svg)
 
 ## Summary Pack 한눈에 보기
-- 리뷰어 API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
+- 아키텍처 API: `GET /ops/service-brief`, `GET /ops/summary-pack`, `GET /ops/summary-pack/schema`
 - 증거 번들: exec dashboard snapshot, security packet, customer journey blueprint, latest eval report
 - 플랫폼 대화: AWS, Databricks, Snowflake, Palantir, MariaDB 롤아웃 매핑을 한 팩에 압축
 
 ## Quick Start
-- **AI engineer 기술 검토자:** `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`
-- **솔루션 아키텍트 기술 검토자:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/summary-pack`
-- **운영 / 플랫폼 리뷰어:** `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`
+- **FastAPI + LLM 흐름:** `GET /ops/service-brief` -> `POST /auth/login` -> `POST /uc1/architecture` -> `POST /uc2/log-intel`
+- **배포 아키텍처:** [`docs/architecture/llm_deployment_options.md`](docs/architecture/llm_deployment_options.md) -> `GET /ops/summary-pack`
+- **운영 관측성:** `GET /audit/summary` -> `GET /ops/runtime/scorecard` -> `GET /metrics`
 
 ![Enterprise summary pack](docs/summary-pack.svg)
 
-## 프로젝트 요약 (신입/핸즈온 관점)
+## 프로젝트 요약
 - 엔터프라이즈 LLM 도입의 Discovery 결과가 어떻게 안전하고 검증 가능한 PoC로 이어지는지 end-to-end로 보여주기 위해 만들었습니다.
 - 백엔드 + 프론트엔드 데모를 직접 구성해 로컬에서 재현 가능한 형태로 제공합니다.
-- 범위를 현실적으로 제한했습니다: LLM은 stub adapter, 데이터는 synthetic, 한계는 명시적으로 적어 포트폴리오 신뢰도를 지켰습니다.
+- 범위를 현실적으로 제한했습니다: LLM은 stub adapter, 데이터는 synthetic, 한계는 명시적으로 적어 프로젝트 신뢰도를 지켰습니다.
 
-## 역할 및 범위
-- 백엔드 API, 프론트엔드 UI, eval harness, 기술 검토 산출물을 단독 구현했습니다.
+## 구현 범위
+- 백엔드 API, 프론트엔드 UI, eval harness, 아키텍처 산출물을 한 저장소 안에 묶었습니다.
 - 주장보다 재현을 우선했습니다: 모든 항목은 문서, 테스트, 또는 스크립트로 검증 가능합니다.
-- 신입 온보딩 관점으로 설계했습니다: 역할 분리, 간단한 실행 절차, 안전한 기본값을 유지했습니다.
+- 역할 분리, 간단한 실행 절차, 안전한 기본값을 유지했습니다.
 - GitHub Actions로 CI 체크(backend quality gate, frontend build, eval gate)를 추가했습니다.
 
 ## 핵심 기능 (실제로 동작 확인 가능한 항목)
@@ -42,7 +42,7 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - LLMOps 지표 (latency, token, usage, policy events)
 - 통합 패턴: Slack/Jira 스타일 ingestion 엔드포인트(UI에서 시뮬레이션 가능)
 - Scenario Runner가 Markdown 리포트를 export하고, 로컬 run history(브라우저 localStorage)를 유지합니다
-- 기술 검토 아티팩트: discovery wizard, Impact 계산기, 데모 스크립트, exec deck
+- 아키텍처 아티팩트: discovery wizard, Impact 계산기, 데모 스크립트, exec deck
 
 ## 아키텍처 요약 (로컬 데모)
 - FastAPI 백엔드: UC1/UC2 흐름, audit log, metrics, integrations
@@ -63,7 +63,7 @@ Note: 리뷰 가능한 엔터프라이즈 검증 키트용 포트폴리오 프�
 - LLM 통합 패턴(RBAC, audit logging, redaction, injection defense, tool allowlist)
 - 회귀 방지 evals + baseline diff
 - LLMOps 준비 상태(metrics, reliability controls, usage tracking)
-- 기술 검토 아티팩트(데모 스크립트, objections, MAP, 30/60/90)
+- 아키텍처 아티팩트(데모 스크립트, objections, MAP, 30/60/90)
 - LLM 도입 경로(API vs LLM Workspace) 및 하이브리드 롤아웃 계획
 
 ## 증빙 (확인 포인트)
@@ -85,7 +85,7 @@ curl -fsS http://localhost:8000/ops/service-brief/schema | python3 -m json.tool 
 ```
 
 ## Runtime Surface
-- `GET /ops/service-brief`: 이해관계자/운영자/리뷰어가 바로 읽을 수 있는 runtime + evidence + rollout stage 요약 계약
+- `GET /ops/service-brief`: runtime + evidence + rollout stage를 한 번에 확인하는 요약 계약
 - `GET /ops/summary-pack`: executive architecture surface, rollout tracks, platform dialogue, architecture sequence를 한 번에 보여주는 계약
 - `GET /ops/summary-pack/schema`: architecture actions, test assets, runtime surfaces에 대한 명시적 계약 표면
 - `GET /ops/service-brief/schema`: service brief payload의 명시적 계약 표면
@@ -155,7 +155,7 @@ ollama pull llama3.2:latest
 make demo-ollama-local
 ```
 
-스크립트가 backend + frontend를 함께 실행하고 `http://localhost:5173`에서 리뷰 가능한 데모를 제공합니다.
+스크립트가 backend + frontend를 함께 실행하고 `http://localhost:5173`에서 로컬 데모를 제공합니다.
 
 ## 효용 체감 5분 투어
 기능 확인을 넘어 "왜 유용한지"가 보이는 순서입니다.

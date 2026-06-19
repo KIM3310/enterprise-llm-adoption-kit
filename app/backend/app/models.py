@@ -275,7 +275,7 @@ class ServiceBriefStage(BaseModel):
     highlights: List[ServiceBriefArtifact] = Field(default_factory=list)
 
 
-class ServiceBriefReviewStep(BaseModel):
+class ServiceBriefArchitectureStep(BaseModel):
     order: int = Field(ge=1)
     title: str
     endpoint: str
@@ -296,7 +296,7 @@ class ServiceBriefRuntime(BaseModel):
     startup_ready: bool
     llm_circuit_state: str
     deploymentMode: str = Field(
-        pattern="^(public-capped-live|review-only-live|artifact-refresh-only)$"
+        pattern="^(public-capped-live|read-only-live|artifact-refresh-only)$"
     )
     publicLiveApi: bool
     liveModel: str
@@ -338,7 +338,7 @@ class ServiceBriefResponse(BaseModel):
     watchouts: List[str] = Field(default_factory=list)
     role_paths: List[ServiceBriefRolePath] = Field(default_factory=list)
     stages: List[ServiceBriefStage] = Field(default_factory=list)
-    review_flow: List[ServiceBriefReviewStep] = Field(default_factory=list)
+    architecture_flow: List[ServiceBriefArchitectureStep] = Field(default_factory=list)
     links: Dict[str, str] = Field(default_factory=dict)
 
 

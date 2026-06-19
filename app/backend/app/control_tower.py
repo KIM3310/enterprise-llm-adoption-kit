@@ -95,7 +95,7 @@ DEFAULT_SPEC: Dict = {
         "mariadb": {
             "low": "Store decision snapshot in control_tower_decisions table.",
             "medium": "Store decision snapshot and create follow-up task records.",
-            "high": "Persist incident decision set and lock affected order rows for review.",
+            "high": "Persist incident decision set and lock affected order rows for operator check.",
             "critical": "Persist emergency decision journal and activate strict write-audit mode.",
         },
     },
@@ -385,7 +385,7 @@ def build_control_tower_decision(payload: ControlTowerDecisionRequest) -> Dict:
     risk_level = _classify_risk(risk_score, spec["risk_bands"])
 
     primary_actions = spec.get("primary_actions", {}).get(
-        risk_level, ["Review control tower metrics and monitor drift."]
+        risk_level, ["Check control tower metrics and monitor drift."]
     )
 
     raw_plan = _build_execution_plan(payload, risk_level, spec)

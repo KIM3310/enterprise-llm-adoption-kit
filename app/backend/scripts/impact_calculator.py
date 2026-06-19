@@ -24,11 +24,11 @@ def compute_impact(inputs: ImpactInputs) -> dict:
         * inputs.adoption_rate
     )
     monthly_hours_saved = weekly_hours_saved * 4.33
-    reviewed_requests = inputs.tickets_per_week * inputs.adoption_rate
+    checked_requests = inputs.tickets_per_week * inputs.adoption_rate
     return {
         "weekly_hours_saved": round(weekly_hours_saved, 2),
         "monthly_hours_saved": round(monthly_hours_saved, 2),
-        "reviewed_requests_per_week": round(reviewed_requests, 2),
+        "checked_requests_per_week": round(checked_requests, 2),
     }
 
 
@@ -49,7 +49,7 @@ def generate_report(inputs: ImpactInputs) -> Path:
 ## Outputs
 - Weekly hours saved: {results['weekly_hours_saved']}
 - Monthly hours saved: {results['monthly_hours_saved']}
-- Reviewed requests per week: {results['reviewed_requests_per_week']}
+- Checked requests per week: {results['checked_requests_per_week']}
 
 ## Notes
 - Monthly estimate uses 4.33 weeks per month.

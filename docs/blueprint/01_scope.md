@@ -9,7 +9,7 @@ Deliver an enterprise-style reference implementation for **Applied AI Architectu
 - Architecture assets (demo scripts, objections, MAP, 30/60/90)
 
 ## Target Personas
-- Enterprise AI technical reader / solution architect (primary)
+- Enterprise AI technical inspection / solution architect (primary)
 - Security/IT (architectures controls)
 - Platform/ML Engineering (evaluates integration/ops)
 

@@ -13,7 +13,7 @@ def test_public_repo_hygiene_files_exist() -> None:
         assert (ROOT_DIR / relative_path).exists(), relative_path
 
 
-def test_makefile_includes_project_review_targets() -> None:
+def test_makefile_includes_project_architecture_targets() -> None:
     makefile = (ROOT_DIR / "Makefile").read_text()
 
     assert "frontend-build:" in makefile

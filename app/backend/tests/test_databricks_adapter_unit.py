@@ -7,7 +7,7 @@ import app.databricks_adapter as da
 
 def test_is_enabled_requires_host_and_profile(monkeypatch) -> None:
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
-    monkeypatch.setenv("DATABRICKS_CONFIG_PROFILE", "portfolio")
+    monkeypatch.setenv("DATABRICKS_CONFIG_PROFILE", "demo")
     monkeypatch.delenv("DATABRICKS_TOKEN", raising=False)
 
     assert da.is_enabled() is True
@@ -46,9 +46,9 @@ def test_build_workspace_client_prefers_token_then_profile(monkeypatch) -> None:
     assert calls[-1] == {"host": "https://dbc.example.com", "token": "token-123"}
 
     monkeypatch.delenv("DATABRICKS_TOKEN", raising=False)
-    monkeypatch.setenv("DATABRICKS_CONFIG_PROFILE", "portfolio-dbx")
+    monkeypatch.setenv("DATABRICKS_CONFIG_PROFILE", "demo-dbx")
     da._build_workspace_client()
-    assert calls[-1] == {"profile": "portfolio-dbx"}
+    assert calls[-1] == {"profile": "demo-dbx"}
 
     monkeypatch.delenv("DATABRICKS_CONFIG_PROFILE", raising=False)
     monkeypatch.setenv("DATABRICKS_CLIENT_ID", "client-id")
@@ -180,7 +180,7 @@ def test_mlflow_helpers_use_profile_auth(monkeypatch) -> None:
     monkeypatch.setitem(sys.modules, "mlflow", fake_mlflow)
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
-    monkeypatch.setenv("DATABRICKS_CONFIG_PROFILE", "portfolio-dbx")
+    monkeypatch.setenv("DATABRICKS_CONFIG_PROFILE", "demo-dbx")
     monkeypatch.setenv("MLFLOW_EXPERIMENT_NAME", "enterprise-llm-eval")
     monkeypatch.setattr(
         da,

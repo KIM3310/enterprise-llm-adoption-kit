@@ -1,6 +1,6 @@
 # Security Questionnaire (Template)
 
-본 문서는 포트폴리오용 가상 템플릿입니다(실제 고객 없음).
+본 문서는 합성 시나리오용 템플릿입니다(실제 고객 없음).
 
 ## Data Governance
 - Data classification (PII/PHI/financial/internal)?

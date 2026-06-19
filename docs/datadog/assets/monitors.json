@@ -3,7 +3,7 @@
     "name": "{{PREFIX}} Enterprise LLM Failures Detected",
     "type": "query alert",
     "query": "sum(last_15m):sum:llm_failures_total{*}.as_count() > 0",
-    "message": "Enterprise LLM runtime recorded at least one post-retry LLM failure. Review provider health, fallback behavior, and the governance runtime board.",
+    "message": "Enterprise LLM runtime recorded at least one post-retry LLM failure. Check provider health, fallback behavior, and the governance runtime board.",
     "tags": [
       "service:{{SERVICE}}",
       "env:{{ENV}}",
@@ -22,7 +22,7 @@
     "name": "{{PREFIX}} Enterprise LLM Refusals Spiking",
     "type": "query alert",
     "query": "sum(last_10m):sum:policy_events_total{event:refusal}.as_count() > 10",
-    "message": "Safety or policy refusals spiked above the agreed baseline. Review request mix, prompt-injection pressure, and recent rule changes before rollout.",
+    "message": "Safety or policy refusals spiked above the agreed baseline. Check request mix, prompt-injection pressure, and recent rule changes before rollout.",
     "tags": [
       "service:{{SERVICE}}",
       "env:{{ENV}}",

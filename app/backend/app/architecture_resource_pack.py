@@ -1,4 +1,4 @@
-"""Built-in synthetic review resources for enterprise rollout demos."""
+"""Built-in synthetic architecture resources for enterprise rollout demos."""
 
 from __future__ import annotations
 
@@ -16,9 +16,9 @@ EXTERNAL_DIR = DATA_DIR / "external" / "customer_support"
 def data_files() -> dict[str, Path]:
     return {
         "workshop_scenarios": DATA_DIR / "architecture_resource_pack.json",
-        "operator_checks": DATA_DIR / "review_operator_checks.json",
-        "validation_cases": DATA_DIR / "review_validation_cases.json",
-        "rollout_playbooks": DATA_DIR / "review_playbooks.json",
+        "operator_checks": DATA_DIR / "architecture_operator_checks.json",
+        "validation_cases": DATA_DIR / "architecture_validation_cases.json",
+        "rollout_playbooks": DATA_DIR / "architecture_playbooks.json",
     }
 
 
@@ -60,7 +60,7 @@ def build_architecture_resource_pack() -> dict[str, object]:
     return {
         "service": "enterprise-adoption-architecture-resource-pack",
         "contract_version": "enterprise-adoption-architecture-resource-pack-v1",
-        "intended_use": "reviewable enterprise rollout and workshop proof without customer data",
+        "intended_use": "inspectable enterprise rollout and workshop proof without customer data",
         "summary": resource_pack_summary(),
         "external_data": {
             "present": external_ticket_path.exists(),
@@ -81,7 +81,7 @@ def build_architecture_resource_pack() -> dict[str, object]:
             "/ops/resource-pack",
             "/ops/summary-pack",
             "/ops/rollout-gates",
-            "/ops/review-summary",
+            "/ops/architecture-summary",
             "/ops/runtime/scorecard",
         ],
         "files": {

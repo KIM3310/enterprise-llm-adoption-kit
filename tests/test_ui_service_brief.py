@@ -19,7 +19,7 @@ def test_ui_includes_executive_summary_pack():
     assert "Fallback posture" in content
     assert "Stakeholder promises" in content
     assert "Rollout tracks" in content
-    assert "Review actions" in content
+    assert "Architecture actions" in content
     assert "Architecture lanes" in content
     assert "Proof assets" in content
     assert "Copy Rollout Decision Brief" in content

@@ -15,7 +15,7 @@ Note:
 ## High-Level Diagram
 ```mermaid
 flowchart LR
-  U[Technical reader / Operator] -->|HTTPS| CF[CloudFront]
+  U[Technical inspection / Operator] -->|HTTPS| CF[CloudFront]
   CF -->|static assets| S3FE[(S3: Frontend)]
   CF -->|/api| ALB[ALB + AWS WAF]
 

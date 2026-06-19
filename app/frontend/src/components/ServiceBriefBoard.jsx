@@ -35,7 +35,7 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
   const stages = Array.isArray(brief.stages) ? brief.stages : [];
   const strengths = Array.isArray(brief.strengths) ? brief.strengths : [];
   const watchouts = Array.isArray(brief.watchouts) ? brief.watchouts : [];
-  const reviewFlow = Array.isArray(brief.review_flow) ? brief.review_flow : [];
+  const architectureFlow = Array.isArray(brief.architecture_flow) ? brief.architecture_flow : [];
   const audiences = Array.isArray(brief.audiences) ? brief.audiences : [];
   const runModes = Array.isArray(brief.run_modes) ? brief.run_modes : [];
   const platformTargets = Array.isArray(brief.platform_targets) ? brief.platform_targets : [];
@@ -60,7 +60,7 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
           <p className="eyebrow">Service Brief</p>
           <h3>Executive Readiness Board</h3>
           <p>
-            {brief.tagline}. Review governance posture, deployment fit, proof inventory, and rollout stages without
+            {brief.tagline}. Check governance posture, deployment fit, proof inventory, and rollout stages without
             leaving the product surface.
           </p>
         </div>
@@ -208,9 +208,9 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
         </article>
       )}
 
-      {!compact && reviewFlow.length > 0 && (
+      {!compact && architectureFlow.length > 0 && (
         <div className="service-brief-flow">
-          {reviewFlow.map((step) => (
+          {architectureFlow.map((step) => (
             <article key={`${step.order}-${step.title}`} className="service-flow-card">
               <span className="service-flow-index">{String(step.order).padStart(2, "0")}</span>
               <div>

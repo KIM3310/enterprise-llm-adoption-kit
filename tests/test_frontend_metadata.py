@@ -5,7 +5,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_INDEX = ROOT_DIR / "app/frontend/index.html"
 
 
-def test_frontend_index_includes_review_surface_metadata():
+def test_frontend_index_includes_architecture_surface_metadata():
     content = FRONTEND_INDEX.read_text()
 
     assert 'name="description"' in content

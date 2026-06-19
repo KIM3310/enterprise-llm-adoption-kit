@@ -26,4 +26,4 @@ def test_compute_impact():
 
     assert result["weekly_hours_saved"] > 0
     assert result["monthly_hours_saved"] > 0
-    assert result["reviewed_requests_per_week"] > 0
+    assert result["checked_requests_per_week"] > 0

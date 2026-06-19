@@ -10,7 +10,7 @@ This is a hypothetical checklist for reference.
 ## Governance
 - [ ] Acceptable use policy communicated
 - [ ] Admin roles and approvals defined
-- [ ] Data retention and storage policy reviewed
+- [ ] Data retention and storage policy checked
 
 ## Usage monitoring
 - [ ] Usage dashboard enabled

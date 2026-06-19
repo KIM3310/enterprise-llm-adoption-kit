@@ -43,7 +43,7 @@ async def test_health_includes_runtime_metadata() -> None:
         "/ops/resource-pack",
         "/ops/summary-pack",
         "/ops/rollout-gates",
-        "/ops/review-summary",
+        "/ops/architecture-summary",
         "/ops/runtime/scorecard",
     ]
     assert "ops-runtime-observability" in payload.get("capabilities", [])

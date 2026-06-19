@@ -86,7 +86,7 @@
     "mariadb": {
       "low": "Store decision snapshot in control_tower_decisions table.",
       "medium": "Store decision snapshot and create follow-up task records.",
-      "high": "Persist incident decision set and lock affected order rows for review.",
+      "high": "Persist incident decision set and lock affected order rows for operator check.",
       "critical": "Persist emergency decision journal and activate strict write-audit mode."
     }
   }

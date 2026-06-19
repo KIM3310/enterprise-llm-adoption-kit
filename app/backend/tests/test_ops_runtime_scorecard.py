@@ -85,7 +85,7 @@ async def test_ops_runtime_scorecard_contract(monkeypatch) -> None:
 
 
 @pytest.mark.anyio
-async def test_ops_runtime_scorecard_flags_review_gate_when_startup_is_degraded(monkeypatch) -> None:
+async def test_ops_runtime_scorecard_flags_architecture_gate_when_startup_is_degraded(monkeypatch) -> None:
     monkeypatch.setattr(main_module, "summarize_log", lambda *_args, **_kwargs: {"requests": 0, "top_users": [], "tools_used": [], "policy_events": [], "total_cost": 0.0})
     monkeypatch.setattr(main_module, "get_daily_cost", lambda: 0.0)
     monkeypatch.setattr(main_module, "evaluate_ops_alerts", lambda *_args, **_kwargs: [])
@@ -107,9 +107,9 @@ async def test_ops_runtime_scorecard_flags_review_gate_when_startup_is_degraded(
 
     assert response.status_code == 200
     body = response.json()
-    assert body["review_gate"]["status"] == "attention"
-    assert "runbooks" in body["review_gate"]["blocker"]
-    assert "/health" in body["review_gate"]["next_step"]
+    assert body["architecture_gate"]["status"] == "attention"
+    assert "runbooks" in body["architecture_gate"]["blocker"]
+    assert "/health" in body["architecture_gate"]["next_step"]
 
 
 @pytest.mark.anyio

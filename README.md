@@ -21,7 +21,7 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 1. Open [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md) to see the production test boundary.
 2. Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.
 3. Run `make verify` to cover backend quality, smoke checks, and frontend build.
-4. Keep synthetic data and environment-gated live providers explicit in any technical reader read.
+4. Keep synthetic data and environment-gated live providers explicit in any technical inspection read.
 
 ## Product and System Surface
 
@@ -277,12 +277,11 @@ enterprise-llm-adoption-kit/
 
 ---
 
-## Latest Verified Snapshot
+## Operating Commands
 
-- **Verified on:** 2026-04-07
-- **Command:** `make verify`
-- **Outcome:** passed locally; syntax check, dependency check, pytest, smoke diagnostics, and frontend production build completed with 84.20% backend coverage
-- **Notes:** `make verify` bootstraps the Python 3.11 backend venv and installs missing frontend dependencies automatically, and Snowflake adapter plus Snowflake-focused service-brief tests were rerun successfully from `app/backend/.venv`
+- `make verify` runs the backend syntax/dependency checks, Python suite, smoke diagnostics, and frontend production build.
+- `app/backend/.venv/bin/python -m pytest tests app/backend/tests -q` exercises the backend services, adapters, runtime scorecards, and UI metadata contracts.
+- `cd app/frontend && pnpm build` produces the static frontend bundle used by the Cloudflare Pages deployment path.
 
 ---
 
@@ -310,7 +309,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the technical reader, trust boundary, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the technical inspection, trust boundary, trust boundary, operating checks, and service path for this repository.
 
 ## System Architecture
 

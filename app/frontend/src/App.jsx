@@ -57,7 +57,7 @@ const capabilityCards = [
   },
   {
     title: "Governance Summary",
-    body: "Review requests, policy events, tool usage, and daily cost in a single decision-ready view."
+    body: "Check requests, policy events, tool usage, and daily cost in a single decision-ready view."
   },
   {
     title: "Metrics and Eval Readiness",
@@ -98,7 +98,7 @@ const scenarioSteps = [
   },
   {
     title: "Governance and Observability",
-    text: "Review audit + cost metrics to decide if the system is production-ready.",
+    text: "Check audit + cost metrics to decide if the system is production-ready.",
     endpoint: "/audit/summary · /metrics"
   }
 ];
@@ -148,12 +148,12 @@ const homeLenses = {
     cards: [
       ["01 · Runtime posture", "Health, provider posture, and evidence counts anchor the system boundary."],
       ["02 · Platform fit", "Capabilities and rollout tracks show how the same stack maps to platform conversations."],
-      ["03 · Architecture routes", "A shareable review link keeps the architecture discussion grounded in real evidence surfaces."],
+      ["03 · Architecture routes", "A shareable architecture link keeps the architecture discussion grounded in real evidence surfaces."],
     ],
     actions: [
       { label: "Open Capabilities", type: "page", value: "capabilities" },
       { label: "Open Readiness", type: "page", value: "validation" },
-      { label: "Copy Review Link", type: "link" },
+      { label: "Copy Architecture Link", type: "link" },
     ],
   },
   operator: {
@@ -219,7 +219,7 @@ function buildStaticServiceBrief() {
     audiences: [
       "Solutions Architect",
       "Platform Engineering",
-      "Security Review",
+      "Security Gate",
       "Customer Success",
       "Executive Sponsor",
     ],
@@ -247,7 +247,7 @@ function buildStaticServiceBrief() {
     run_modes: ["local-jwt demo", "docker compose", "ollama local", "openai compatible"],
     platform_targets: ["aws", "databricks", "mariadb", "palantir", "snowflake"],
     strengths: [
-      "One repo ties discovery, governance, evals, runtime diagnostics, and executive review together.",
+      "One repo ties discovery, governance, evals, runtime diagnostics, and executive readout together.",
       "Scenario Runner and ops surfaces make the project feel like a working service instead of a static deck.",
       "Platform mapping speaks directly to AWS, Snowflake, and Palantir-flavored deployment conversations.",
       "Static fallback keeps the architecture surface readable even when the backend is not running.",
@@ -402,7 +402,7 @@ function buildStaticServiceBrief() {
       },
       {
         key: "operations",
-        label: "Operations and Executive Review",
+        label: "Operations and Executive Readout",
         readiness: "ready",
         artifact_count: 4,
         highlights: [
@@ -429,7 +429,7 @@ function buildStaticServiceBrief() {
         ],
       },
     ],
-    review_flow: [
+    architecture_flow: [
       {
         order: 1,
         title: "Issue a role-aware token",
@@ -492,7 +492,7 @@ function buildStaticServiceBriefSchema() {
       "platform_targets",
       "role_paths",
       "stages",
-      "review_flow",
+      "architecture_flow",
       "links",
     ],
     runtime_required_fields: [
@@ -597,11 +597,11 @@ function buildStaticSummaryPack() {
         "/metrics",
       ],
     },
-    review_actions: [
+    architecture_actions: [
       {
-        label: "Check review-ready runtime posture",
+        label: "Check architecture-ready runtime posture",
         surface: "/ops/service-brief",
-        proof: "Review maturity stage, runtime posture, and stage evidence before the demo.",
+        proof: "Check maturity stage, runtime posture, and stage evidence before the demo.",
       },
       {
         label: "Inspect executive overview",
@@ -619,7 +619,7 @@ function buildStaticSummaryPack() {
         proof: "Choose API-first, workspace-first, or hybrid rollout with evidence-backed tradeoffs.",
       },
     ],
-    two_minute_review: [
+    two_minute_architecture: [
       {
         step: "1. Runtime posture",
         surface: "/ops/service-brief",
@@ -638,7 +638,7 @@ function buildStaticSummaryPack() {
       {
         step: "4. Deployment decision",
         surface: "docs/architecture/llm_deployment_options.md -> docs/blueprint/09_customer_journey.md",
-        proof: "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
+        proof: "Tie runtime evidence back to rollout strategy and customer journey in one architecture path.",
       },
     ],
     role_paths: [
@@ -689,7 +689,7 @@ function buildStaticSummaryPack() {
       },
       {
         track: "hybrid control tower",
-        fit_for: ["platform governance", "evaluation gate", "quarterly business review"],
+        fit_for: ["platform governance", "evaluation gate", "quarterly business readout"],
         evidence: "docs/architecture_assets/qbr_template.md",
       },
     ],
@@ -700,7 +700,7 @@ function buildStaticSummaryPack() {
       "palantir: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
       "snowflake: map discovery, governance, and deployment decisions into the customer's preferred platform language.",
     ],
-    review_sequence: [
+    architecture_sequence: [
       "1. Issue a role-aware token -> /auth/login",
       "2. Run architecture diagnosis with citations -> /uc1/architecture",
       "3. Run log-intel and inspect actionability -> /uc2/log-intel",
@@ -711,7 +711,7 @@ function buildStaticSummaryPack() {
       "Security and Governance",
       "Evaluation and Regression",
       "Deployment and Integration",
-      "Operations and Executive Review",
+      "Operations and Executive Readout",
     ],
     watchouts: [
       "Static mode is active until the backend serves /ops/summary-pack.",
@@ -1246,9 +1246,9 @@ export default function App() {
     const architectureAssets =
       Number(evidenceBundle.architecture_assets_count || 0) ||
       (Array.isArray(evidenceBundle.architecture_assets) ? evidenceBundle.architecture_assets.length : 0) ||
-      (Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.length : 0) ||
+      (Array.isArray(summaryPack?.architecture_actions) ? summaryPack.architecture_actions.length : 0) ||
       5;
-    const reviewRoutes =
+    const architectureRoutes =
       (Array.isArray(evidenceBundle.architecture_endpoints) ? evidenceBundle.architecture_endpoints.length : 0) ||
       (Array.isArray(evidenceBundle.runtime_surfaces) ? evidenceBundle.runtime_surfaces.length : 0) ||
       Object.values(summaryPack?.links || {}).filter((value) => String(value || "").startsWith("/")).length ||
@@ -1256,8 +1256,8 @@ export default function App() {
     return {
       readinessStages: Array.isArray(serviceBrief?.stages) ? serviceBrief.stages.length : 5,
       architectureAssets,
-      reviewRoutes,
-      reviewActions: Array.isArray(summaryPack?.review_actions) ? summaryPack.review_actions.slice(0, 3) : [],
+      architectureRoutes,
+      architectureActions: Array.isArray(summaryPack?.architecture_actions) ? summaryPack.architecture_actions.slice(0, 3) : [],
       rolloutTracks: Array.isArray(summaryPack?.rollout_tracks) ? summaryPack.rollout_tracks.slice(0, 3) : [],
       stakeholderPromises: Array.isArray(summaryPack?.stakeholder_promises) ? summaryPack.stakeholder_promises.slice(0, 2) : [],
       maturityStage: serviceBrief?.maturity_stage || "pre-production validation system",
@@ -1461,7 +1461,7 @@ export default function App() {
         checks: [
           `API base ${API_BASE || "(same origin)"} is not serving the scenario routes yet`,
           "Start the local demo runtime, then return once /health is reachable",
-          "Use the readiness board for static review only until the backend is online",
+          "Use the readiness board for static inspection only until the backend is online",
         ],
         actionLabel: "Open Readiness",
         action: () => navigate("validation"),
@@ -1508,17 +1508,17 @@ export default function App() {
     setPage(nextPage);
   }
 
-  async function copyCurrentReviewLink() {
+  async function copyCurrentArchitectureLink() {
     const url = buildArchitectureShareUrl({ page, tab: activeTab, role });
     const ok = await copyTextToClipboard(url);
-    setStatus(ok ? "Current review link copied" : "Failed to copy current review link");
+    setStatus(ok ? "Current architecture link copied" : "Failed to copy current architecture link");
   }
 
   async function copyArchitectureBundle() {
-    const reviewRoutes =
-      summaryPack?.review_routes?.length
-        ? summaryPack.review_routes
-        : summaryPack?.two_minute_review?.map((item) => item.surface || item).filter(Boolean) || [];
+    const architectureRoutes =
+      summaryPack?.architecture_routes?.length
+        ? summaryPack.architecture_routes
+        : summaryPack?.two_minute_architecture?.map((item) => item.surface || item).filter(Boolean) || [];
     const proofAssets = Array.isArray(summaryPack?.proof_assets) ? summaryPack.proof_assets : [];
     const text = [
       "LLM Adoption Atelier export summary",
@@ -1529,7 +1529,7 @@ export default function App() {
       `Share link: ${buildArchitectureShareUrl({ page, tab: activeTab, role })}`,
       "",
       "Architecture routes",
-      ...(reviewRoutes.length > 0 ? reviewRoutes.map((item) => `- ${item}`) : ["- Architecture routes unavailable."]),
+      ...(architectureRoutes.length > 0 ? architectureRoutes.map((item) => `- ${item}`) : ["- Architecture routes unavailable."]),
       "",
       "Proof assets",
       ...(proofAssets.length > 0
@@ -1567,7 +1567,7 @@ export default function App() {
       return;
     }
     if (action.type === "link") {
-      await copyCurrentReviewLink();
+      await copyCurrentArchitectureLink();
     }
   }
 
@@ -1609,7 +1609,7 @@ export default function App() {
 
       if (event.shiftKey && event.key.toLowerCase() === "l") {
         event.preventDefault();
-        void copyCurrentReviewLink();
+        void copyCurrentArchitectureLink();
         return;
       }
 
@@ -2700,7 +2700,7 @@ export default function App() {
       {
         key: "governance",
         title: "Governance and Observability",
-        text: "Review audit + runtime usage signals to decide if the system is production-ready.",
+        text: "Check audit + runtime usage signals to decide if the system is production-ready.",
         endpoint: "/audit/summary",
         status: "idle"
       },
@@ -3227,7 +3227,7 @@ export default function App() {
                     <span>Architecture assets</span>
                   </article>
                   <article className="kpi-item">
-                    <p>{String(homeFrontDoor.reviewRoutes).padStart(2, "0")}</p>
+                    <p>{String(homeFrontDoor.architectureRoutes).padStart(2, "0")}</p>
                     <span>Runtime architecture routes</span>
                   </article>
                 </div>
@@ -3254,7 +3254,7 @@ export default function App() {
                     <div className="media-tag">CONTROL TOWER</div>
                   </div>
                   <div className="media-proof-grid">
-                    {homeFrontDoor.reviewActions.map((action, index) => (
+                    {homeFrontDoor.architectureActions.map((action, index) => (
                       <article key={action.label} className="media-proof-card">
                         <span>{`0${index + 1}`}</span>
                         <strong>{action.label}</strong>
@@ -3395,7 +3395,7 @@ export default function App() {
                     <Icon name="governance" />
                   </div>
                   <h3>Governance and Audit Flow</h3>
-                  <p>Review policy events, tool usage, and daily cost to make adoption decisions defensible.</p>
+                  <p>Check policy events, tool usage, and daily cost to make adoption decisions defensible.</p>
                   <div className="card-meta">
                     <span className="tag">
                       <strong>AUDIT</strong> events
@@ -3560,7 +3560,7 @@ export default function App() {
                 <p className="eyebrow">Scenario Runner</p>
                 <h2>Run a repeatable end-to-end validation</h2>
                 <p>
-                  Issue a token, execute UC1/UC2, review governance signals, and export a report you can share with
+                  Issue a token, execute UC1/UC2, check governance signals, and export a report you can share with
                   operators.
                 </p>
               </Reveal>
@@ -3587,8 +3587,8 @@ export default function App() {
                   >
                     {scenarioAssistant.actionLabel}
                   </button>
-                  <button className="cta-light" onClick={() => void copyCurrentReviewLink()}>
-                    Copy Review Link
+                  <button className="cta-light" onClick={() => void copyCurrentArchitectureLink()}>
+                    Copy Architecture Link
                   </button>
                 </div>
               </Reveal>
@@ -4759,7 +4759,7 @@ export default function App() {
             <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/issues">GitHub Issues</a>
           </p>
           <p>Privacy: only operational telemetry required for governance workflows.</p>
-          <p>Terms: guidance output must be reviewed by human operators before production decisions.</p>
+          <p>Terms: guidance output must be checked by human operators before production decisions.</p>
           <p>
             Links: <a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> ·{" "}
             <a href="/contact.html">Contact</a> · <a href="/compliance.html">Compliance</a>

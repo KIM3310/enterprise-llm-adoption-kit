@@ -161,7 +161,7 @@ echo ""
 echo "Open: http://localhost:5173"
 echo "Use case tour (3-5 min):"
 echo "1) Issue Ops/Admin token in Access Control"
-echo "2) Run UC1/UC2 and review Audit/Runtime/Metrics"
+echo "2) Run UC1/UC2 and check Audit/Runtime/Metrics"
 echo "3) In another terminal, run 'make scenario-run' or 'make scenario-demo-local'"
 echo ""
 

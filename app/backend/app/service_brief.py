@@ -2,7 +2,7 @@
 
 Builds comprehensive governance and delivery surfaces by composing
 runtime posture, evidence counts, platform targets, rollout gates,
-and review-flow metadata into structured JSON responses.
+and architecture-flow metadata into structured JSON responses.
 """
 
 import os
@@ -59,7 +59,7 @@ def build_openai_live_contract() -> Dict[str, object]:
     monthly_budget = _read_usd_env("OPENAI_PUBLIC_MONTHLY_BUDGET_USD", 120.0)
     public_live = bool(api_key) and not kill_switch and daily_budget > 0 and monthly_budget > 0
     return {
-        "deploymentMode": "public-capped-live" if public_live else "review-only-live",
+        "deploymentMode": "public-capped-live" if public_live else "read-only-live",
         "publicLiveApi": public_live,
         "liveModel": str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip() or "gpt-4o-mini",
         "refreshModel": str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip() or "gpt-4o",
@@ -200,7 +200,7 @@ def build_service_brief(
         watchouts.append("Shared demo login code is disabled. Enable it for tighter workshop access control.")
     if str(circuit_snapshot.get("state", "closed")) != "closed":
         watchouts.append(
-            f"LLM circuit breaker is {circuit_snapshot.get('state', 'open')}. Review provider health before live sessions."
+            f"LLM circuit breaker is {circuit_snapshot.get('state', 'open')}. Check provider health before live sessions."
         )
     if not startup_ready and failed_checks:
         watchouts.append(f"Startup diagnostics need attention: {failed_checks[0]}")
@@ -260,7 +260,7 @@ def build_service_brief(
         "audiences": [
             "Solutions Architect",
             "Platform Engineering",
-            "Security Review",
+            "Security Gate",
             "Customer Success",
             "Executive Sponsor",
         ],
@@ -337,7 +337,7 @@ def build_service_brief(
             },
             {
                 "key": "operations",
-                "label": "Operations and Executive Review",
+                "label": "Operations and Executive Readout",
                 "readiness": _stage_readiness(
                     artifacts=operations_artifacts,
                     startup_ready=startup_ready,
@@ -346,7 +346,7 @@ def build_service_brief(
                 "highlights": operations_artifacts,
             },
         ],
-        "review_flow": [
+        "architecture_flow": [
             {
                 "order": 1,
                 "title": "Issue a role-aware token",
@@ -391,7 +391,7 @@ def build_service_brief(
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
             "rollout_gates": "/ops/rollout-gates",
-            "review_summary": "/ops/review-summary",
+            "architecture_summary": "/ops/architecture-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
@@ -417,7 +417,7 @@ def build_service_summary_pack(
     runtime = brief.get("runtime", {})
     evidence = brief.get("evidence", {})
     platform_targets = [str(item) for item in brief.get("platform_targets", [])]
-    review_flow = brief.get("review_flow", [])
+    architecture_flow = brief.get("architecture_flow", [])
     role_paths = [item for item in brief.get("role_paths", []) if isinstance(item, dict)]
     stage_labels = [
         str(stage.get("label", stage.get("key", "")))
@@ -435,11 +435,11 @@ def build_service_summary_pack(
         ]
     )
     resource_pack = build_architecture_resource_pack()
-    review_actions = [
+    architecture_actions = [
         {
-            "label": "Check review-ready runtime posture",
+            "label": "Check architecture-ready runtime posture",
             "surface": "/ops/service-brief",
-            "proof": "Review maturity stage, runtime posture, and stage evidence before the demo.",
+            "proof": "Check maturity stage, runtime posture, and stage evidence before the demo.",
         },
         {
             "label": "Inspect executive overview",
@@ -457,7 +457,7 @@ def build_service_summary_pack(
             "proof": "Choose API-first, workspace-first, or hybrid rollout with evidence-backed tradeoffs.",
         },
     ]
-    two_minute_review = [
+    two_minute_architecture = [
         {
             "step": "1. Runtime posture",
             "surface": "/ops/service-brief",
@@ -481,18 +481,18 @@ def build_service_summary_pack(
         {
             "step": "5. Deployment decision",
             "surface": "docs/architecture/llm_deployment_options.md -> docs/blueprint/09_customer_journey.md",
-            "proof": "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
+            "proof": "Tie runtime evidence back to rollout strategy and customer journey in one architecture path.",
         },
     ]
     startup_ready = bool(runtime.get("startup_ready", False))
     startup_status = str(runtime.get("startup_status", "") or "unknown")
     circuit_state = str(runtime.get("llm_circuit_state", "") or "unknown")
-    review_gate_ready = startup_ready and circuit_state == "closed"
-    review_gate_blockers = []
+    architecture_gate_ready = startup_ready and circuit_state == "closed"
+    architecture_gate_blockers = []
     if not startup_ready:
-        review_gate_blockers.append(f"startup is {startup_status}")
+        architecture_gate_blockers.append(f"startup is {startup_status}")
     if circuit_state != "closed":
-        review_gate_blockers.append(f"LLM circuit is {circuit_state}")
+        architecture_gate_blockers.append(f"LLM circuit is {circuit_state}")
 
     return {
         "service": brief["service"],
@@ -512,22 +512,22 @@ def build_service_summary_pack(
             "startup_ready": bool(runtime.get("startup_ready", False)),
             "llm_circuit_state": runtime.get("llm_circuit_state", "closed"),
         },
-        "review_gate": {
-            "status": "ready" if review_gate_ready else "attention",
+        "architecture_gate": {
+            "status": "ready" if architecture_gate_ready else "attention",
             "fallback_posture": (
-                "Executive review can stay on service brief, summary pack, and review summary while runtime recovery is in progress."
-                if not review_gate_ready
+                "Executive readout can stay on service brief, summary pack, and architecture summary while runtime recovery is in progress."
+                if not architecture_gate_ready
                 else "Runtime posture is stable enough to move from the summary pack into runtime scorecard and audit evidence."
             ),
             "blocker": (
                 "Runtime posture is stable across startup and circuit checks."
-                if review_gate_ready
-                else ", ".join(review_gate_blockers)
+                if architecture_gate_ready
+                else ", ".join(architecture_gate_blockers)
             ),
             "next_step": (
                 "Open /ops/runtime/scorecard and /audit/summary to confirm live runtime evidence before rollout decisions."
-                if review_gate_ready
-                else "Open /ops/runtime/scorecard, confirm the degraded posture, then keep the executive walkthrough on /ops/review-summary until startup and circuit checks recover."
+                if architecture_gate_ready
+                else "Open /ops/runtime/scorecard, confirm the degraded posture, then keep the executive walkthrough on /ops/architecture-summary until startup and circuit checks recover."
             ),
         },
         "evidence_bundle": {
@@ -548,7 +548,7 @@ def build_service_summary_pack(
                 "/ops/rollout-board",
                 "/ops/rollout-drill",
                 "/ops/rollout-gates",
-                "/ops/review-summary",
+                "/ops/architecture-summary",
                 "/ops/summary-pack/schema",
                 "/ops/runtime/scorecard",
                 "/ops/runtime",
@@ -560,15 +560,15 @@ def build_service_summary_pack(
                 "/ops/resource-pack",
                 "/ops/summary-pack",
                 "/ops/rollout-gates",
-                "/ops/review-summary",
+                "/ops/architecture-summary",
                 "/ops/summary-pack/schema",
                 "/ops/runtime/scorecard",
                 "/audit/summary",
                 "/metrics",
             ],
         },
-        "review_actions": review_actions,
-        "two_minute_review": two_minute_review,
+        "architecture_actions": architecture_actions,
+        "two_minute_architecture": two_minute_architecture,
         "role_paths": role_paths,
         "rollout_tracks": [
             {
@@ -583,7 +583,7 @@ def build_service_summary_pack(
             },
             {
                 "track": "hybrid control tower",
-                "fit_for": ["platform governance", "evaluation gate", "quarterly business review"],
+                "fit_for": ["platform governance", "evaluation gate", "quarterly business readout"],
                 "evidence": "docs/architecture_assets/qbr_template.md",
             },
         ],
@@ -591,9 +591,9 @@ def build_service_summary_pack(
             f"{platform_name}: map discovery, governance, and deployment decisions into the customer's preferred platform language."
             for platform_name in platform_targets
         ],
-        "review_sequence": [
-            f"{index + 1}. {step.get('title', 'review step')} -> {step.get('endpoint', '-')}"
-            for index, step in enumerate(review_flow)
+        "architecture_sequence": [
+            f"{index + 1}. {step.get('title', 'architecture step')} -> {step.get('endpoint', '-')}"
+            for index, step in enumerate(architecture_flow)
             if isinstance(step, dict)
         ],
         "stage_map": stage_labels,
@@ -608,7 +608,7 @@ def build_service_summary_pack(
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
             "rollout_gates": "/ops/rollout-gates",
-            "review_summary": "/ops/review-summary",
+            "architecture_summary": "/ops/architecture-summary",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
             "summary_pack_schema": "/ops/summary-pack/schema",
             "metrics": "/metrics",
@@ -694,7 +694,7 @@ def build_service_rollout_board(
             "llm_provider": runtime.get("llm_provider", ""),
         },
         "items": classified_tracks,
-        "review_actions": [
+        "architecture_actions": [
             "Use the service brief to confirm runtime posture before choosing a rollout lane.",
             "Use the summary pack to connect test assets and stakeholder promises to the selected track.",
             "Escalate to the ops runtime scorecard when startup readiness or circuit state needs attention.",
@@ -702,7 +702,7 @@ def build_service_rollout_board(
         "links": {
             "service_brief": "/ops/service-brief",
             "summary_pack": "/ops/summary-pack",
-            "review_summary": "/ops/review-summary",
+            "architecture_summary": "/ops/architecture-summary",
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
             "rollout_gates": "/ops/rollout-gates",
@@ -721,7 +721,7 @@ def build_service_rollout_board_schema() -> Dict[str, object]:
             "contract_version",
             "summary",
             "items",
-            "review_actions",
+            "architecture_actions",
             "links",
         ],
         "summary_required_fields": [
@@ -798,9 +798,9 @@ def build_service_rollout_drill(
             "llm_provider": runtime.get("llm_provider", ""),
         },
         "items": items,
-        "review_actions": [
+        "architecture_actions": [
             "Use the rollout board to choose a lane, then prove rollback posture with this drill view.",
-            "Keep guardrail trip points visible in executive review instead of implying they exist off-screen.",
+            "Keep guardrail trip points visible in executive readout instead of implying they exist off-screen.",
             "Escalate to the ops runtime scorecard when startup readiness or circuit posture changes.",
         ],
         "links": {
@@ -823,7 +823,7 @@ def build_service_rollout_drill_schema() -> Dict[str, object]:
             "contract_version",
             "summary",
             "items",
-            "review_actions",
+            "architecture_actions",
             "links",
         ],
         "summary_required_fields": [
@@ -891,7 +891,7 @@ def build_service_rollout_gates(
     circuit_closed = str(runtime.get("llm_circuit_state", "closed")) == "closed"
     security_ready = str(stages.get("security", {}).get("readiness", "attention")) == "ready"
     eval_ready = int(evidence.get("eval_reports", 0)) >= 1
-    review_gate_status = str(summary_pack.get("review_gate", {}).get("status", "attention"))
+    architecture_gate_status = str(summary_pack.get("architecture_gate", {}).get("status", "attention"))
 
     gates: List[Dict[str, object]] = []
     for item in rollout_board.get("items", []):
@@ -922,13 +922,13 @@ def build_service_rollout_gates(
                     "track": track_name,
                     "gate": "governance-proof",
                     "gate_label": "Governance proof",
-                    "status": "ready" if security_ready and review_gate_status == "ready" else "attention",
-                    "owner": "security-review",
+                    "status": "ready" if security_ready and architecture_gate_status == "ready" else "attention",
+                    "owner": "security-gate",
                     "decision_rule": "security stage artifacts and executive architecture posture must both be ready",
                     "proof_surfaces": ["/ops/summary-pack", "/audit/summary", "/metrics"],
                     "next_action": (
                         "Use the summary pack and audit summary as the stakeholder-facing trust boundary."
-                        if security_ready and review_gate_status == "ready"
+                        if security_ready and architecture_gate_status == "ready"
                         else "Keep the rollout in architecture mode until governance evidence and architecture posture are both ready."
                     ),
                 },
@@ -939,9 +939,9 @@ def build_service_rollout_gates(
                     "status": "ready" if eval_ready and track_readiness == "ready" else "attention",
                     "owner": "evaluation-owner",
                     "decision_rule": "the selected track must be ready and at least one eval report must exist",
-                    "proof_surfaces": ["/ops/review-summary", "/ops/summary-pack", "evals/reports/latest_report.md"],
+                    "proof_surfaces": ["/ops/architecture-summary", "/ops/summary-pack", "evals/reports/latest_report.md"],
                     "next_action": (
-                        "Use the review summary to show the evaluation floor behind the selected rollout track."
+                        "Use the architecture summary to show the evaluation floor behind the selected rollout track."
                         if eval_ready and track_readiness == "ready"
                         else "Do not claim go-live readiness until the selected track and evaluation floor are both visible."
                     ),
@@ -955,7 +955,7 @@ def build_service_rollout_gates(
                     "decision_rule": "kill switch posture must be closed and rollback ETA must stay within 15 minutes",
                     "proof_surfaces": ["/ops/rollout-drill", "/ops/rollout-board", "/ops/runtime/scorecard"],
                     "next_action": (
-                        "Keep the rollback drill in the executive review so the kill-switch posture is explicit."
+                        "Keep the rollback drill in the executive readout so the kill-switch posture is explicit."
                         if circuit_closed and rollback_eta_minutes <= 15
                         else "Tune the rollback path before approving a customer-facing rollout."
                     ),
@@ -978,14 +978,14 @@ def build_service_rollout_gates(
             "ready_gates": len(ready_gates),
             "attention_gates": len(attention_gates),
             "release_recommendation": "proceed" if len(attention_gates) == 0 else "hold",
-            "review_gate_status": review_gate_status,
+            "architecture_gate_status": architecture_gate_status,
             "llm_provider": str(runtime.get("llm_provider", "")),
         },
         "tracks": rollout_board.get("items", []),
         "gates": gates,
-        "review_actions": [
+        "architecture_actions": [
             "Use the rollout board to choose the candidate lane before reading any gate status.",
-            "Keep runtime, governance, evaluation, and rollback gates visible in the same stakeholder review.",
+            "Keep runtime, governance, evaluation, and rollback gates visible in the same stakeholder readout.",
             "Treat a hold recommendation as the default until every required gate is explicit.",
         ],
         "links": {
@@ -994,7 +994,7 @@ def build_service_rollout_gates(
             "rollout_board": "/ops/rollout-board",
             "rollout_drill": "/ops/rollout-drill",
             "rollout_gates": "/ops/rollout-gates",
-            "review_summary": "/ops/review-summary",
+            "architecture_summary": "/ops/architecture-summary",
             "ops_runtime_scorecard": "/ops/runtime/scorecard",
         },
     }
@@ -1010,7 +1010,7 @@ def build_service_rollout_gates_schema() -> Dict[str, object]:
             "summary",
             "tracks",
             "gates",
-            "review_actions",
+            "architecture_actions",
             "links",
         ],
         "summary_required_fields": [
@@ -1019,7 +1019,7 @@ def build_service_rollout_gates_schema() -> Dict[str, object]:
             "ready_gates",
             "attention_gates",
             "release_recommendation",
-            "review_gate_status",
+            "architecture_gate_status",
             "llm_provider",
         ],
         "track_required_fields": [
@@ -1077,7 +1077,7 @@ def build_service_customer_architecture_pack(
     visible_platforms = [
         item for item in platform_targets if platform_filter is None or item == platform_filter
     ]
-    review_gate = summary_pack.get("review_gate", {}) if isinstance(summary_pack, dict) else {}
+    architecture_gate = summary_pack.get("architecture_gate", {}) if isinstance(summary_pack, dict) else {}
     architecture_notes = {
         "aws": {
             "fit": "Strong fit for secure reference-architecture and deployment-boundary conversations.",
@@ -1170,7 +1170,7 @@ def build_service_customer_architecture_pack(
         "summary": {
             "visible_platforms": len(platform_cards),
             "startup_ready": bool(brief.get("runtime", {}).get("startup_ready", False)),
-            "review_gate_status": str(review_gate.get("status", "attention")),
+            "architecture_gate_status": str(architecture_gate.get("status", "attention")),
             "release_recommendation": str(
                 rollout_gates.get("summary", {}).get("release_recommendation", "hold")
             ),
@@ -1178,7 +1178,7 @@ def build_service_customer_architecture_pack(
         },
         "architecture_stages": architecture_stages,
         "platform_cards": platform_cards,
-        "review_actions": [
+        "architecture_actions": [
             "Start here for customer-facing architecture before diving into runtime endpoints.",
             "Use the summary pack to keep stakeholder promises and test assets on the same path.",
             "Use rollout gates to block hand-wavy go-live claims until runtime and rollback posture are visible.",
@@ -1208,13 +1208,13 @@ def build_service_customer_architecture_pack_schema() -> Dict[str, object]:
             "summary",
             "architecture_stages",
             "platform_cards",
-            "review_actions",
+            "architecture_actions",
             "links",
         ],
         "summary_required_fields": [
             "visible_platforms",
             "startup_ready",
-            "review_gate_status",
+            "architecture_gate_status",
             "release_recommendation",
             "platform_targets",
         ],
@@ -1298,7 +1298,7 @@ def build_service_workshop_readout_pack(
             "evidence": "docs/blueprint/09_customer_journey.md",
         },
         {
-            "stage": "platform-fit-review",
+            "stage": "platform-fit-readout",
             "goal": "Choose the right stakeholder-facing platform story before implementation detail takes over.",
             "surface": "/ops/customer-architecture-pack",
             "evidence": "docs/architecture/reference_architectures.md",
@@ -1317,7 +1317,7 @@ def build_service_workshop_readout_pack(
         },
         {
             "stage": "handoff-assets",
-            "goal": "Leave the workshop with artifacts that support the next technical or executive review.",
+            "goal": "Leave the workshop with artifacts that support the next technical or executive readout.",
             "surface": "docs/architecture_assets/demo_screenshots/15_workshop_readout.svg",
             "evidence": "docs/architecture_assets/exec_value_dashboard/snapshot.svg",
         },
@@ -1345,7 +1345,7 @@ def build_service_workshop_readout_pack(
         "tracks": tracks,
         "workshop_artifacts": workshop_artifacts,
         "visual_evidence": visual_evidence,
-        "review_actions": [
+        "architecture_actions": [
             "Use this pack when the audience is a workshop or pilot closeout, not just a architecture walkthrough.",
             "Keep customer architecture and rollout gates on the same path so next steps stay concrete.",
             "Show the visual evidence boards before summarizing the recommendation out loud.",
@@ -1378,7 +1378,7 @@ def build_service_workshop_readout_pack_schema() -> Dict[str, object]:
             "tracks",
             "workshop_artifacts",
             "visual_evidence",
-            "review_actions",
+            "architecture_actions",
             "links",
         ],
         "summary_required_fields": [
@@ -1409,7 +1409,7 @@ def build_service_workshop_readout_pack_schema() -> Dict[str, object]:
     }
 
 
-def build_service_review_summary(
+def build_service_architecture_summary(
     *,
     stage: Optional[str] = None,
     startup_report: Optional[Dict[str, object]],
@@ -1451,17 +1451,17 @@ def build_service_review_summary(
         for item in evidence_bundle.get("architecture_assets", [])
         if isinstance(item, dict)
     ][:3]
-    two_minute_review = [
+    two_minute_architecture = [
         item
-        for item in summary_pack.get("two_minute_review", [])
+        for item in summary_pack.get("two_minute_architecture", [])
         if isinstance(item, dict)
     ][:3]
 
     return {
         "service": brief["service"],
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "contract_version": "enterprise-adoption-review-summary-v1",
-        "headline": "Compact review summary for stakeholder, operator, and governance checks before a deeper walkthrough.",
+        "contract_version": "enterprise-adoption-architecture-summary-v1",
+        "headline": "Compact architecture summary for stakeholder, operator, and governance checks before a deeper walkthrough.",
         "readiness": {
             "maturity_stage": brief.get("maturity_stage", ""),
             "focus_stage": stage_filter,
@@ -1490,23 +1490,23 @@ def build_service_review_summary(
             }
             for item in visible_stages[:3]
         ],
-        "fastest_review_path": two_minute_review,
+        "fastest_architecture_path": two_minute_architecture,
         "top_assets": top_assets,
         "links": {
             "service_brief": "/ops/service-brief",
             "summary_pack": "/ops/summary-pack",
             "rollout_board": "/ops/rollout-board",
             "rollout_gates": "/ops/rollout-gates",
-            "review_summary": "/ops/review-summary",
+            "architecture_summary": "/ops/architecture-summary",
             "audit_summary": "/audit/summary",
             "metrics": "/metrics",
         },
     }
 
 
-def build_service_review_summary_schema() -> Dict[str, object]:
+def build_service_architecture_summary_schema() -> Dict[str, object]:
     return {
-        "schema": "enterprise-adoption-review-summary-v1",
+        "schema": "enterprise-adoption-architecture-summary-v1",
         "required_fields": [
             "service",
             "generated_at",
@@ -1517,7 +1517,7 @@ def build_service_review_summary_schema() -> Dict[str, object]:
             "priority_watchouts",
             "top_platform_targets",
             "stage_highlights",
-            "fastest_review_path",
+            "fastest_architecture_path",
             "top_assets",
             "links",
         ],
@@ -1544,7 +1544,7 @@ def build_service_review_summary_schema() -> Dict[str, object]:
             "readiness",
             "artifact_count",
         ],
-        "fastest_review_path_required_fields": [
+        "fastest_architecture_path_required_fields": [
             "step",
             "surface",
             "proof",
@@ -1557,8 +1557,8 @@ def build_service_review_summary_schema() -> Dict[str, object]:
         "links": {
             "service_brief": "/ops/service-brief",
             "summary_pack": "/ops/summary-pack",
-            "review_summary": "/ops/review-summary",
-            "review_summary_schema": "/ops/review-summary/schema",
+            "architecture_summary": "/ops/architecture-summary",
+            "architecture_summary_schema": "/ops/architecture-summary/schema",
             "rollout_gates": "/ops/rollout-gates",
         },
     }
@@ -1575,12 +1575,12 @@ def build_service_summary_pack_schema() -> Dict[str, object]:
             "stakeholder_promises",
             "runtime_summary",
             "evidence_bundle",
-            "review_actions",
-            "two_minute_review",
+            "architecture_actions",
+            "two_minute_architecture",
             "role_paths",
             "rollout_tracks",
             "platform_dialogues",
-            "review_sequence",
+            "architecture_sequence",
             "stage_map",
             "watchouts",
             "links",
@@ -1605,17 +1605,17 @@ def build_service_summary_pack_schema() -> Dict[str, object]:
             "runtime_surfaces",
             "architecture_endpoints",
         ],
-        "review_asset_required_fields": [
+        "architecture_asset_required_fields": [
             "label",
             "path",
             "kind",
         ],
-        "review_action_required_fields": [
+        "architecture_action_required_fields": [
             "label",
             "surface",
             "proof",
         ],
-        "two_minute_review_required_fields": [
+        "two_minute_architecture_required_fields": [
             "step",
             "surface",
             "proof",
@@ -1651,7 +1651,7 @@ def build_service_brief_schema() -> Dict[str, object]:
             "platform_targets",
             "role_paths",
             "stages",
-            "review_flow",
+            "architecture_flow",
             "links",
         ],
         "runtime_required_fields": [
@@ -1687,7 +1687,7 @@ def build_service_brief_schema() -> Dict[str, object]:
             "path",
             "kind",
         ],
-        "review_step_required_fields": [
+        "architecture_step_required_fields": [
             "order",
             "title",
             "endpoint",

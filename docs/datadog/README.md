@@ -22,7 +22,7 @@ That means the observability story is already architecturally expected, even tho
 ## Service map
 
 - `enterprise-llm-frontend`
-  - technical reader and operator UI
+  - technical inspection and operator UI
 - `enterprise-llm-api`
   - FastAPI governance and runtime endpoints
 - `enterprise-llm-evals`

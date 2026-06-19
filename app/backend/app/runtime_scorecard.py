@@ -31,10 +31,10 @@ def build_ops_runtime_scorecard(
     startup_status = str(startup_state.get("overall_status", "unknown"))
     startup_ready = bool(startup_state.get("startup_ready", False))
     top_alert = alerts[0] if alerts else None
-    review_gate = {
+    architecture_gate = {
         "status": "ready" if startup_ready and startup_status == "healthy" else "attention",
         "blocker": (
-            f"Startup diagnostics need review: {failed_checks[0]}"
+            f"Startup diagnostics need attention: {failed_checks[0]}"
             if failed_checks
             else (
                 f"Startup status is {startup_status}."
@@ -45,7 +45,7 @@ def build_ops_runtime_scorecard(
         "next_step": (
             "Open /health, confirm the degraded startup checks, then refresh /ops/runtime before sharing validation data."
             if failed_checks or startup_status in {"degraded", "critical"}
-            else "Use /ops/runtime/scorecard and /ops/summary-pack together before executive review."
+            else "Use /ops/runtime/scorecard and /ops/summary-pack together before executive readout."
         ),
     }
     return {
@@ -71,10 +71,10 @@ def build_ops_runtime_scorecard(
             "daily_cost_usd": round(float(daily_cost_usd), 6),
         },
         "top_alert": top_alert,
-        "review_gate": review_gate,
+        "architecture_gate": architecture_gate,
         "top_service_event": service_events[0] if service_events else None,
         "top_decision": recent_decisions[0] if recent_decisions else None,
-        "fastest_review_path": [
+        "fastest_architecture_path": [
             "/health",
             "/ops/runtime/scorecard",
             "/ops/runtime",
@@ -92,7 +92,7 @@ def build_ops_runtime_scorecard(
             "ops_runtime_scorecard_schema": "/ops/runtime/scorecard/schema",
             "ops_runtime": "/ops/runtime",
             "summary_pack": "/ops/summary-pack",
-            "review_summary": "/ops/review-summary",
+            "architecture_summary": "/ops/architecture-summary",
             "metrics": "/metrics",
             "audit_summary": "/audit/summary",
         },
@@ -107,8 +107,8 @@ def build_ops_runtime_scorecard_schema() -> Dict[str, object]:
             "contract_version",
             "runtime",
             "summary",
-            "review_gate",
-            "fastest_review_path",
+            "architecture_gate",
+            "fastest_architecture_path",
             "links.ops_runtime_scorecard",
         ],
         "runtime_required_fields": [

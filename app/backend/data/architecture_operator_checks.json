@@ -7,7 +7,7 @@
   {
     "check_id": "open-resource-pack",
     "surface": "/ops/resource-pack",
-    "why_it_matters": "Built-in synthetic workshop scenarios keep the repo reviewable without private customer material."
+    "why_it_matters": "Built-in synthetic workshop scenarios keep the repo inspectable without private customer material."
   },
   {
     "check_id": "verify-gates",

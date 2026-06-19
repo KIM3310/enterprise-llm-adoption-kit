@@ -40,18 +40,18 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
   const stakeholderPromises = Array.isArray(summaryPack.stakeholder_promises) ? summaryPack.stakeholder_promises : [];
   const rolloutTracks = Array.isArray(summaryPack.rollout_tracks) ? summaryPack.rollout_tracks : [];
   const platformDialogues = Array.isArray(summaryPack.platform_dialogues) ? summaryPack.platform_dialogues : [];
-  const reviewSequence = Array.isArray(summaryPack.review_sequence) ? summaryPack.review_sequence : [];
+  const architectureSequence = Array.isArray(summaryPack.architecture_sequence) ? summaryPack.architecture_sequence : [];
   const stageMap = Array.isArray(summaryPack.stage_map) ? summaryPack.stage_map : [];
   const watchouts = Array.isArray(summaryPack.watchouts) ? summaryPack.watchouts : [];
-  const reviewActions = Array.isArray(summaryPack.review_actions) ? summaryPack.review_actions : [];
-  const twoMinuteReview = Array.isArray(summaryPack.two_minute_review) ? summaryPack.two_minute_review : [];
+  const architectureActions = Array.isArray(summaryPack.architecture_actions) ? summaryPack.architecture_actions : [];
+  const twoMinuteArchitecture = Array.isArray(summaryPack.two_minute_architecture) ? summaryPack.two_minute_architecture : [];
   const rolePaths = Array.isArray(summaryPack.role_paths) ? summaryPack.role_paths : [];
-  const reviewGate = summaryPack.review_gate || {};
+  const architectureGate = summaryPack.architecture_gate || {};
   const evidenceBundle = summaryPack.evidence_bundle || {};
   const architectureAssets = Array.isArray(evidenceBundle.architecture_assets) ? evidenceBundle.architecture_assets : [];
   const runtimeSurfaces = Array.isArray(evidenceBundle.runtime_surfaces) ? evidenceBundle.runtime_surfaces : [];
   const runtimeSummary = summaryPack.runtime_summary || {};
-  const fastReviewSurfaces = Object.entries(summaryPack.links || {}).filter(([, surface]) => typeof surface === "string" && surface).slice(0, compact ? 4 : 6);
+  const fastArchitectureSurfaces = Object.entries(summaryPack.links || {}).filter(([, surface]) => typeof surface === "string" && surface).slice(0, compact ? 4 : 6);
   const describePlatformDialogue = (item) => {
     if (typeof item === "string") {
       return item;
@@ -70,7 +70,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     health: "Confirm startup posture and runtime state before discussing rollout.",
     service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
     summary_pack: "Open the executive overview for stakeholder promises and rollout tracks.",
-    summary_pack_schema: "Lock the explicit contract for review actions and test assets.",
+    summary_pack_schema: "Lock the explicit contract for architecture actions and test assets.",
     metrics: "Show runtime cost and latency visibility without leaving the evaluation path.",
     audit_summary: "Surface audit and governance signals before making enterprise-readiness claims.",
     customer_journey: "Tie the technical proof back to adoption sequence.",
@@ -79,13 +79,13 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     qbr_template: "Show how proof rolls forward into executive cadence.",
     proof_map: "Open the role-based evidence map when the user needs the shortest evidence path.",
   };
-  const fastReviewRouteText = [
+  const fastArchitectureRouteText = [
     "Enterprise architecture routes",
-    ...fastReviewSurfaces.map(([label, surface]) => `- ${label}: ${surface}`),
+    ...fastArchitectureSurfaces.map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
-  const twoMinuteReviewText = [
-    "Enterprise review flow",
-    ...twoMinuteReview.map((item) => `- ${item.step}: ${item.surface} (${item.proof})`),
+  const twoMinuteArchitectureText = [
+    "Enterprise architecture flow",
+    ...twoMinuteArchitecture.map((item) => `- ${item.step}: ${item.surface} (${item.proof})`),
   ].join("\n");
   const supportingEvidenceText = [
     "Enterprise executive overview",
@@ -125,7 +125,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     ...stakeholderPromises.slice(0, 3).map((item) => `- ${item}`),
     "",
     "Fast architecture surfaces",
-    ...fastReviewSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
+    ...fastArchitectureSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
   const rolloutDecisionBriefText = [
     "Enterprise rollout decision brief",
@@ -139,7 +139,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     ...(rolloutTracks.length > 0
       ? rolloutTracks.slice(0, 2).map(
           (track, index) =>
-            `${index + 1}. ${track.track}: ${track.milestone} (${Array.isArray(track.fit_for) ? track.fit_for.join(", ") : "fit review"})`
+            `${index + 1}. ${track.track}: ${track.milestone} (${Array.isArray(track.fit_for) ? track.fit_for.join(", ") : "fit readout"})`
         )
       : ["1. Summary pack unavailable. Start with /ops/service-brief and /ops/rollout-board."]),
     "",
@@ -155,17 +155,17 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     ...(watchouts.length > 0 ? watchouts.slice(0, 3).map((item) => `- ${item}`) : ["- No active watchouts."]),
     "",
     "Fast architecture surfaces",
-    ...fastReviewSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
+    ...fastArchitectureSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
 
   const handleCopyRoutes = async () => {
-    const ok = await copyTextToClipboard(fastReviewRouteText);
+    const ok = await copyTextToClipboard(fastArchitectureRouteText);
     setCopyStatus(ok ? "Copied executive architecture routes." : "Failed to copy executive architecture routes.");
   };
 
-  const handleCopyTwoMinuteReview = async () => {
-    const ok = await copyTextToClipboard(twoMinuteReviewText);
-    setCopyStatus(ok ? "Copied executive review flow." : "Failed to copy executive review flow.");
+  const handleCopyTwoMinuteArchitecture = async () => {
+    const ok = await copyTextToClipboard(twoMinuteArchitectureText);
+    setCopyStatus(ok ? "Copied executive architecture flow." : "Failed to copy executive architecture flow.");
   };
 
   const handleCopySupportingEvidence = async () => {
@@ -230,23 +230,23 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
       <div className="summary-pack-grid">
         <article className="service-brief-card">
           <p className="service-card-label">Quality gate</p>
-          <strong>{reviewGate.status || "unknown"}</strong>
-          <p>{reviewGate.blocker || "No explicit blocker recorded."}</p>
-          <p className="meta-text">{reviewGate.next_step || "Open the summary pack before moving into runtime-specific claims."}</p>
+          <strong>{architectureGate.status || "unknown"}</strong>
+          <p>{architectureGate.blocker || "No explicit blocker recorded."}</p>
+          <p className="meta-text">{architectureGate.next_step || "Open the summary pack before moving into runtime-specific claims."}</p>
         </article>
         <article className="service-brief-card">
           <p className="service-card-label">Fallback posture</p>
           <strong>{runtimeSummary.startup_status || "-"}</strong>
-          <p>{reviewGate.fallback_posture || "Keep the walkthrough grounded in checked-in test assets if runtime evidence is degraded."}</p>
+          <p>{architectureGate.fallback_posture || "Keep the walkthrough grounded in checked-in test assets if runtime evidence is degraded."}</p>
         </article>
       </div>
 
       <div className="summary-pack-toolbar">
         <button type="button" onClick={() => void handleCopyRoutes()}>
-          Copy Review Routes
+          Copy Architecture Routes
         </button>
-        <button type="button" onClick={() => void handleCopyTwoMinuteReview()}>
-          Copy Review Flow
+        <button type="button" onClick={() => void handleCopyTwoMinuteArchitecture()}>
+          Copy Architecture Flow
         </button>
         <button type="button" onClick={() => void handleCopySupportingEvidence()}>
           Copy Supporting Evidence
@@ -267,7 +267,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
         <p className="service-card-label">Fast architecture surfaces</p>
         <p className="service-support-note">Keep governance and deployment evidence visible in the same evaluation path.</p>
         <div className="summary-pack-action-list">
-          {fastReviewSurfaces.map(([label, surface]) => (
+          {fastArchitectureSurfaces.map(([label, surface]) => (
             <div key={`${label}-${surface}`} className="summary-pack-action-card">
               <strong>{label.replaceAll("_", " ")}</strong>
               <code className="service-path">{surface}</code>
@@ -288,9 +288,9 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
         </article>
 
         <article className="service-brief-card">
-          <p className="service-card-label">Review sequence</p>
+          <p className="service-card-label">Architecture sequence</p>
           <ul className="service-brief-list">
-            {reviewSequence.slice(0, compact ? 3 : 4).map((item) => (
+            {architectureSequence.slice(0, compact ? 3 : 4).map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
@@ -300,7 +300,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
       <article className="service-brief-card">
         <p className="service-card-label">2-minute evidence path</p>
         <div className="summary-pack-action-list">
-          {twoMinuteReview.slice(0, compact ? 2 : 4).map((item) => (
+          {twoMinuteArchitecture.slice(0, compact ? 2 : 4).map((item) => (
             <div key={`${item.step}-${item.surface}`} className="summary-pack-action-card">
               <strong>{item.step}</strong>
               <code className="service-path">{item.surface}</code>
@@ -364,9 +364,9 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
 
       <div className="summary-pack-columns">
         <article className="service-brief-card">
-          <p className="service-card-label">Review actions</p>
+          <p className="service-card-label">Architecture actions</p>
           <div className="summary-pack-action-list">
-            {reviewActions.slice(0, compact ? 2 : 4).map((item) => (
+            {architectureActions.slice(0, compact ? 2 : 4).map((item) => (
               <div key={`${item.label}-${item.surface}`} className="summary-pack-action-card">
                 <strong>{item.label}</strong>
                 <code className="service-path">{item.surface}</code>

@@ -17,14 +17,14 @@
     "scenario_id": "hybrid-governance-board",
     "stakeholder_team": "platform-governance",
     "platform": "databricks",
-    "goal": "Review rollout ownership, risk posture, and evaluation evidence before a hybrid deployment.",
+    "goal": "Check rollout ownership, risk posture, and evaluation evidence before a hybrid deployment.",
     "next_surface": "/ops/rollout-gates"
   },
   {
-    "scenario_id": "workspace-adoption-review",
+    "scenario_id": "workspace-adoption-readout",
     "stakeholder_team": "business-transformation",
     "platform": "mariadb",
     "goal": "Keep a workspace-first adoption path grounded in audit, metrics, and runtime proof.",
-    "next_surface": "/ops/review-summary"
+    "next_surface": "/ops/architecture-summary"
   }
 ]

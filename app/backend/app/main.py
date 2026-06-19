@@ -118,8 +118,8 @@ from .service_brief import (
     build_service_rollout_board_schema,
     build_service_summary_pack,
     build_service_summary_pack_schema,
-    build_service_review_summary,
-    build_service_review_summary_schema,
+    build_service_architecture_summary,
+    build_service_architecture_summary_schema,
     build_service_workshop_readout_pack,
     build_service_workshop_readout_pack_schema,
 )
@@ -150,7 +150,7 @@ LIVE_WORKSHOP_SCENARIOS = {
         "platform": "snowflake",
         "scenario_id": "snowflake-discovery",
         "title": "Snowflake governed analytics workshop",
-        "next_review_path": "/ops/customer-architecture-pack?platform=snowflake",
+        "next_architecture_path": "/ops/customer-architecture-pack?platform=snowflake",
         "estimated_cost_usd": 0.012,
         "prompt": (
             "A Snowflake-oriented stakeholder workshop needs a crisp rollout stance, architecture path, "
@@ -161,10 +161,10 @@ LIVE_WORKSHOP_SCENARIOS = {
         "platform": "databricks",
         "scenario_id": "databricks-control-tower",
         "title": "Databricks hybrid control-tower workshop",
-        "next_review_path": "/ops/workshop-readout-pack?platform=databricks",
+        "next_architecture_path": "/ops/workshop-readout-pack?platform=databricks",
         "estimated_cost_usd": 0.013,
         "prompt": (
-            "A Databricks-oriented field review wants to know if the pilot should proceed, what rollout gates matter, "
+            "A Databricks-oriented field readout wants to know if the pilot should proceed, what rollout gates matter, "
             "and how the customer architecture should be framed."
         ),
     },
@@ -974,7 +974,7 @@ def health(request: Request) -> Dict[str, object]:
             "next_action": (
                 f"investigate critical check: {failed_critical[0]}"
                 if failed_critical
-                else f"review warning check: {failed_warning[0]}"
+                else f"warning check: {failed_warning[0]}"
                 if failed_warning
                 else "system ready"
             ),
@@ -1016,11 +1016,11 @@ def health(request: Request) -> Dict[str, object]:
             "/ops/resource-pack",
             "/ops/summary-pack",
             "/ops/rollout-gates",
-            "/ops/review-summary",
+            "/ops/architecture-summary",
             "/ops/runtime/scorecard",
         ],
         "capabilities": [
-            "rbac-gated-review-console",
+            "rbac-gated-architecture-console",
             "ops-runtime-observability",
             "control-tower-decisioning",
             "audit-and-cost-tracking",
@@ -1052,8 +1052,8 @@ def health(request: Request) -> Dict[str, object]:
             "rollout_board_schema": "/ops/rollout-board/schema",
             "rollout_gates": "/ops/rollout-gates",
             "rollout_gates_schema": "/ops/rollout-gates/schema",
-            "review_summary": "/ops/review-summary",
-            "review_summary_schema": "/ops/review-summary/schema",
+            "architecture_summary": "/ops/architecture-summary",
+            "architecture_summary_schema": "/ops/architecture-summary/schema",
         },
     }
 
@@ -1200,10 +1200,10 @@ def ops_workshop_readout_pack_schema() -> Dict[str, object]:
     return build_service_workshop_readout_pack_schema()
 
 
-@app.get("/ops/review-summary", tags=["ops"], summary="Review summary")
-def ops_review_summary(stage: Optional[str] = None) -> Dict[str, object]:
+@app.get("/ops/architecture-summary", tags=["ops"], summary="Architecture summary")
+def ops_architecture_summary(stage: Optional[str] = None) -> Dict[str, object]:
     try:
-        return build_service_review_summary(
+        return build_service_architecture_summary(
             stage=stage,
             startup_report=getattr(app.state, "startup_report", None),
             circuit_snapshot=_llm_circuit_snapshot(),
@@ -1212,9 +1212,9 @@ def ops_review_summary(stage: Optional[str] = None) -> Dict[str, object]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@app.get("/ops/review-summary/schema", tags=["ops"], summary="Review summary schema")
-def ops_review_summary_schema() -> Dict[str, object]:
-    return build_service_review_summary_schema()
+@app.get("/ops/architecture-summary/schema", tags=["ops"], summary="Architecture summary schema")
+def ops_architecture_summary_schema() -> Dict[str, object]:
+    return build_service_architecture_summary_schema()
 
 
 @app.post("/ops/live-workshop-preview", tags=["ops"], summary="Live workshop preview")
@@ -1278,7 +1278,7 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
         "capped": True,
         "traceId": request_id,
         "estimatedCostUsd": scenario["estimated_cost_usd"],
-        "nextReviewPath": scenario["next_review_path"],
+        "nextArchitecturePath": scenario["next_architecture_path"],
         "result": {
             "title": scenario["title"],
             "platform": scenario["platform"],
