@@ -1,0 +1,73 @@
+{
+  "name": "Enterprise LLM Adoption Kit",
+  "slug": "enterprise-llm-adoption-kit",
+  "canonical_url": "https://enterprise-llm-kit.pages.dev/",
+  "repository_url": "https://github.com/KIM3310/enterprise-llm-adoption-kit",
+  "architecture_url": "https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/system-architecture.md",
+  "revenue_architecture_url": "https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/revenue-architecture.md",
+  "lead_capture_url": "mailto:ehdjs1351@gmail.com?subject=Enterprise%20LLM%20Adoption%20Kit%20private%20workspace&body=I%20am%20interested%20in%20paid%20workshop%20pack%2C%20private%20control%20tower%20deployment%2C%20and%20governance%20evidence%20bundle%20for%20Enterprise%20LLM%20Adoption%20Kit.",
+  "productized_offer": "adoption kit with governance controls, workshop assets, service briefs, evals, and control tower surfaces",
+  "first_paid_sku": "paid workshop pack, private control tower deployment, and governance evidence bundle",
+  "free_lead_magnet": "public templates, service brief samples, and architecture docs",
+  "search_positioning": {
+    "primary_query": "Enterprise LLM Adoption Kit governance controls workshop",
+    "secondary_queries": [
+      "Enterprise LLM Adoption Kit demo",
+      "Enterprise LLM Adoption Kit system architecture",
+      "Enterprise LLM Adoption Kit business tool",
+      "adoption kit with governance controls, workshop assets, service briefs, evals, and control tower surfaces service"
+    ],
+    "audience_intent": "Find a runnable demo, inspect the system architecture, and decide whether a private workspace or implementation package is useful."
+  },
+  "monetization_boundary": {
+    "free": "public templates, service brief samples, and architecture docs",
+    "paid": "paid workshop pack, private control tower deployment, and governance evidence bundle",
+    "metering_hooks": [
+      "workspace_id",
+      "plan",
+      "quota_day",
+      "export_count",
+      "lead_source"
+    ],
+    "cost_guardrails": [
+      "static first",
+      "edge functions",
+      "customer API keys",
+      "cached AI outputs",
+      "synthetic public data"
+    ]
+  },
+  "structured_data": {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Enterprise LLM Adoption Kit",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web, serverless, and local development environments",
+    "url": "https://enterprise-llm-kit.pages.dev/",
+    "codeRepository": "https://github.com/KIM3310/enterprise-llm-adoption-kit",
+    "description": "Enterprise LLM Adoption Kit: adoption kit with governance controls, workshop assets, service briefs, evals, and control tower surfaces. Free entry point: public templates, service brief samples, and architecture docs..",
+    "creator": {
+      "@type": "Person",
+      "name": "KIM3310",
+      "url": "https://github.com/KIM3310"
+    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "public templates, service brief samples, and architecture docs",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": "https://enterprise-llm-kit.pages.dev/"
+      },
+      {
+        "@type": "Offer",
+        "name": "paid workshop pack, private control tower deployment, and governance evidence bundle",
+        "availability": "https://schema.org/LimitedAvailability",
+        "url": "https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/revenue-architecture.md"
+      }
+    ],
+    "isAccessibleForFree": true,
+    "keywords": "enterprise-llm-adoption-kit, Enterprise, LLM, Adoption, Kit, adoption, kit, governance, controls, workshop, assets, briefs, evals, control, tower, surfaces, pack, deployment, evidence, bundle"
+  }
+}

@@ -318,3 +318,17 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 ## Service Architecture
 
 - [Service architecture](docs/service-architecture.md) defines the cloud resources, account information, usage controls, and production guardrails needed to turn this repo into a scoped service without publishing public financial assumptions.
+
+<!-- search-growth-readme:start -->
+
+## Search And Service Surface
+
+- Public entry: public templates, service brief samples, and architecture docs
+- Paid boundary: paid workshop pack, private control tower deployment, and governance evidence bundle
+- Canonical URL: https://enterprise-llm-kit.pages.dev/
+- Lead capture: mailto:ehdjs1351@gmail.com?subject=Enterprise%20LLM%20Adoption%20Kit%20private%20workspace&body=I%20am%20interested%20in%20paid%20workshop%20pack%2C%20private%20control%20tower%20deployment%2C%20and%20governance%20evidence%20bundle%20for%20Enterprise%20LLM%20Adoption%20Kit.
+- Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
+- Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
+- Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)
+
+<!-- search-growth-readme:end -->
