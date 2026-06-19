@@ -326,7 +326,7 @@ This repository includes a neutral cloud and AI engineering blueprint that maps 
 - Public entry: public templates, service brief samples, and architecture docs
 - Paid boundary: paid workshop pack, private control tower deployment, and governance evidence bundle
 - Canonical URL: https://enterprise-llm-kit.pages.dev/
-- Lead capture: mailto:ehdjs1351@gmail.com?subject=Enterprise%20LLM%20Adoption%20Kit%20private%20workspace&body=I%20am%20interested%20in%20paid%20workshop%20pack%2C%20private%20control%20tower%20deployment%2C%20and%20governance%20evidence%20bundle%20for%20Enterprise%20LLM%20Adoption%20Kit.
+- Lead capture: https://github.com/KIM3310/enterprise-llm-adoption-kit/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Enterprise+LLM+Adoption+Kit
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
 - Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)

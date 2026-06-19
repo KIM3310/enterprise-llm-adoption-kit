@@ -10,7 +10,7 @@ This repository now exposes a search-readable service surface in addition to the
 | Revenue architecture | [docs/revenue-architecture.md](./revenue-architecture.md) |
 | System architecture | [docs/system-architecture.md](./system-architecture.md) |
 | Public canonical URL | https://enterprise-llm-kit.pages.dev/ |
-| Lead capture URL | mailto:ehdjs1351@gmail.com?subject=Enterprise%20LLM%20Adoption%20Kit%20private%20workspace&body=I%20am%20interested%20in%20paid%20workshop%20pack%2C%20private%20control%20tower%20deployment%2C%20and%20governance%20evidence%20bundle%20for%20Enterprise%20LLM%20Adoption%20Kit. |
+| Lead capture URL | https://github.com/KIM3310/enterprise-llm-adoption-kit/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Enterprise+LLM+Adoption+Kit |
 
 ## Search Positioning
 
@@ -27,5 +27,5 @@ The public surface stays crawlable and free. Paid value starts when a visitor wa
 
 - Keep the sitemap and robots file aligned with the final production domain.
 - Submit the canonical URL and sitemap in Google Search Console after the domain is connected.
-- Use a real checkout or lead-capture endpoint only after the free demo shows repeated intent.
+- The lead-capture path is a GitHub Issue Form so private workspace and paid-package requests create a trackable queue before payment infrastructure is added.
 - Keep exact free-tier quotas out of public promises because provider limits change.
