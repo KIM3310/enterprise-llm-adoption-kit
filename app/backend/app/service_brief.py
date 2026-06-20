@@ -1346,7 +1346,7 @@ def build_service_workshop_readout_pack(
         "workshop_artifacts": workshop_artifacts,
         "visual_evidence": visual_evidence,
         "architecture_actions": [
-            "Use this pack when the audience is a workshop or pilot closeout, not just a architecture walkthrough.",
+            "Use this pack when the audience is a workshop or pilot closeout, not just an architecture walkthrough.",
             "Keep customer architecture and rollout gates on the same path so next steps stay concrete.",
             "Show the visual evidence boards before summarizing the recommendation out loud.",
         ],

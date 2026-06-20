@@ -47,4 +47,4 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 
 ## Service Next Step
 
-Turn the repo into a architecture-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.
+Turn the repo into an architecture-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.
