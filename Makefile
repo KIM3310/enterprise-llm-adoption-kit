@@ -10,7 +10,9 @@ BACKEND_VENV := $(BACKEND_DIR)/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_UVICORN := $(BACKEND_VENV)/bin/uvicorn
 BACKEND_STAMP := $(BACKEND_VENV)/.installed-dev
-FRONTEND_STAMP := $(FRONTEND_DIR)/node_modules/.package-lock.json
+NPM ?= npm
+NPM_INSTALL_FLAGS ?= --no-audit
+FRONTEND_STAMP := $(FRONTEND_DIR)/node_modules/.frontend-installed
 
 eval-gate:
 	python3 evals/runner/eval_gate.py
@@ -33,7 +35,8 @@ $(BACKEND_STAMP): $(BACKEND_DIR)/pyproject.toml $(BACKEND_DIR)/requirements.txt
 frontend-install: $(FRONTEND_STAMP)
 
 $(FRONTEND_STAMP): $(FRONTEND_DIR)/package.json $(FRONTEND_DIR)/package-lock.json
-	@cd $(FRONTEND_DIR) && npm install --no-audit
+	@cd $(FRONTEND_DIR) && $(NPM) install $(NPM_INSTALL_FLAGS)
+	@touch $(FRONTEND_STAMP)
 
 demo:
 	@echo "[1/6] starting services..."
@@ -80,7 +83,7 @@ scenario-demo-ollama-local:
 	@bash scripts/run_scenario_ollama_local.sh
 
 frontend-build: frontend-install
-	@cd $(FRONTEND_DIR) && npm run build
+	@cd $(FRONTEND_DIR) && $(NPM) run build
 
 quality-check: backend-install
 	@cd app/backend && ./scripts/quality_gate.sh
