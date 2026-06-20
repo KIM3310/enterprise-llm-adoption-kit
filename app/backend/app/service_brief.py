@@ -53,7 +53,9 @@ def _read_usd_env(name: str, fallback: float) -> float:
 
 
 def build_openai_live_contract() -> Dict[str, object]:
-    api_key = str(os.getenv("OPENAI_API_KEY", "")).strip()
+    openrouter_api_key = str(os.getenv("OPENROUTER_API_KEY", "")).strip()
+    api_key = openrouter_api_key or str(os.getenv("OPENAI_API_KEY", "")).strip()
+    uses_openrouter = bool(openrouter_api_key)
     kill_switch = _read_bool_env("OPENAI_KILL_SWITCH", False)
     daily_budget = _read_usd_env("OPENAI_PUBLIC_DAILY_BUDGET_USD", 4.0)
     monthly_budget = _read_usd_env("OPENAI_PUBLIC_MONTHLY_BUDGET_USD", 120.0)
@@ -61,12 +63,33 @@ def build_openai_live_contract() -> Dict[str, object]:
     return {
         "deploymentMode": "public-capped-live" if public_live else "read-only-live",
         "publicLiveApi": public_live,
-        "liveModel": str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip() or "gpt-4o-mini",
-        "refreshModel": str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip() or "gpt-4o",
+        "gateway": "openrouter" if uses_openrouter else "openai",
+        "baseUrl": (
+            str(os.getenv("OPENROUTER_BASE_URL", "")).strip() or "https://openrouter.ai/api/v1"
+            if uses_openrouter
+            else "https://api.openai.com/v1"
+        ),
+        "httpReferer": str(os.getenv("OPENROUTER_HTTP_REFERER", "")).strip()
+        or "https://enterprise-llm-kit.pages.dev",
+        "appTitle": str(os.getenv("OPENROUTER_APP_TITLE", "")).strip() or "Enterprise LLM Adoption Kit",
+        "liveModel": (
+            str(os.getenv("OPENROUTER_MODEL", "")).strip()
+            or str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip()
+            or "openai/gpt-5.4-mini"
+            if uses_openrouter
+            else str(os.getenv("OPENAI_MODEL_PUBLIC", "")).strip() or "gpt-4o-mini"
+        ),
+        "refreshModel": (
+            str(os.getenv("OPENROUTER_MODEL", "")).strip()
+            or str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip()
+            or "openai/gpt-5.4-mini"
+            if uses_openrouter
+            else str(os.getenv("OPENAI_MODEL_REFRESH", "")).strip() or "gpt-4o"
+        ),
         "dailyBudgetUsd": daily_budget,
         "monthlyBudgetUsd": monthly_budget,
         "killSwitch": kill_switch,
-        "moderationEnabled": _read_bool_env("OPENAI_MODERATION_ENABLED", True),
+        "moderationEnabled": (not uses_openrouter) and _read_bool_env("OPENAI_MODERATION_ENABLED", True),
     }
 
 

@@ -1208,7 +1208,7 @@ export default function App() {
     temperature: "0.2",
     max_tokens: "512",
     timeout_sec: "30",
-    openai_base_url: "https://api.openai.com/v1",
+    openai_base_url: "https://openrouter.ai/api/v1",
     ollama_base_url: "http://127.0.0.1:11434",
     openai_org: "",
     openai_api_key: ""
@@ -2031,7 +2031,7 @@ export default function App() {
       temperature: String(data.temperature ?? "0.2"),
       max_tokens: String(data.max_tokens ?? "512"),
       timeout_sec: String(data.timeout_sec ?? "30"),
-      openai_base_url: String(data.openai_base_url || "https://api.openai.com/v1"),
+      openai_base_url: String(data.openai_base_url || "https://openrouter.ai/api/v1"),
       ollama_base_url: String(data.ollama_base_url || "http://127.0.0.1:11434"),
       openai_org: String(data.openai_org || ""),
       openai_api_key: ""

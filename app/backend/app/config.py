@@ -192,10 +192,21 @@ class Settings:
     llm_temperature: float = _parse_float_env("LLM_TEMPERATURE", 0.2, min_value=0.0, max_value=2.0)
     llm_max_tokens: int = _parse_int_env("LLM_MAX_TOKENS", 512, min_value=1, max_value=32768)
     llm_timeout_sec: float = _parse_float_env("LLM_TIMEOUT_SEC", 30.0, min_value=1.0, max_value=600.0)
-    llm_openai_base_url: str = os.getenv("LLM_OPENAI_BASE_URL", "https://api.openai.com/v1").strip()
+    llm_openai_base_url: str = os.getenv(
+        "LLM_OPENAI_BASE_URL",
+        "https://openrouter.ai/api/v1" if os.getenv("OPENROUTER_API_KEY", "").strip() else "https://api.openai.com/v1",
+    ).strip()
     llm_ollama_base_url: str = os.getenv("LLM_OLLAMA_BASE_URL", "http://127.0.0.1:11434").strip()
     llm_openai_org: str = os.getenv("LLM_OPENAI_ORG", "").strip()
-    llm_openai_api_key: str = _load_env_or_file("LLM_OPENAI_API_KEY", "LLM_OPENAI_API_KEY_FILE")
+    llm_openai_api_key: str = _load_env_or_file("LLM_OPENAI_API_KEY", "LLM_OPENAI_API_KEY_FILE") or os.getenv("OPENROUTER_API_KEY", "").strip()
+    llm_openrouter_http_referer: str = os.getenv(
+        "OPENROUTER_HTTP_REFERER",
+        "https://enterprise-llm-kit.pages.dev",
+    ).strip()
+    llm_openrouter_app_title: str = os.getenv(
+        "OPENROUTER_APP_TITLE",
+        "Enterprise LLM Adoption Kit",
+    ).strip()
     llm_fallback_to_stub_on_error: bool = _parse_bool_env("LLM_FALLBACK_TO_STUB_ON_ERROR", True)
     llm_circuit_breaker_threshold: int = _parse_int_env(
         "LLM_CIRCUIT_BREAKER_THRESHOLD",

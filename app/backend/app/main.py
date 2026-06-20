@@ -144,6 +144,7 @@ control_tower_service = ControlTowerService()
 LLM_MAX_RETRIES = 3
 APP_STARTED_AT = int(time.time())
 ROLE_PRIORITY = {"Employee": 1, "Ops": 2, "Admin": 3}
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 LIVE_WORKSHOP_PREVIEW_SCHEMA = "enterprise-adoption-live-workshop-preview-v1"
 LIVE_WORKSHOP_SCENARIOS = {
     "snowflake-discovery": {
@@ -254,14 +255,28 @@ async def _call_openai_moderation(api_key: str, payload: str) -> None:
         raise HTTPException(status_code=400, detail="workshop preview blocked by moderation")
 
 
-async def _call_openai_workshop_preview(api_key: str, model: str, payload: Dict[str, object]) -> Dict[str, object]:
+def _openai_compatible_headers(api_key: str, runtime: Dict[str, object]) -> Dict[str, str]:
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    if str(runtime.get("gateway", "")) == "openrouter":
+        headers["HTTP-Referer"] = str(runtime.get("httpReferer") or "https://enterprise-llm-kit.pages.dev")
+        headers["X-OpenRouter-Title"] = str(runtime.get("appTitle") or "Enterprise LLM Adoption Kit")
+    return headers
+
+
+async def _call_openai_workshop_preview(
+    api_key: str,
+    model: str,
+    payload: Dict[str, object],
+) -> Dict[str, object]:
+    runtime = build_openai_live_contract()
+    base_url = str(runtime.get("baseUrl") or "https://api.openai.com/v1").rstrip("/")
     async with httpx.AsyncClient(timeout=20.0) as client:
         response = await client.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
+            f"{base_url}/chat/completions",
+            headers=_openai_compatible_headers(api_key, runtime),
             json={
                 "model": model,
                 "temperature": 0.2,
@@ -1223,11 +1238,11 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
 
     request_id = getattr(request.state, "request_id", f"req-{uuid.uuid4().hex[:12]}")
     runtime = build_openai_live_contract()
-    api_key = str(os.getenv("OPENAI_API_KEY", "")).strip()
+    api_key = str(os.getenv("OPENROUTER_API_KEY", "")).strip() or str(os.getenv("OPENAI_API_KEY", "")).strip()
     if not runtime["publicLiveApi"]:
         raise HTTPException(
             status_code=503,
-            detail="public OpenAI live workshop preview is unavailable; configure OPENAI_API_KEY and keep budgets above zero",
+            detail="public OpenRouter/OpenAI live workshop preview is unavailable; configure OPENROUTER_API_KEY or OPENAI_API_KEY and keep budgets above zero",
         )
 
     body = await request.json()
@@ -1274,7 +1289,7 @@ async def ops_live_workshop_preview(request: Request) -> Dict[str, object]:
         "mode": runtime["deploymentMode"],
         "model": runtime["liveModel"],
         "scenarioId": scenario["scenario_id"],
-        "moderated": True,
+        "moderated": bool(runtime["moderationEnabled"]),
         "capped": True,
         "traceId": request_id,
         "estimatedCostUsd": scenario["estimated_cost_usd"],

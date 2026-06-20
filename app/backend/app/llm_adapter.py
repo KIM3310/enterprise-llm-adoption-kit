@@ -42,6 +42,8 @@ _runtime_overrides: Dict[str, Optional[object]] = {
     "ollama_base_url": None,
     "openai_org": None,
     "openai_api_key": None,
+    "openrouter_http_referer": None,
+    "openrouter_app_title": None,
 }
 _user_api_keys_lock = Lock()
 _user_api_keys: Dict[str, str] = {}
@@ -105,6 +107,8 @@ def _active_runtime_config() -> Dict[str, object]:
     ollama_base_url_raw = snapshot["ollama_base_url"]
     org_raw = snapshot["openai_org"]
     api_key_raw = snapshot["openai_api_key"]
+    openrouter_http_referer_raw = snapshot["openrouter_http_referer"]
+    openrouter_app_title_raw = snapshot["openrouter_app_title"]
 
     provider = _normalize_provider(str(provider_raw or settings.llm_provider or "stub"))
     model = _normalize_runtime_model(provider, str(model_raw or settings.llm_model).strip())
@@ -119,6 +123,16 @@ def _active_runtime_config() -> Dict[str, object]:
     ).strip()
     org = str(settings.llm_openai_org if org_raw is None else org_raw).strip()
     api_key = str(settings.llm_openai_api_key if api_key_raw is None else api_key_raw).strip()
+    openrouter_http_referer = str(
+        settings.llm_openrouter_http_referer
+        if openrouter_http_referer_raw is None
+        else openrouter_http_referer_raw
+    ).strip()
+    openrouter_app_title = str(
+        settings.llm_openrouter_app_title
+        if openrouter_app_title_raw is None
+        else openrouter_app_title_raw
+    ).strip()
 
     return {
         "provider": provider,
@@ -130,6 +144,8 @@ def _active_runtime_config() -> Dict[str, object]:
         "ollama_base_url": ollama_base_url,
         "openai_org": org,
         "openai_api_key": api_key,
+        "openrouter_http_referer": openrouter_http_referer,
+        "openrouter_app_title": openrouter_app_title,
     }
 
 
@@ -251,6 +267,8 @@ class OpenAICompatibleAdapter(LLMAdapter):
         self.base_url = str(runtime["openai_base_url"]).rstrip("/")
         self.api_key = str(runtime["openai_api_key"]).strip()
         self.organization = str(runtime["openai_org"]).strip()
+        self.openrouter_http_referer = str(runtime.get("openrouter_http_referer", "")).strip()
+        self.openrouter_app_title = str(runtime.get("openrouter_app_title", "")).strip()
         self.timeout_sec = max(1.0, float(runtime["timeout_sec"]))
         self.model = str(runtime["model"])
         self.temperature = float(runtime["temperature"])
@@ -266,6 +284,11 @@ class OpenAICompatibleAdapter(LLMAdapter):
         }
         if self.organization:
             headers["OpenAI-Organization"] = self.organization
+        if "openrouter.ai" in self.base_url:
+            if self.openrouter_http_referer:
+                headers["HTTP-Referer"] = self.openrouter_http_referer
+            if self.openrouter_app_title:
+                headers["X-OpenRouter-Title"] = self.openrouter_app_title
 
         payload = {
             "model": self.model,
