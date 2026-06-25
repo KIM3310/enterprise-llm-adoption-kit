@@ -144,11 +144,14 @@ make demo-local        # auto-selects Ollama if available, otherwise stub
 ### Manual setup
 
 ```bash
+# 0. Backend requires Python 3.11+.
+# If your default python3 is older, pass a known interpreter:
+# make BOOTSTRAP_PYTHON=/path/to/python3.11 backend-install
+
 # 1. Backend
-cd app/backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-python3 -m app                    # starts on http://localhost:8000
+make backend-install
+cd app/backend && .venv/bin/python -m app
+# starts on http://localhost:8000
 
 # 2. Frontend (separate terminal)
 cd app/frontend
