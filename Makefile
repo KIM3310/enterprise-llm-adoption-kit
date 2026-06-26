@@ -5,7 +5,14 @@ SHELL := /bin/bash
 COMPOSE := docker compose -f infra/docker-compose.yml
 BACKEND_DIR := app/backend
 FRONTEND_DIR := app/frontend
-BOOTSTRAP_PYTHON ?= python3
+PYTHON_MIN_VERSION := 3.11
+PYTHON_CANDIDATES := python3.13 python3.12 python3.11 python3
+BOOTSTRAP_PYTHON ?= $(shell for py in $(PYTHON_CANDIDATES); do \
+	if command -v $$py >/dev/null 2>&1 && $$py -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)' >/dev/null 2>&1; then \
+		command -v $$py; \
+		break; \
+	fi; \
+done)
 BACKEND_VENV := $(BACKEND_DIR)/.venv
 BACKEND_PYTHON := $(BACKEND_VENV)/bin/python
 BACKEND_UVICORN := $(BACKEND_VENV)/bin/uvicorn
@@ -14,12 +21,25 @@ NPM ?= npm
 NPM_INSTALL_FLAGS ?= --no-audit
 FRONTEND_STAMP := $(FRONTEND_DIR)/node_modules/.frontend-installed
 
-eval-gate:
-	python3 evals/runner/eval_gate.py
+.PHONY: check-bootstrap-python
 
-backend-install: $(BACKEND_STAMP)
+check-bootstrap-python:
+	@if [ -z "$(BOOTSTRAP_PYTHON)" ]; then \
+		echo "Python $(PYTHON_MIN_VERSION)+ is required for backend targets." >&2; \
+		echo "Install Python $(PYTHON_MIN_VERSION)+ or run: make BOOTSTRAP_PYTHON=/path/to/python$(PYTHON_MIN_VERSION) <target>" >&2; \
+		exit 1; \
+	fi
+	@$(BOOTSTRAP_PYTHON) -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)' || { \
+		echo "BOOTSTRAP_PYTHON=$(BOOTSTRAP_PYTHON) is not Python $(PYTHON_MIN_VERSION)+." >&2; \
+		exit 1; \
+	}
 
-$(BACKEND_STAMP): $(BACKEND_DIR)/pyproject.toml $(BACKEND_DIR)/requirements.txt
+eval-gate: check-bootstrap-python
+	$(BOOTSTRAP_PYTHON) evals/runner/eval_gate.py
+
+backend-install: check-bootstrap-python $(BACKEND_STAMP)
+
+$(BACKEND_STAMP): $(BACKEND_DIR)/pyproject.toml $(BACKEND_DIR)/requirements.txt | check-bootstrap-python
 	@if [ ! -x "$(BACKEND_PYTHON)" ] || ! $(BACKEND_PYTHON) -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)" >/dev/null 2>&1; then \
 		rm -rf $(BACKEND_VENV); \
 		$(BOOTSTRAP_PYTHON) -m venv $(BACKEND_VENV); \
@@ -126,11 +146,11 @@ smoke-backend: backend-install
 
 verify: quality-check smoke-backend
 
-datadog-plan:
-	@python3 scripts/datadog_assets.py plan
+datadog-plan: check-bootstrap-python
+	@$(BOOTSTRAP_PYTHON) scripts/datadog_assets.py plan
 
-datadog-sync:
-	@python3 scripts/datadog_assets.py sync
+datadog-sync: check-bootstrap-python
+	@$(BOOTSTRAP_PYTHON) scripts/datadog_assets.py sync
 
 bundle-application:
 	@bash scripts/package_application.sh
