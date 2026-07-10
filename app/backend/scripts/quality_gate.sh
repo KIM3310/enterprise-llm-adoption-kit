@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 export APP_ENV="${APP_ENV:-test}"
-export JWT_SECRET="${JWT_SECRET:-enterprise-llm-test-secret}"
+export JWT_SECRET="${JWT_SECRET:-enterprise-llm-test-secret-32-byte-minimum}"
 
 if [[ -x "${ROOT_DIR}/.venv/bin/python" ]]; then
   PYTHON_BIN="${ROOT_DIR}/.venv/bin/python"

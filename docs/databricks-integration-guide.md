@@ -8,7 +8,7 @@ This guide walks through connecting the Enterprise LLM Adoption Kit to a Databri
 |---|---|---|
 | Databricks workspace | Runtime 13.3 LTS+ | Unity Catalog enabled |
 | `databricks-sdk` | 0.20+ | `pip install databricks-sdk` |
-| `mlflow` | 2.11+ | `pip install mlflow` |
+| `mlflow-skinny` | 3.11+ | `pip install mlflow-skinny` |
 | SQL warehouse | Serverless or Pro | Needed for Delta table writes via Statement Execution API |
 | Service principal **or** user token | -- | See Authentication section below |
 

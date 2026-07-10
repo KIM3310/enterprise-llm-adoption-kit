@@ -38,7 +38,7 @@ dev = [
   "snowflake-connector-python==4.4.0",
 ]
 databricks = [
-  "mlflow==3.11.1",
+  "mlflow-skinny==3.11.1",
   "databricks-sdk==0.105.0",
 ]
 
