@@ -60,7 +60,7 @@ class HashEmbedding:
         for text in input:
             vec = np.zeros(self.dim, dtype=float)
             for token in text.lower().split():
-                digest = hashlib.md5(token.encode("utf-8")).hexdigest()
+                digest = hashlib.md5(token.encode("utf-8"), usedforsecurity=False).hexdigest()
                 idx = int(digest, 16) % self.dim
                 vec[idx] += 1.0
             norm = np.linalg.norm(vec)

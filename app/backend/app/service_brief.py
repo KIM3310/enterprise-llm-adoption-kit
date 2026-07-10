@@ -223,7 +223,7 @@ def build_service_brief(
         watchouts.append("Shared demo login code is disabled. Enable it for tighter workshop access control.")
     if str(circuit_snapshot.get("state", "closed")) != "closed":
         watchouts.append(
-            f"LLM circuit breaker is {circuit_snapshot.get('state', 'open')}. Check provider health before live sessions."
+            f"LLM circuit breaker is {circuit_snapshot.get('state', 'open')}. Review provider health before live sessions."
         )
     if not startup_ready and failed_checks:
         watchouts.append(f"Startup diagnostics need attention: {failed_checks[0]}")
@@ -460,9 +460,9 @@ def build_service_summary_pack(
     resource_pack = build_architecture_resource_pack()
     architecture_actions = [
         {
-            "label": "Check architecture-ready runtime posture",
+            "label": "Check review-ready runtime posture",
             "surface": "/ops/service-brief",
-            "proof": "Check maturity stage, runtime posture, and stage evidence before the demo.",
+            "proof": "Review maturity stage, runtime posture, and stage evidence before the demo.",
         },
         {
             "label": "Inspect executive overview",
@@ -504,7 +504,7 @@ def build_service_summary_pack(
         {
             "step": "5. Deployment decision",
             "surface": "docs/architecture/llm_deployment_options.md -> docs/blueprint/09_customer_journey.md",
-            "proof": "Tie runtime evidence back to rollout strategy and customer journey in one architecture path.",
+            "proof": "Tie runtime evidence back to rollout strategy and customer journey in one review path.",
         },
     ]
     startup_ready = bool(runtime.get("startup_ready", False))
@@ -596,7 +596,7 @@ def build_service_summary_pack(
         "rollout_tracks": [
             {
                 "track": "api-first validation",
-                "fit_for": ["solution architecture", "security pilot", "ops workshop"],
+                "fit_for": ["solution architecture review", "security pilot", "ops workshop"],
                 "evidence": "docs/architecture/llm_deployment_options.md",
             },
             {
@@ -615,7 +615,7 @@ def build_service_summary_pack(
             for platform_name in platform_targets
         ],
         "architecture_sequence": [
-            f"{index + 1}. {step.get('title', 'architecture step')} -> {step.get('endpoint', '-')}"
+            f"{index + 1}. {step.get('title', 'review step')} -> {step.get('endpoint', '-')}"
             for index, step in enumerate(architecture_flow)
             if isinstance(step, dict)
         ],
@@ -947,12 +947,12 @@ def build_service_rollout_gates(
                     "gate_label": "Governance proof",
                     "status": "ready" if security_ready and architecture_gate_status == "ready" else "attention",
                     "owner": "security-gate",
-                    "decision_rule": "security stage artifacts and executive architecture posture must both be ready",
+                    "decision_rule": "security stage artifacts and executive review posture must both be ready",
                     "proof_surfaces": ["/ops/summary-pack", "/audit/summary", "/metrics"],
                     "next_action": (
                         "Use the summary pack and audit summary as the stakeholder-facing trust boundary."
                         if security_ready and architecture_gate_status == "ready"
-                        else "Keep the rollout in architecture mode until governance evidence and architecture posture are both ready."
+                        else "Keep the rollout in review mode until governance evidence and review posture are both ready."
                     ),
                 },
                 {
@@ -1176,7 +1176,7 @@ def build_service_customer_architecture_pack(
         },
         {
             "stage": "handoff",
-            "goal": "Turn the architecture into an operator-ready system handoff.",
+            "goal": "Turn the architecture review into an operator-ready system handoff.",
             "surface": "/ops/runtime/scorecard -> /audit/summary -> /metrics",
             "exit_criteria": "Runtime posture and audit evidence are explicit enough for delivery ownership.",
         },
@@ -1186,7 +1186,7 @@ def build_service_customer_architecture_pack(
         "service": brief["service"],
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-adoption-customer-architecture-pack-v1",
-        "headline": "Customer architecture pack that turns discovery, platform fit, rollout gates, and handoff proof into one solution-architect architecture surface.",
+        "headline": "Customer architecture pack that turns discovery, platform fit, rollout gates, and handoff proof into one solution-architect review surface.",
         "filters": {
             "platform": platform_filter,
         },
@@ -1202,7 +1202,7 @@ def build_service_customer_architecture_pack(
         "architecture_stages": architecture_stages,
         "platform_cards": platform_cards,
         "architecture_actions": [
-            "Start here for customer-facing architecture before diving into runtime endpoints.",
+            "Start here for customer-facing architecture review before diving into runtime endpoints.",
             "Use the summary pack to keep stakeholder promises and test assets on the same path.",
             "Use rollout gates to block hand-wavy go-live claims until runtime and rollback posture are visible.",
         ],
@@ -1369,7 +1369,7 @@ def build_service_workshop_readout_pack(
         "workshop_artifacts": workshop_artifacts,
         "visual_evidence": visual_evidence,
         "architecture_actions": [
-            "Use this pack when the audience is a workshop or pilot closeout, not just an architecture walkthrough.",
+            "Use this pack when the audience is a workshop or pilot closeout, not just a technical review.",
             "Keep customer architecture and rollout gates on the same path so next steps stay concrete.",
             "Show the visual evidence boards before summarizing the recommendation out loud.",
         ],
@@ -1484,7 +1484,7 @@ def build_service_architecture_summary(
         "service": brief["service"],
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "contract_version": "enterprise-adoption-architecture-summary-v1",
-        "headline": "Compact architecture summary for stakeholder, operator, and governance checks before a deeper walkthrough.",
+        "headline": "Compact review summary for stakeholder, operator, and governance checks before a deeper walkthrough.",
         "readiness": {
             "maturity_stage": brief.get("maturity_stage", ""),
             "focus_stage": stage_filter,

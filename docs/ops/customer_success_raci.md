@@ -1,4 +1,4 @@
-# Deployment RACI (Architecture -> Deployment)
+# Deployment RACI (Review -> Deployment)
 
 This RACI is a hypothetical template for reference.
 

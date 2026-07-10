@@ -10,7 +10,7 @@ This is a hypothetical checklist for reference.
 ## Governance
 - [ ] Acceptable use policy communicated
 - [ ] Admin roles and approvals defined
-- [ ] Data retention and storage policy checked
+- [ ] Data retention and storage policy reviewed
 
 ## Usage monitoring
 - [ ] Usage dashboard enabled
@@ -25,4 +25,4 @@ This is a hypothetical checklist for reference.
 ## Transition to API (if needed)
 - [ ] Use cases prioritized
 - [ ] Evals framework drafted
-- [ ] Security architecture scheduled
+- [ ] Security review scheduled

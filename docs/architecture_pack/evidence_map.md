@@ -1,6 +1,6 @@
 # Evidence Map
 
-This map connects the project surface to concrete inspectable artifacts.
+This map connects the project surface to concrete reviewable artifacts.
 
 | Surface | Evidence | Validation |
 | --- | --- | --- |

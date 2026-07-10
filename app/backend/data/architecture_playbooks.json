@@ -9,7 +9,7 @@
     "playbook_id": "exec-sponsor-walkthrough",
     "entry_surface": "/ops/summary-pack",
     "handoff_surface": "/ops/architecture-summary",
-    "focus": "Use when the audience needs a short architecture-ready explanation tied to visible evidence."
+    "focus": "Use when the audience needs a short review-ready explanation tied to visible evidence."
   },
   {
     "playbook_id": "field-workshop-closeout",

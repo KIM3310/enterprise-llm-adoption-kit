@@ -49,7 +49,7 @@ def generate_report(inputs: ImpactInputs) -> Path:
 ## Outputs
 - Weekly hours saved: {results['weekly_hours_saved']}
 - Monthly hours saved: {results['monthly_hours_saved']}
-- Checked requests per week: {results['checked_requests_per_week']}
+- Reviewed requests per week: {results['checked_requests_per_week']}
 
 ## Notes
 - Monthly estimate uses 4.33 weeks per month.

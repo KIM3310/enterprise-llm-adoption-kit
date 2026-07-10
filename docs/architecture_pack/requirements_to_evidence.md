@@ -1,4 +1,4 @@
-# Requirements → Evidence Map (Applied AI Architecture Architect)
+# Requirements → Evidence Map (Applied AI Architecture Review)
 
 ## Discovery → Architecture Translation
 - Evidence: `docs/blueprint/01_scope.md`, `docs/blueprint/02_architecture.md`

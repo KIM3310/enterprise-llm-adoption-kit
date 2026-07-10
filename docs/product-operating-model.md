@@ -1,13 +1,13 @@
 # Product Operating Model
 
 Repository: `enterprise-llm-adoption-kit`
-Last updated: 2026-06-03 KST
+Last reviewed: 2026-06-03 KST
 
 ## Enterprise Product Position
 
 ![CI](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/ci.yml)
 
-This repository is packaged as a concrete system surface, not a loose code sample. The enterprise value is a narrow proof that can be inspected, run, tested, and converted into a scoped implementation motion.
+This repository is packaged as a concrete system surface, not a loose code sample. The enterprise value is a narrow proof that can be inspected, run, tested, and converted into a reviewed implementation motion.
 
 ## Stakeholder And Service Path
 
@@ -47,4 +47,4 @@ This repository is packaged as a concrete system surface, not a loose code sampl
 
 ## Service Next Step
 
-Turn the repo into an architecture-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.
+Turn the repo into a reviewer-facing adoption path by pairing the proof surface with one discovery question, one measurable success metric, and one bounded follow-up path. The smallest viable package should be easy to verify and bounded enough to deliver without custom platform work.

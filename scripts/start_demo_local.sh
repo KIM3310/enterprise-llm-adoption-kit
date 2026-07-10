@@ -14,11 +14,13 @@ require_cmd() {
 
 kill_port() {
   local port="$1"
-  local pids
-  pids="$(lsof -ti "tcp:${port}" -sTCP:LISTEN || true)"
-  if [[ -n "${pids}" ]]; then
-    echo "Killing listeners on :${port} (${pids})"
-    kill ${pids} || true
+  local -a pids=()
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] && pids+=("$pid")
+  done < <(lsof -ti "tcp:${port}" -sTCP:LISTEN || true)
+  if ((${#pids[@]} > 0)); then
+    echo "Killing listeners on :${port} (${pids[*]})"
+    kill "${pids[@]}" || true
   fi
 }
 

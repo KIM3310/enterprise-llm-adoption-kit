@@ -6,7 +6,7 @@
   },
   {
     "case_id": "resource-pack-databricks",
-    "goal": "Databricks control-tower path should stay inspectable from workshop readout through rollout gates.",
+    "goal": "Databricks control-tower path should stay reviewable from workshop readout through rollout gates.",
     "proof_surface": "/ops/workshop-readout-pack?platform=databricks"
   },
   {
@@ -16,7 +16,7 @@
   },
   {
     "case_id": "resource-pack-architecture-summary",
-    "goal": "Architecture handoff should stay grounded in the same rollout board and summary-pack signals.",
+    "goal": "Reviewer handoff should stay grounded in the same rollout board and summary-pack signals.",
     "proof_surface": "/ops/architecture-summary"
   }
 ]

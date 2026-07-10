@@ -165,7 +165,7 @@ LIVE_WORKSHOP_SCENARIOS = {
         "next_architecture_path": "/ops/workshop-readout-pack?platform=databricks",
         "estimated_cost_usd": 0.013,
         "prompt": (
-            "A Databricks-oriented field readout wants to know if the pilot should proceed, what rollout gates matter, "
+            "A Databricks-oriented field review wants to know if the pilot should proceed, what rollout gates matter, "
             "and how the customer architecture should be framed."
         ),
     },

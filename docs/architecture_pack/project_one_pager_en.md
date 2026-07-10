@@ -9,7 +9,7 @@ Enterprise LLM Adoption Kit is a reproducible reference implementation for evalu
 - Cloud and workspace architecture options.
 - Backend, frontend, and verification surfaces that can be run locally.
 
-## Architecture Path
+## Review Path
 
 1. Read `README.md` for the system overview.
 2. Open `docs/cloud-ai-architecture.md` for the cloud and AI blueprint.

@@ -17,7 +17,7 @@
     "scenario_id": "hybrid-governance-board",
     "stakeholder_team": "platform-governance",
     "platform": "databricks",
-    "goal": "Check rollout ownership, risk posture, and evaluation evidence before a hybrid deployment.",
+    "goal": "Review rollout ownership, risk posture, and evaluation evidence before a hybrid deployment.",
     "next_surface": "/ops/rollout-gates"
   },
   {

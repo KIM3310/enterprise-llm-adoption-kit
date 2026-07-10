@@ -60,7 +60,7 @@ export default function ServiceBriefBoard({ brief, schema, health, checkedAt = "
           <p className="eyebrow">Service Brief</p>
           <h3>Executive Readiness Board</h3>
           <p>
-            {brief.tagline}. Check governance posture, deployment fit, proof inventory, and rollout stages without
+            {brief.tagline}. Review governance posture, deployment fit, proof inventory, and rollout stages without
             leaving the product surface.
           </p>
         </div>

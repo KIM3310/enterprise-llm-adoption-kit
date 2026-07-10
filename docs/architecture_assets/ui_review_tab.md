@@ -1,4 +1,4 @@
-# Architecture UI Tab
+# Review UI Tab
 
 ## Scenario Runner + Console
 The UI provides two user-friendly surfaces:

@@ -2,7 +2,7 @@
 
 ## Impact Snapshot
 - Monthly hours saved: {{monthly_hours saved}}
-- Architecture window: {{breakeven_months}} months
+- Review window: {{breakeven_months}} months
 
 ## Quality Snapshot
 - Accuracy: {{accuracy}}

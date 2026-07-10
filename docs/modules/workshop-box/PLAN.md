@@ -2,7 +2,7 @@
 
 Phase 1: Workshop materials
 - Agenda (3 hours)
-- Exercises for discovery, BYO eval, security architecture
+- Exercises for discovery, BYO eval, security review
 
 Phase 2: Output generator
 - CLI that writes outputs to a target folder

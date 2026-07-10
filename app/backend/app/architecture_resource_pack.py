@@ -1,4 +1,4 @@
-"""Built-in synthetic architecture resources for enterprise rollout demos."""
+"""Built-in synthetic review resources for enterprise rollout demos."""
 
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ def build_architecture_resource_pack() -> dict[str, object]:
     return {
         "service": "enterprise-adoption-architecture-resource-pack",
         "contract_version": "enterprise-adoption-architecture-resource-pack-v1",
-        "intended_use": "inspectable enterprise rollout and workshop proof without customer data",
+        "intended_use": "reviewable enterprise rollout and workshop proof without customer data",
         "summary": resource_pack_summary(),
         "external_data": {
             "present": external_ticket_path.exists(),

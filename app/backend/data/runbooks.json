@@ -21,7 +21,7 @@
     "signature": "Timeout while",
     "steps": [
       "Check upstream latency metrics.",
-      "Check recent infra incidents.",
+      "Review recent infra incidents.",
       "Increase timeout cautiously or add retries.",
       "Escalate to on-call if persistent."
     ]

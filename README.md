@@ -8,9 +8,9 @@
 
 **Production-grade governance toolkit for enterprise LLM deployments** -- RBAC, prompt-injection detection, PII redaction, audit logging, eval harness, and multi-cloud LLM routing, all wired into a single FastAPI + React application with Kubernetes-ready infrastructure.
 
-> All rollout data and architecture scenarios are synthetic. The goal is a inspectable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.
+> All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.
 
-Architecture pack: [`docs/architecture-pack.md`](docs/architecture-pack.md)
+Technical review pack: [`docs/architecture-pack.md`](docs/architecture-pack.md)
 
 Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
@@ -21,33 +21,33 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 1. Open [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md) to see the production test boundary.
 2. Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.
 3. Run `make verify` to cover backend quality, smoke checks, and frontend build.
-4. Keep synthetic data and environment-gated live providers explicit in any technical inspection read.
+4. Keep synthetic data and environment-gated live providers explicit in any technical review.
 
-## Product and System Surface
+## System Overview
 
 | Lens | Current answer |
 |---|---|
-| Audience | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
-| Architecture path | Validate the demo, README, architecture notes, and quality gate before deeper workflow architecture. |
-| System signal | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
-| Safety boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
-| Fast path | `make verify`, [`docs/architecture-pack.md`](docs/architecture-pack.md), and [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md). |
+| Users | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
+| Technical path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
+| System scope | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
+| Operating boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
+| Evaluation path | `make verify`, [`docs/architecture-pack.md`](docs/architecture-pack.md), and [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md). |
 
-## System Fast Path
+## Evaluation Path
 
-- **First minute:** Open the governance layers, eval gate, and PoC success criteria before the full architecture.
+- **Start here:** Open the governance layers, eval gate, and PoC success criteria before the full architecture.
 - **Local demo:** Run the backend and frontend quick-start commands, then open `http://localhost:8000` and `http://localhost:5173`.
-- **Verification:** Run `make verify`; it covers backend quality, smoke checks, and frontend build.
+- **Checks:** Run `make verify`; it covers backend quality, smoke checks, and frontend build.
 
 ---
 
 ## Service Launch Playbook
 
-- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to architecture audiences, operating gates, operating boundaries, and risk controls.
+- [Service launch playbook](docs/service-launch-playbook.md) maps the repository to its product scope, operating gates, operating boundaries, and risk controls.
 
 ## Architecture Notes
 
-- [Architecture guide](docs/architecture-evidence-map.md) summarizes the project angle, first files to inspect, runtime commands, and known boundaries.
+- [Review guide](docs/architecture-evidence-map.md) summarizes the system scope, first files to inspect, verification commands, and known boundaries.
 - [Quality notes](docs/quality-gate.md) lists the local checks, CI surface, and release expectations for this repository.
 - [Enterprise readiness notes](docs/enterprise-readiness.md) outlines security, data, operations, integration, and handoff expectations.
 
@@ -209,7 +209,7 @@ kubectl apply -f infra/k8s/
 | `GET /metrics` | Prometheus metrics (requests, latency, tokens, usage, policy events) |
 | `GET /health` | Runtime posture and diagnostics |
 | `GET /ops/service-brief` | Operational service brief and readiness summary |
-| `GET /ops/resource-pack` | Resource pack for architecture and evidence |
+| `GET /ops/resource-pack` | Resource pack for review and evidence |
 
 ---
 
@@ -276,7 +276,7 @@ enterprise-llm-adoption-kit/
 - **Primary architecture lane:** enterprise LLM governance, applied AI controls, and platform integration
 - **Strongest proof surface:** governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split
 - **What is real here:** RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding
-- **What is bounded here:** architecture cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
+- **What is bounded here:** review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated
 
 ---
 
@@ -304,15 +304,13 @@ MIT
 
 ## Cloud + AI Architecture
 
-This repository includes a neutral cloud and AI engineering blueprint that maps the current proof surface to runtime boundaries, data contracts, model-risk controls, deployment posture, and validation hooks.
-
 - [Cloud + AI architecture blueprint](docs/cloud-ai-architecture.md)
 - [Machine-readable architecture manifest](docs/architecture/blueprint.json)
 - Validation command: `python3 scripts/validate_architecture_blueprint.py`
 
 ## Enterprise Productization
 
-- [Product operating model](docs/product-operating-model.md) defines the technical inspection, trust boundary, trust boundary, operating checks, and service path for this repository.
+- [Product operating model](docs/product-operating-model.md) defines the product scope, trust boundary, operating checks, and service path for this repository.
 
 ## System Architecture
 

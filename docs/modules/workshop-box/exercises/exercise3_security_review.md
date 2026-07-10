@@ -1,4 +1,4 @@
-# Exercise 3 — Security Architecture
+# Exercise 3 — Security Review
 
 - Architecture guardrails (RBAC, redaction, injection defense)
 - Inspect audit log and metrics

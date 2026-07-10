@@ -20,7 +20,7 @@ def _latest_impact() -> dict:
         return match.group(1) if match else "N/A"
     return {
         "monthly_hours_saved": _find(r"Monthly hours saved"),
-        "checked_requests_per_week": _find(r"Checked requests per week"),
+        "checked_requests_per_week": _find(r"Reviewed requests per week"),
         "source": str(latest),
     }
 
@@ -55,7 +55,7 @@ def generate_dashboard() -> Path:
 
 ## Impact Snapshot
 - Monthly hours saved: {monthly_hours_saved}
-- Checked requests per week: {checked_requests_per_week}
+- Reviewed requests per week: {checked_requests_per_week}
 - Source: {impact_source}
 
 ## Quality Snapshot

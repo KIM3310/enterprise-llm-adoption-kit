@@ -3,7 +3,7 @@
 ## 1) Governance & Security
 - Confirm data handling mode (demo vs enterprise)
 - Retention and audit logging requirements
-- PIPA/K-ISMS alignment architecture
+- PIPA/K-ISMS alignment review
 
 ## 2) Architecture & Connectivity
 - Select deployment: SaaS, VPC/PrivateLink-like, or on-prem connector

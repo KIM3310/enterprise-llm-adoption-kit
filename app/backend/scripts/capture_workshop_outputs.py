@@ -12,7 +12,7 @@ def create_snapshot(output_dir: Path) -> Path:
     inputs = WorkshopInputs(
         company="Hypothetical Enterprise",
         use_case="Support deflection + incident triage",
-        users="Support agents, SRE, security operators",
+        users="Support agents, SRE, security reviewers",
         data_sources="Ticket system, runbooks, handover docs",
         constraints="PII handling, auditability, latency < 3s",
         success_metrics="Deflection rate, CSAT delta, MTTR reduction",

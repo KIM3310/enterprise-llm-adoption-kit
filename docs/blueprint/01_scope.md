@@ -1,16 +1,16 @@
 # Scope
 
 ## Mission
-Deliver an enterprise-style reference implementation for **Applied AI Architecture Architect, Korea** as a personal project (no real customers; synthetic data only) that proves:
+Deliver an enterprise-style reference implementation for an **Applied AI architecture review in Korea** as a personal project (no real customers; synthetic data only) that proves:
 - Enterprise discovery translated into architecture decisions
 - Safe enterprise LLM integration (RBAC/SSO concept, audit, PII redaction, injection defense, tool allowlist)
 - Evaluation harness (golden set, rubric, regression, report + baseline diff)
 - Ops readiness (metrics, reliability controls, usage tracking)
-- Architecture assets (demo scripts, objections, MAP, 30/60/90)
+- Technical review assets (demo scripts, objections, MAP, 30/60/90)
 
 ## Target Personas
-- Enterprise AI technical inspection / solution architect (primary)
-- Security/IT (architectures controls)
+- Enterprise AI reviewer / solution architect (primary)
+- Security/IT (reviews controls)
 - Platform/ML Engineering (evaluates integration/ops)
 
 ## In-Scope Use Cases (Only 2)
@@ -48,5 +48,5 @@ Deliver an enterprise-style reference implementation for **Applied AI Architectu
 
 ## Deliverables
 - Full repo with backend + frontend + evals + docs + infra
-- Architecture artifacts
+- Technical review artifacts
 - Blueprint docs and acceptance criteria

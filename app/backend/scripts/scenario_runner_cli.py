@@ -335,7 +335,7 @@ def _render_markdown_report(
             lines.append(f"  - {item['labels']} = {item['value']}")
     lines.append("")
 
-    lines.append("## Notes for Operators")
+    lines.append("## Notes for Reviewers")
     lines.append("- This run was executed against a local backend; in production, swap storage and enable OIDC.")
     lines.append("- RBAC is enforced at retrieval time; the report includes a role-by-role citation sanity check.")
     lines.append("")
@@ -380,7 +380,10 @@ def main() -> int:
     doc_access = _load_doc_access_groups(dataset_path)
 
     session = requests.Session()
-    session.headers.update({"x-request-id": f"cli-{hashlib.md5(started_at.encode('utf-8')).hexdigest()[:10]}"})
+    request_id_digest = hashlib.md5(started_at.encode("utf-8"), usedforsecurity=False).hexdigest()
+    session.headers.update(
+        {"x-request-id": f"cli-{request_id_digest[:10]}"}
+    )
 
     # --- Preflight
     health_result = _http_json(session, "GET", f"{base_url}/health", timeout=timeout)

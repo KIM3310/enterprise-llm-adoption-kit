@@ -1,8 +1,8 @@
 # Customer Journey Blueprint (Discovery -> Production)
 
-Note: This is a hypothetical template for a personal personal project. It does not represent any real customer engagement.
+Note: This is a hypothetical template for a personal project. It does not represent any real customer engagement.
 
-This blueprint maps the end-to-end architecture walkthrough and the evidence artifacts produced at each stage.
+This blueprint maps the end-to-end technical review journey and the evidence artifacts produced at each stage.
 
 ## Phase 1: Discovery
 Goals

@@ -525,7 +525,7 @@ class StubLLMAdapter(LLMAdapter):
 
         if use_case == "uc1":
             lines = []
-            lines.append("Adoption risk check (offline stub mode).")
+            lines.append("Adoption risk review (offline stub mode).")
             lines.append("")
             lines.append("Top risks:")
             # Keep the list stable but slightly contextual.

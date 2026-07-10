@@ -4,12 +4,24 @@ import json
 import os
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ASSET_DIR = REPO_ROOT / "docs" / "datadog" / "assets"
+ALLOWED_DD_SITES = frozenset(
+    {
+        "datadoghq.com",
+        "us3.datadoghq.com",
+        "us5.datadoghq.com",
+        "datadoghq.eu",
+        "ap1.datadoghq.com",
+        "ap2.datadoghq.com",
+        "ddog-gov.com",
+    }
+)
 
 DD_SITE = os.environ.get("DD_SITE", "datadoghq.com").strip()
 DD_API_KEY = os.environ.get("DD_API_KEY", "").strip()
@@ -42,14 +54,33 @@ def _load_assets() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     return _apply_templates(dashboard, replacements), _apply_templates(monitors, replacements)
 
 
+def _validate_dd_site(site: str) -> str:
+    normalized = site.strip().lower()
+    if (
+        not normalized
+        or normalized != site.strip()
+        or normalized not in ALLOWED_DD_SITES
+        or any(separator in normalized for separator in (":", "/", "\\", "@", "?", "#"))
+    ):
+        allowed = ", ".join(sorted(ALLOWED_DD_SITES))
+        raise RuntimeError(f"Unsupported DD_SITE: {site!r}. Expected one of: {allowed}.")
+    return normalized
+
+
+def _datadog_api_url(site: str, api_path: str) -> str:
+    validated_site = _validate_dd_site(site)
+    return urllib.parse.urlunsplit(("https", f"api.{validated_site}", api_path, "", ""))
+
+
 def _datadog_request(method: str, api_path: str, payload: Any | None = None, *, require_app_key: bool = True) -> Any:
+    url = _datadog_api_url(DD_SITE, api_path)
     if not DD_API_KEY:
         raise RuntimeError("DD_API_KEY is required for Datadog API calls.")
     if require_app_key and not DD_APP_KEY:
         raise RuntimeError("DD_APP_KEY is required for dashboard and monitor sync.")
 
     request = urllib.request.Request(
-        url=f"https://api.{DD_SITE}{api_path}",
+        url=url,
         method=method,
         headers={
             "Accept": "application/json",
@@ -61,7 +92,8 @@ def _datadog_request(method: str, api_path: str, payload: Any | None = None, *, 
     )
 
     try:
-        with urllib.request.urlopen(request) as response:
+        # URL host is built from an allowlisted DD_SITE before credentials are attached.
+        with urllib.request.urlopen(request) as response:  # nosec B310
             body = response.read().decode("utf-8")
             return json.loads(body) if body else None
     except urllib.error.HTTPError as exc:

@@ -25,7 +25,7 @@ Notes:
 - Terraform >= 1.5
 - AWS credentials configured locally (or via `AWS_PROFILE`)
 
-## Quick Start (For Architecture Only)
+## Quick Start (For Review Only)
 ```bash
 cd infra/aws/terraform
 terraform init
@@ -42,4 +42,3 @@ See `variables.tf`.
 
 ## Outputs
 - `alb_dns_name`: where the backend is reachable (HTTP)
-

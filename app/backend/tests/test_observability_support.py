@@ -312,6 +312,28 @@ def test_module_entrypoint_runs_uvicorn(monkeypatch) -> None:
 
     assert calls == {
         "app": "app.main:app",
+        "host": "127.0.0.1",
+        "port": 8000,
+        "reload": False,
+    }
+
+
+def test_module_entrypoint_allows_explicit_host_override(monkeypatch) -> None:
+    import uvicorn
+
+    calls = {}
+
+    def _fake_run(app, host, port, reload) -> None:
+        calls.update(
+            {"app": app, "host": host, "port": port, "reload": reload}
+        )
+
+    monkeypatch.setenv("APP_HOST", "0.0.0.0")
+    monkeypatch.setattr(uvicorn, "run", _fake_run)
+    runpy.run_module("app.__main__", run_name="__main__")
+
+    assert calls == {
+        "app": "app.main:app",
         "host": "0.0.0.0",
         "port": 8000,
         "reload": False,

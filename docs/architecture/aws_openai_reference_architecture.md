@@ -15,7 +15,7 @@ Note:
 ## High-Level Diagram
 ```mermaid
 flowchart LR
-  U[Technical inspection / Operator] -->|HTTPS| CF[CloudFront]
+  U[Reviewer / Operator] -->|HTTPS| CF[CloudFront]
   CF -->|static assets| S3FE[(S3: Frontend)]
   CF -->|/api| ALB[ALB + AWS WAF]
 
@@ -111,4 +111,3 @@ An IaC draft for this architecture is included at:
 It is intentionally conservative:
 - Secure defaults, placeholder secrets, and no production claims.
 - Designed for operators to inspect, not for a “one click prod deploy.”
-

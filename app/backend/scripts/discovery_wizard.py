@@ -22,7 +22,7 @@ def _default_inputs() -> DiscoveryInputs:
     return DiscoveryInputs(
         company="Hypothetical Enterprise",
         use_case="Customer support deflection and ops incident triage",
-        users="Support agents, SRE, security operators",
+        users="Support agents, SRE, security reviewers",
         data_sources="Ticket system, runbooks, handover docs",
         constraints="PII handling, auditability, latency < 3s",
         success_metrics="Deflection rate, CSAT delta, MTTR reduction",

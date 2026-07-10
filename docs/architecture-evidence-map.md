@@ -1,8 +1,8 @@
-# Architecture Guide - Enterprise LLM Adoption Kit
+# Review Guide - Enterprise LLM Adoption Kit
 
 Updated: 2026-05-30
 
-Use this page as the short path through the repository. It keeps the architecture grounded in the code, docs, commands, and boundaries that are already present.
+Use this page as the short path through the repository. It keeps the review grounded in the code, docs, commands, and boundaries that are already present.
 
 ## Summary
 
@@ -16,9 +16,9 @@ Use this page as the short path through the repository. It keeps the architectur
 ## Open First
 
 1. Start with the README fast path and architecture section.
-2. Open `docs/service-launch-playbook.md` only when architectureing the product or service angle.
+2. Open `docs/service-launch-playbook.md` only when reviewing the product or service angle.
 3. Check the commands below before making claims about quality.
-4. Skim the CI workflows and fixture data before deeper implementation architecture.
+4. Skim the CI workflows and fixture data before deeper implementation review.
 5. Read the boundaries section before presenting the project externally.
 
 ## Checks
@@ -32,7 +32,7 @@ Use this page as the short path through the repository. It keeps the architectur
 - .github/workflows/architecture-blueprint.yml
 - .github/workflows/backend-quality-gate.yml
 - .github/workflows/ci.yml
-- .github/workflows/dependency-architecture.yml
+- .github/workflows/dependency-review.yml
 - .github/workflows/docker-publish.yml
 - .github/workflows/pages-auto-deploy.yml
 - .github/workflows/production-smoke.yml
@@ -43,19 +43,19 @@ Use this page as the short path through the repository. It keeps the architectur
 
 ## Evidence
 
-- infrastructure-as-code architecture surface
+- infrastructure-as-code review surface
 - containerized delivery path
 - make verify passes
-- Architecture assets are current
+- Review assets are current
 - Governance controls are demonstrable
 
 ## Architecture Notes
 
 | Possible offer | Working scope assumption |
 |---|---|
-| Adoption workshop | Scope after product intake |
-| Governance starter implementation | Scope after product intake |
-| Security/eval pack | Scope after product intake |
+| Adoption workshop | Scope after stakeholder intake |
+| Governance starter implementation | Scope after stakeholder intake |
+| Security/eval pack | Scope after stakeholder intake |
 
 ## Boundaries
 

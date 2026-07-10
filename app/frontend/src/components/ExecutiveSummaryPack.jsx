@@ -57,7 +57,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
       return item;
     }
     const surface = item?.surface || item?.platform || "platform";
-    const fitFor = Array.isArray(item?.fit_for) && item.fit_for.length > 0 ? item.fit_for.join(", ") : "architecture fit";
+    const fitFor = Array.isArray(item?.fit_for) && item.fit_for.length > 0 ? item.fit_for.join(", ") : "review fit";
     return `${surface}: ${fitFor}`;
   };
   const platformDialogueKey = (item, index) => {
@@ -70,7 +70,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     health: "Confirm startup posture and runtime state before discussing rollout.",
     service_brief: "Anchor the walkthrough in maturity stage, evidence counts, and operator posture.",
     summary_pack: "Open the executive overview for stakeholder promises and rollout tracks.",
-    summary_pack_schema: "Lock the explicit contract for architecture actions and test assets.",
+    summary_pack_schema: "Lock the explicit contract for review actions and test assets.",
     metrics: "Show runtime cost and latency visibility without leaving the evaluation path.",
     audit_summary: "Surface audit and governance signals before making enterprise-readiness claims.",
     customer_journey: "Tie the technical proof back to adoption sequence.",
@@ -80,11 +80,11 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     proof_map: "Open the role-based evidence map when the user needs the shortest evidence path.",
   };
   const fastArchitectureRouteText = [
-    "Enterprise architecture routes",
+    "Enterprise review routes",
     ...fastArchitectureSurfaces.map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
   const twoMinuteArchitectureText = [
-    "Enterprise architecture flow",
+    "Enterprise review flow",
     ...twoMinuteArchitecture.map((item) => `- ${item.step}: ${item.surface} (${item.proof})`),
   ].join("\n");
   const supportingEvidenceText = [
@@ -92,7 +92,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     `Tests: ${evidenceBundle.tests || 0}`,
     `Blueprints: ${evidenceBundle.blueprints || 0}`,
     `Eval Assets: ${evidenceBundle.eval_assets || 0}`,
-    `Architecture assets: ${evidenceBundle.architecture_assets_count || architectureAssets.length || 0}`,
+    `Review assets: ${evidenceBundle.architecture_assets_count || architectureAssets.length || 0}`,
     ...(architectureAssets.length
       ? ["", "Supporting assets", ...architectureAssets.map((item) => `- ${item}`)]
       : []),
@@ -118,13 +118,13 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     "Enterprise stakeholder thesis snapshot",
     `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
-    `Architecture assets: ${evidenceBundle.architecture_assets_count || architectureAssets.length || 0}`,
+    `Review assets: ${evidenceBundle.architecture_assets_count || architectureAssets.length || 0}`,
     `Endpoints: ${Array.isArray(evidenceBundle.architecture_endpoints) ? evidenceBundle.architecture_endpoints.length : 0}`,
     "",
     "Stakeholder promises",
     ...stakeholderPromises.slice(0, 3).map((item) => `- ${item}`),
     "",
-    "Fast architecture surfaces",
+    "Fast review surfaces",
     ...fastArchitectureSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
   const rolloutDecisionBriefText = [
@@ -132,7 +132,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     `Headline: ${summaryPack.headline}`,
     `Runtime: ${runtimeSummary.llm_provider || "-"} / ${runtimeSummary.startup_status || "-"}`,
     `Circuit: ${runtimeSummary.llm_circuit_state || "-"}`,
-    `Architecture assets: ${evidenceBundle.architecture_assets_count || architectureAssets.length || 0}`,
+    `Review assets: ${evidenceBundle.architecture_assets_count || architectureAssets.length || 0}`,
     `Endpoints: ${Array.isArray(evidenceBundle.architecture_endpoints) ? evidenceBundle.architecture_endpoints.length : 0}`,
     "",
     "Recommended rollout tracks",
@@ -147,25 +147,25 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
     ...(platformDialogues.length > 0
       ? platformDialogues.slice(0, 3).map(
           (item) =>
-            `- ${item.surface}: ${Array.isArray(item.fit_for) ? item.fit_for.join(", ") : "architecture fit"}`
+            `- ${item.surface}: ${Array.isArray(item.fit_for) ? item.fit_for.join(", ") : "review fit"}`
         )
       : ["- Platform dialogue unavailable."]),
     "",
     "Watchouts",
     ...(watchouts.length > 0 ? watchouts.slice(0, 3).map((item) => `- ${item}`) : ["- No active watchouts."]),
     "",
-    "Fast architecture surfaces",
+    "Fast review surfaces",
     ...fastArchitectureSurfaces.slice(0, 4).map(([label, surface]) => `- ${label}: ${surface}`),
   ].join("\n");
 
   const handleCopyRoutes = async () => {
     const ok = await copyTextToClipboard(fastArchitectureRouteText);
-    setCopyStatus(ok ? "Copied executive architecture routes." : "Failed to copy executive architecture routes.");
+    setCopyStatus(ok ? "Copied executive review routes." : "Failed to copy executive review routes.");
   };
 
   const handleCopyTwoMinuteArchitecture = async () => {
     const ok = await copyTextToClipboard(twoMinuteArchitectureText);
-    setCopyStatus(ok ? "Copied executive architecture flow." : "Failed to copy executive architecture flow.");
+    setCopyStatus(ok ? "Copied executive review flow." : "Failed to copy executive review flow.");
   };
 
   const handleCopySupportingEvidence = async () => {
@@ -222,7 +222,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
           <strong>{Array.isArray(evidenceBundle.architecture_endpoints) ? evidenceBundle.architecture_endpoints.length : 0}</strong>
         </article>
         <article className="service-metric-card">
-          <span>Architecture Assets</span>
+          <span>Review Assets</span>
           <strong>{evidenceBundle.architecture_assets_count || architectureAssets.length || 0}</strong>
         </article>
       </div>
@@ -243,10 +243,10 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
 
       <div className="summary-pack-toolbar">
         <button type="button" onClick={() => void handleCopyRoutes()}>
-          Copy Architecture Routes
+          Copy Review Routes
         </button>
         <button type="button" onClick={() => void handleCopyTwoMinuteArchitecture()}>
-          Copy Architecture Flow
+          Copy Review Flow
         </button>
         <button type="button" onClick={() => void handleCopySupportingEvidence()}>
           Copy Supporting Evidence
@@ -264,7 +264,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
       </div>
 
       <article className="service-brief-card">
-        <p className="service-card-label">Fast architecture surfaces</p>
+        <p className="service-card-label">Fast review surfaces</p>
         <p className="service-support-note">Keep governance and deployment evidence visible in the same evaluation path.</p>
         <div className="summary-pack-action-list">
           {fastArchitectureSurfaces.map(([label, surface]) => (
@@ -288,7 +288,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
         </article>
 
         <article className="service-brief-card">
-          <p className="service-card-label">Architecture sequence</p>
+          <p className="service-card-label">Review sequence</p>
           <ul className="service-brief-list">
             {architectureSequence.slice(0, compact ? 3 : 4).map((item) => (
               <li key={item}>{item}</li>
@@ -312,7 +312,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
 
       {rolePaths.length > 0 && (
         <article className="service-brief-card">
-          <p className="service-card-label">Architecture lanes</p>
+          <p className="service-card-label">Review lanes</p>
           <div className="summary-pack-action-list">
             {rolePaths.map((path) => (
               <div key={path.role} className="summary-pack-action-card">
@@ -364,7 +364,7 @@ export default function ExecutiveSummaryPack({ summaryPack, variant = "full" }) 
 
       <div className="summary-pack-columns">
         <article className="service-brief-card">
-          <p className="service-card-label">Architecture actions</p>
+          <p className="service-card-label">Review actions</p>
           <div className="summary-pack-action-list">
             {architectureActions.slice(0, compact ? 2 : 4).map((item) => (
               <div key={`${item.label}-${item.surface}`} className="summary-pack-action-card">

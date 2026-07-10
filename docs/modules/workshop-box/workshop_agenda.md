@@ -8,7 +8,7 @@
 ## Hour 2 — Evals & Safety
 - Draft eval rubric and dataset fields
 - BYO dataset ingestion (sample)
-- Safety guardrails architecture
+- Safety guardrails review
 
 ## Hour 3 — PoC Success & Impact
 - PoC success criteria (SLOs + security gates)

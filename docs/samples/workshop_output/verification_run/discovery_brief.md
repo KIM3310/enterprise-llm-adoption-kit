@@ -4,7 +4,7 @@ Note: This is a synthetic sample output. No real customer data is included.
 
 - Company: Hypothetical Enterprise
 - Use case: Support deflection + incident triage
-- Users: Support agents, SRE, security teams
+- Users: Support agents, SRE, security reviewers
 
 ## Data Sources
 Ticket system, runbooks, handover docs

@@ -345,7 +345,7 @@ def query_eval_history(
         safe_limit = max(1, min(limit, 10000))
         params.append(safe_limit)
         cur.execute(
-            f"SELECT * FROM eval_results{where} ORDER BY created_at DESC LIMIT %s",  # noqa: S608
+            f"SELECT * FROM eval_results{where} ORDER BY created_at DESC LIMIT %s",  # noqa: S608  # nosec B608
             params,
         )
         columns = [desc[0].lower() for desc in cur.description]
@@ -388,7 +388,7 @@ def query_audit_history(
         safe_limit = max(1, min(limit, 10000))
         params.append(safe_limit)
         cur.execute(
-            f"SELECT * FROM audit_logs{where} ORDER BY created_at DESC LIMIT %s",  # noqa: S608
+            f"SELECT * FROM audit_logs{where} ORDER BY created_at DESC LIMIT %s",  # noqa: S608  # nosec B608
             params,
         )
         columns = [desc[0].lower() for desc in cur.description]
@@ -427,7 +427,7 @@ def get_eval_summary(run_id: Optional[str] = None) -> Dict[str, Any]:
                 MIN(created_at) AS first_run,
                 MAX(created_at) AS last_run
             FROM eval_results{where}
-            """,
+            """,  # nosec B608
             params,
         )
         row = cur.fetchone()
