@@ -39,6 +39,7 @@ dev = [
 ]
 databricks = [
   "mlflow-skinny==3.11.1",
+  "GitPython==3.1.55",
   "databricks-sdk==0.105.0",
 ]
 
