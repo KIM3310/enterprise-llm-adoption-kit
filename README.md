@@ -328,6 +328,7 @@ MIT
 - Paid boundary: paid workshop pack, private control tower deployment, and governance evidence bundle
 - Canonical URL: https://enterprise-llm-kit.pages.dev/
 - Lead capture: https://github.com/KIM3310/enterprise-llm-adoption-kit/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Enterprise+LLM+Adoption+Kit
+- Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=enterprise-llm-adoption-kit#service-offers
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
 - Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)

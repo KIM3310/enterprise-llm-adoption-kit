@@ -11,6 +11,7 @@ This repository now exposes a search-readable service surface in addition to the
 | System architecture | [docs/system-architecture.md](./system-architecture.md) |
 | Public canonical URL | https://enterprise-llm-kit.pages.dev/ |
 | Lead capture URL | https://github.com/KIM3310/enterprise-llm-adoption-kit/issues/new?template=service-inquiry.yml&title=Private+workspace+inquiry%3A+Enterprise+LLM+Adoption+Kit |
+| Commercial route | https://kim3310-doeon-kim-portfolio.pages.dev/?offer=enterprise-llm-adoption-kit#service-offers |
 
 ## Search Positioning
 
