@@ -328,9 +328,20 @@ MIT
 - Paid boundary: paid workshop pack, private control tower deployment, and governance evidence bundle
 - Canonical URL: https://enterprise-llm-kit.pages.dev/
 - Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=enterprise-llm-adoption-kit&inquiry=private-ai-readiness-sprint#private-inquiry
+- Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/enterprise-llm-adoption-kit/
 - Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=enterprise-llm-adoption-kit#service-offers
 - Machine-readable offer: [docs/service-offer.json](docs/service-offer.json)
 - Search growth implementation: [docs/search-growth-implementation.md](docs/search-growth-implementation.md)
 - Revenue architecture: [docs/revenue-architecture.md](docs/revenue-architecture.md)
 
 <!-- search-growth-readme:end -->
+
+<!-- KIM3310:AD-DATA-PIVOT:START -->
+## Free Resource, Advertising, and Aggregate Data
+
+- [Public utility and architecture checklist](https://kim3310-doeon-kim-portfolio.pages.dev/resources/enterprise-llm-adoption-kit/)
+- Revenue model: contextual advertising on the policy-eligible central resource page.
+- Aggregate value: anonymous aggregate LLM governance control interest and checklist usage counts
+- Boundary: ads allowed only on public governance checklist pages; policy consoles, audit logs, eval runs, and admin flows are ad-free
+- Consent defaults off, DNT/GPC fail closed, and personal or sensitive data is never sold.
+<!-- KIM3310:AD-DATA-PIVOT:END -->
