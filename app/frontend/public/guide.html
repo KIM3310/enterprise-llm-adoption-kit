@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Guide | Enterprise LLM Adoption Kit</title>
+  <meta name="description" content="Free LLM governance adoption checklist for RBAC, redaction, audits, and eval gates. Source-backed guide for enterprise AI governance teams.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="google-adsense-account" content="ca-pub-4973160293737562">
+  <link rel="canonical" href="https://enterprise-llm-kit.pages.dev/guide.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Project Guide | Enterprise LLM Adoption Kit">
+  <meta property="og:description" content="Free LLM governance adoption checklist for RBAC, redaction, audits, and eval gates. Source-backed guide for enterprise AI governance teams.">
+  <meta property="og:url" content="https://enterprise-llm-kit.pages.dev/guide.html">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Project Guide | Enterprise LLM Adoption Kit","description":"Free LLM governance adoption checklist for RBAC, redaction, audits, and eval gates. Source-backed guide for enterprise AI governance teams.","url":"https://enterprise-llm-kit.pages.dev/guide.html","dateModified":"2026-07-28","author":{"@type":"Person","name":"KIM3310","url":"https://github.com/KIM3310"},"publisher":{"@type":"Person","name":"KIM3310","url":"https://kim3310-doeon-kim-portfolio.pages.dev"},"isAccessibleForFree":true}</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4973160293737562" crossorigin="anonymous"></script>
+  <style>
+    :root { color-scheme: light; --ink: #17201f; --muted: #52605d; --line: #cbd2ce; --paper: #ffffff; --ground: #f5f6f4; --green: #126455; --coral: #c94732; --gold: #b67a00; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--ground); color: var(--ink); font: 17px/1.72 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    a { color: var(--green); text-underline-offset: 3px; }
+    .site-header { border-bottom: 1px solid var(--line); background: rgba(245, 246, 244, .97); }
+    .site-nav, .article-shell, .site-footer-inner { width: min(920px, calc(100% - 32px)); margin: 0 auto; }
+    .site-nav { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .site-nav strong { font-size: .92rem; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 14px; font-size: .84rem; }
+    .article-shell { padding: 54px 0 72px; }
+    .breadcrumbs { color: var(--muted); font-size: .82rem; }
+    .article-intro { padding: 28px 0 36px; border-bottom: 2px solid var(--ink); }
+    .kicker { color: var(--coral); font-size: .76rem; font-weight: 800; text-transform: uppercase; }
+    h1 { margin: 10px 0 16px; max-width: 18ch; font-size: 3.5rem; line-height: 1.04; letter-spacing: 0; overflow-wrap: anywhere; }
+    .lede { max-width: 68ch; color: var(--muted); font-size: 1.08rem; }
+    .review-note { margin-top: 18px; color: var(--muted); font-size: .84rem; }
+    article { padding-top: 24px; }
+    article h2 { margin: 42px 0 12px; padding-top: 6px; font-size: 1.75rem; line-height: 1.2; letter-spacing: 0; }
+    article h3 { margin: 30px 0 8px; font-size: 1.2rem; letter-spacing: 0; }
+    article h4 { margin: 24px 0 6px; font-size: 1.02rem; letter-spacing: 0; }
+    article p, article li { max-width: 76ch; }
+    article li + li { margin-top: 6px; }
+    pre { max-width: 100%; overflow: auto; border-left: 4px solid var(--gold); background: #1d2423; color: #f6f8f7; padding: 18px; border-radius: 4px; font-size: .86rem; }
+    code { overflow-wrap: anywhere; }
+    :not(pre) > code { border: 1px solid var(--line); background: var(--paper); padding: 1px 5px; border-radius: 3px; font-size: .9em; }
+    .table-scroll { overflow-x: auto; margin: 20px 0; }
+    table { width: 100%; border-collapse: collapse; background: var(--paper); font-size: .9rem; }
+    th, td { border: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #e9eeeb; }
+    .boundary-note { margin: 30px 0 4px; border-left: 4px solid var(--coral); background: var(--paper); padding: 18px; }
+    .source-basis { margin-top: 48px; border-top: 1px solid var(--line); padding-top: 22px; color: var(--muted); }
+    .site-footer { border-top: 1px solid var(--line); background: var(--paper); }
+    .site-footer-inner { padding: 28px 0 44px; color: var(--muted); font-size: .84rem; }
+    .site-footer-links { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+    @media (max-width: 720px) {
+      .site-nav { align-items: flex-start; flex-direction: column; padding: 14px 0; }
+      .article-shell { padding-top: 32px; }
+      h1 { font-size: 2.35rem; }
+    }
+  </style>
+</head>
+<body data-ad-surface="editorial">
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Primary">
+      <strong>Enterprise LLM Adoption Kit</strong>
+      <div class="nav-links"><a href="/">Home</a><a href="/guide.html">Project guide</a><a href="/architecture.html">Architecture</a><a href="/verification.html">Verification</a><a href="/publisher.html">Publisher</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div>
+    </nav>
+  </header>
+  <main class="article-shell">
+    <p class="breadcrumbs"><a href="/">Home</a> / Project guide</p>
+    <header class="article-intro">
+      <div class="kicker">Project guide</div>
+      <h1>Project Guide | Enterprise LLM Adoption Kit</h1>
+      <p class="lede">Free LLM governance adoption checklist for RBAC, redaction, audits, and eval gates. This guide organizes the repository&#039;s original implementation notes for enterprise AI governance teams.</p>
+      <p class="review-note">Reviewed 2026-07-28. This page is derived from checked-in repository evidence and links back to its source.</p>
+    </header>
+
+    <article><h2>Enterprise LLM Adoption Kit</h2>
+<p><strong>Production-grade governance toolkit for enterprise LLM deployments</strong> -- RBAC, prompt-injection detection, PII redaction, audit logging, eval harness, and multi-cloud LLM routing, all wired into a single FastAPI + React application with Kubernetes-ready infrastructure.</p>
+<p>All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.</p>
+<p>Technical review pack: <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/architecture-pack.md" rel="noopener">`docs/architecture-pack.md`</a></p>
+<p>Demo video: <a href="https://youtu.be/yMq03b0js0E" rel="noopener">https://youtu.be/yMq03b0js0E</a></p>
+<p>---</p>
+<h3>Three-Minute Proof</h3>
+<ol><li>Open <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/architecture_assets/poc_success_criteria.md" rel="noopener">`docs/architecture_assets/poc_success_criteria.md`</a> to see the production test boundary.</li><li>Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.</li><li>Run <code>make verify</code> to cover backend quality, smoke checks, and frontend build.</li><li>Keep synthetic data and environment-gated live providers explicit in any technical review.</li></ol>
+<h3>System Overview</h3>
+<div class="table-scroll"><table><thead><tr><th>Lens</th><th>Current answer</th></tr></thead><tbody><tr><td>Users</td><td>Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout.</td></tr><tr><td>Technical path</td><td>Validate the demo, README, architecture notes, and quality gate before deeper workflow review.</td></tr><tr><td>System scope</td><td>RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit.</td></tr><tr><td>Operating boundary</td><td>Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated.</td></tr><tr><td>Evaluation path</td><td><code>make verify</code>, <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/architecture-pack.md" rel="noopener">`docs/architecture-pack.md`</a>, and <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/architecture_assets/poc_success_criteria.md" rel="noopener">`docs/architecture_assets/poc_success_criteria.md`</a>.</td></tr></tbody></table></div>
+<h3>Evaluation Path</h3>
+<ul><li><strong>Start here:</strong> Open the governance layers, eval gate, and PoC success criteria before the full architecture.</li><li><strong>Local demo:</strong> Run the backend and frontend quick-start commands, then open <code>http://localhost:8000</code> and <code>http://localhost:5173</code>.</li><li><strong>Checks:</strong> Run <code>make verify</code>; it covers backend quality, smoke checks, and frontend build.</li></ul>
+<p>---</p>
+<h3>Architecture Notes</h3>
+<ul><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/architecture-evidence-map.md" rel="noopener">Review guide</a> summarizes the system scope, first files to inspect, verification commands, and known boundaries.</li><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/quality-gate.md" rel="noopener">Quality notes</a> lists the local checks, CI surface, and release expectations for this repository.</li><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/enterprise-readiness.md" rel="noopener">Enterprise readiness notes</a> outlines security, data, operations, integration, and handoff expectations.</li></ul>
+<h3>Architecture</h3>
+<p>Every request passes through four governance layers before reaching the LLM. Each layer can short-circuit the request with a policy refusal, and every decision is audit-logged.</p>
+<pre><code>flowchart TB
+    subgraph Client[&quot;Client Layer&quot;]
+        UI[&quot;React + Vite UI&quot;]
+        CLI[&quot;API / CLI Consumer&quot;]
+    end
+
+    subgraph Gateway[&quot;API Gateway&quot;]
+        ING[&quot;TLS Ingress&quot;] --&gt; AUTH[&quot;JWT / OIDC Auth&quot;]
+        AUTH --&gt; RL[&quot;Rate Limiter&quot;]
+    end
+
+    subgraph Governance[&quot;Governance Pipeline -- 4 Layers&quot;]
+        direction TB
+        RBAC[&quot;1. RBAC Enforcement&lt;br/&gt;&lt;i&gt;Employee / Ops / Admin&lt;/i&gt;&quot;]
+        INJ[&quot;2. Prompt Injection Detection&lt;br/&gt;&lt;i&gt;keyword + regex heuristics&lt;/i&gt;&quot;]
+        PII[&quot;3. PII Redaction&lt;br/&gt;&lt;i&gt;email, phone, ID masking&lt;/i&gt;&quot;]
+        SAFE[&quot;4. Safety Policy Engine&lt;br/&gt;&lt;i&gt;22 regex patterns, ReDoS-safe&lt;/i&gt;&quot;]
+        RBAC --&gt; INJ --&gt; PII --&gt; SAFE
+    end
+
+    subgraph Core[&quot;Application Core&quot;]
+        RAG[&quot;RAG Retrieval&lt;br/&gt;&lt;i&gt;ChromaDB + hash embeddings&lt;/i&gt;&quot;]
+        LLM[&quot;LLM Router&lt;br/&gt;&lt;i&gt;OpenAI / Ollama / Bedrock / Stub&lt;/i&gt;&quot;]
+        TOOLS[&quot;Tool Executor&lt;br/&gt;&lt;i&gt;allowlisted tools only&lt;/i&gt;&quot;]
+        RAG --&gt; LLM
+        LLM --&gt; TOOLS
+    end
+
+    subgraph Observability[&quot;Observability + Persistence&quot;]
+        AUDIT[&quot;Audit Logger&lt;br/&gt;&lt;i&gt;SHA-256 enterprise hashing&lt;/i&gt;&quot;]
+        PROM[&quot;Prometheus Metrics&lt;br/&gt;&lt;i&gt;latency, tokens, usage, policy&lt;/i&gt;&quot;]
+        OTEL[&quot;OpenTelemetry&lt;br/&gt;&lt;i&gt;OTLP traces&lt;/i&gt;&quot;]
+        DD[&quot;Datadog Integration&quot;]
+    end
+
+    subgraph DataPlatform[&quot;Data Platform Integration&quot;]
+        SF[&quot;Snowflake&lt;br/&gt;&lt;i&gt;eval + audit persistence&lt;/i&gt;&quot;]
+        DB[&quot;Databricks&lt;br/&gt;&lt;i&gt;MLflow + Delta Lake&lt;/i&gt;&quot;]
+        EVAL[&quot;Eval Harness&lt;br/&gt;&lt;i&gt;baseline diffs, red-team&lt;/i&gt;&quot;]
+    end
+
+    UI &amp; CLI --&gt; ING
+    RL --&gt; RBAC
+    SAFE --&gt; RAG
+    LLM --&gt; AUDIT &amp; PROM &amp; OTEL
+    AUDIT --&gt; SF &amp; DB
+    OTEL --&gt; DD
+    EVAL --&gt; SF &amp; DB
+
+    style Governance fill:#fff3e0,stroke:#e65100
+    style Observability fill:#e8f5e9,stroke:#2e7d32
+    style DataPlatform fill:#e3f2fd,stroke:#1565c0</code></pre>
+<p>---</p>
+<h3>Tech Stack</h3>
+<div class="table-scroll"><table><thead><tr><th>Layer</th><th>Technologies</th></tr></thead><tbody><tr><td><strong>Backend API</strong></td><td>Python 3.11+, FastAPI, Uvicorn, Pydantic</td></tr><tr><td><strong>Frontend</strong></td><td>React 18, Vite</td></tr><tr><td><strong>Auth</strong></td><td>JWT (HS256) with key rotation, OIDC (RS256) via JWKS discovery</td></tr><tr><td><strong>RAG</strong></td><td>ChromaDB, deterministic hash embeddings, in-memory fallback</td></tr><tr><td><strong>LLM Providers</strong></td><td>OpenAI, Ollama, AWS Bedrock, stub (offline deterministic)</td></tr><tr><td><strong>Eval</strong></td><td>Custom harness -- accuracy, groundedness, helpfulness, safety scoring</td></tr><tr><td><strong>Storage</strong></td><td>SQLite, Chroma, JSONL event logs</td></tr><tr><td><strong>Data Platform</strong></td><td>Snowflake (eval + audit), Databricks (MLflow + Delta Lake)</td></tr><tr><td><strong>Observability</strong></td><td>Prometheus, Grafana, OpenTelemetry (OTLP), Datadog-ready</td></tr><tr><td><strong>Infrastructure</strong></td><td>Docker Compose, Kubernetes (HPA, TLS ingress, AlertManager), Terraform (AWS + GCP)</td></tr><tr><td><strong>CI/CD</strong></td><td>GitHub Actions (CI, security scan, Docker publish, Cloudflare Pages deploy)</td></tr><tr><td><strong>Security</strong></td><td>pip-audit, Bandit, Trivy container scanning</td></tr></tbody></table></div>
+<p>---</p>
+<h4>One-command demo (recommended)</h4>
+<pre><code>git clone https://github.com/KIM3310/enterprise-llm-adoption-kit.git
+cd enterprise-llm-adoption-kit
+make demo-local        # auto-selects Ollama if available, otherwise stub</code></pre>
+<h4>Manual setup</h4>
+<pre><code>
+## 1. Backend
+make backend-install
+cd app/backend &amp;&amp; .venv/bin/python -m app
+
+## 2. Frontend (separate terminal)
+cd app/frontend
+npm install &amp;&amp; npm run dev        # starts on http://localhost:5173
+
+
+## 3. Verify everything
+make verify                       # syntax, deps, pytest, smoke, frontend build</code></pre>
+<h4>Docker</h4>
+<pre><code>cd infra &amp;&amp; docker-compose up --build
+
+## Backend: http://localhost:8000   Frontend: http://localhost:5173</code></pre>
+<h4>Kubernetes</h4>
+<pre><code>kubectl create namespace llm-adoption
+kubectl apply -f infra/k8s/secret.yaml
+kubectl apply -f infra/k8s/</code></pre>
+<p>---</p>
+<h3>Key Capabilities</h3>
+<div class="table-scroll"><table><thead><tr><th>Capability</th><th>Description</th><th>Code</th></tr></thead><tbody><tr><td><strong>RBAC</strong></td><td>Role-to-access-group mapping enforced at RAG retrieval time (Employee / Ops / Admin)</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/rbac.py" rel="noopener">`app/backend/app/rbac.py`</a></td></tr><tr><td><strong>Prompt Injection Detection</strong></td><td>Keyword heuristics flag known injection patterns before LLM invocation</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/injection.py" rel="noopener">`app/backend/app/injection.py`</a></td></tr><tr><td><strong>Safety Policy Engine</strong></td><td>22 regex patterns targeting exfiltration, escalation, and adversarial prompts (ReDoS-safe)</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/safety.py" rel="noopener">`app/backend/app/safety.py`</a></td></tr><tr><td><strong>PII Redaction</strong></td><td>Email, phone, and ID masking with per-category event tracking</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/redaction.py" rel="noopener">`app/backend/app/redaction.py`</a></td></tr><tr><td><strong>Audit Logging</strong></td><td>Structured JSON logs with SHA-256 hashing in enterprise mode and auto-retention pruning</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/audit.py" rel="noopener">`app/backend/app/audit.py`</a></td></tr><tr><td><strong>RAG Retrieval</strong></td><td>ChromaDB + deterministic hash embeddings with RBAC-filtered document access</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/rag.py" rel="noopener">`app/backend/app/rag.py`</a></td></tr><tr><td><strong>Eval Harness</strong></td><td>Accuracy, groundedness, helpfulness, safety scoring with baseline diffs and red-team datasets</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/evals/runner/" rel="noopener">`evals/runner/`</a></td></tr><tr><td><strong>LLMOps Metrics</strong></td><td>Request latency, token counts, usage tracking, policy events via Prometheus</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/metrics.py" rel="noopener">`app/backend/app/metrics.py`</a></td></tr><tr><td><strong>Circuit Breaker</strong></td><td>LLM provider failure isolation with configurable threshold and cooldown</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/llm_adapter.py" rel="noopener">`app/backend/app/llm_adapter.py`</a></td></tr><tr><td><strong>Multi-provider LLM</strong></td><td>Hot-swappable runtime config across OpenAI, Ollama, Bedrock, and stub backends</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/llm_adapter.py" rel="noopener">`app/backend/app/llm_adapter.py`</a></td></tr><tr><td><strong>Snowflake Integration</strong></td><td>Eval results and audit logs persisted to Snowflake (env-var gated)</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/snowflake_adapter.py" rel="noopener">`app/backend/app/snowflake_adapter.py`</a></td></tr><tr><td><strong>Databricks Integration</strong></td><td>MLflow experiment tracking and Delta audit tables in Unity Catalog</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/databricks_adapter.py" rel="noopener">`app/backend/app/databricks_adapter.py`</a></td></tr><tr><td><strong>OpenTelemetry</strong></td><td>OTLP trace export with Datadog-ready integration</td><td><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/app/backend/app/telemetry.py" rel="noopener">`app/backend/app/telemetry.py`</a></td></tr></tbody></table></div>
+<p>---</p>
+<h3>Core API</h3>
+<div class="table-scroll"><table><thead><tr><th>Endpoint</th><th>Description</th></tr></thead><tbody><tr><td><code>POST /auth/login</code></td><td>Issue JWT (local_jwt or OIDC mode)</td></tr><tr><td><code>POST /uc1/architecture</code></td><td>LLM-assisted architecture query (RBAC-gated RAG)</td></tr><tr><td><code>POST /uc2/log-intel</code></td><td>Log intelligence and root cause generation</td></tr><tr><td><code>GET /audit/summary</code></td><td>Governance and audit log summary</td></tr><tr><td><code>GET /metrics</code></td><td>Prometheus metrics (requests, latency, tokens, usage, policy events)</td></tr><tr><td><code>GET /health</code></td><td>Runtime posture and diagnostics</td></tr><tr><td><code>GET /ops/service-brief</code></td><td>Operational service brief and readiness summary</td></tr><tr><td><code>GET /ops/resource-pack</code></td><td>Resource pack for review and evidence</td></tr></tbody></table></div>
+<p>---</p>
+<h3>Snowflake / Databricks Integration</h3>
+<p><strong>Snowflake</strong> -- set <code>SNOWFLAKE_ACCOUNT</code> to activate. Stores eval results and audit logs; supports <code>query_eval_history()</code>, <code>query_audit_history()</code>, aggregate reporting.</p>
+<p><strong>Databricks</strong> -- set <code>DATABRICKS_HOST</code> to activate. MLflow experiment tracking per eval run; Delta audit tables in Unity Catalog; <code>databricks-cli</code> or service-principal OAuth auth.</p>
+<p>See <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/.env.example" rel="noopener">`.env.example`</a> for the full configuration surface.</p>
+<p>---</p>
+<h3>Datadog-Ready Pack</h3>
+<ul><li>Datadog-ready resource pack: <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/datadog/README.md" rel="noopener">`docs/datadog/README.md`</a></li><li>Existing env hooks already reserve a Datadog integration lane in <code>.env.example</code></li><li>Current state: asset sync and OTLP wiring are prepared, but live tenant integration is intentionally disabled by default</li><li>Best use: show how enterprise LLM governance, audit, latency, and rollout readiness would be observed in one operator-facing Datadog surface</li></ul>
+<p>---</p>
+<h3>Project Structure</h3>
+<pre><code>enterprise-llm-adoption-kit/
+  app/
+    backend/               # FastAPI backend (RBAC, RAG, safety, audit, LLM adapters)
+      app/
+        main.py            # FastAPI app with governance middleware
+        rbac.py            # Role-to-access-group mapping
+        safety.py          # 22-pattern safety policy engine
+        injection.py       # Prompt injection detection
+        redaction.py       # PII redaction engine
+        audit.py           # Structured audit logging with SHA-256 hashing
+        auth.py            # JWT/OIDC authentication
+        llm_adapter.py     # Multi-provider LLM router with circuit breaker
+        rag.py             # ChromaDB RAG with RBAC-filtered retrieval
+        snowflake_adapter.py
+        databricks_adapter.py
+        metrics.py         # Prometheus metric definitions
+        telemetry.py       # OpenTelemetry instrumentation
+        config.py          # 60+ env vars, type-safe parsing
+    frontend/              # React + Vite UI
+  evals/
+    runner/                # Eval harness (run_eval, eval_gate, baseline)
+    datasets/              # Test datasets (initial, red-team, Korean)
+    reports/               # Generated eval reports and diffs
+  infra/
+    k8s/                   # Kubernetes manifests (HPA, TLS, AlertManager)
+    aws/terraform/         # AWS ECS + ALB Terraform module
+    gcp/terraform/         # GCP Terraform module
+    docker-compose.yml     # Local multi-service orchestration
+    monitoring/            # Grafana dashboard + AlertManager rules
+  tests/                   # 30+ test files, 84% backend coverage
+  docs/                    # Architecture, ops, blueprint, Datadog, evals docs
+  scripts/                 # Demo runners, quality gates, release ops</code></pre>
+<p>---</p>
+<h3>Technical Proof Boundary</h3>
+<ul><li><strong>Primary architecture lane:</strong> enterprise LLM governance, applied AI controls, and platform integration</li><li><strong>Strongest proof surface:</strong> governance pipeline, eval harness, observability surfaces, and deployment-ready backend/frontend split</li><li><strong>What is real here:</strong> RBAC, safety pipeline, audit logging, metrics, integration adapters, CI/CD, and deployment scaffolding</li><li><strong>What is bounded here:</strong> review cases and documents are synthetic, and Snowflake / Databricks / Bedrock integrations are env-gated</li></ul>
+<p>---</p>
+<h3>Operating Commands</h3>
+<ul><li><code>make verify</code> runs the backend syntax/dependency checks, Python suite, smoke diagnostics, and frontend production build.</li><li><code>app/backend/.venv/bin/python -m pytest tests app/backend/tests -q</code> exercises the backend services, adapters, runtime scorecards, and UI metadata contracts.</li><li><code>cd app/frontend &amp;&amp; pnpm build</code> produces the static frontend bundle used by the Cloudflare Pages deployment path.</li></ul>
+<p>---</p>
+<h3>CI/CD</h3>
+<p>GHCR Docker image published on every push to <code>main</code>. Security scan (pip-audit, bandit, Trivy) runs on schedule. Frontend auto-deploys to Cloudflare Pages.</p>
+<p>---</p>
+<h3>Related Projects</h3>
+<p>For governed NL-to-SQL analytics, see <a href="https://github.com/KIM3310/Nexus-Hive" rel="noopener">Nexus-Hive</a>. For the data pipeline layer, see <a href="https://github.com/KIM3310/lakehouse-contract-lab" rel="noopener">lakehouse-contract-lab</a>.</p>
+<h3>Cloud + AI Architecture</h3>
+<ul><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/cloud-ai-architecture.md" rel="noopener">Cloud + AI architecture blueprint</a></li><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/architecture/blueprint.json" rel="noopener">Machine-readable architecture manifest</a></li><li>Validation command: <code>python3 scripts/validate_architecture_blueprint.py</code></li></ul>
+<h3>Enterprise Productization</h3>
+<ul><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/product-operating-model.md" rel="noopener">Product operating model</a> defines the product scope, trust boundary, operating checks, and service path for this repository.</li></ul>
+<h3>System Architecture</h3>
+<ul><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/system-architecture.md" rel="noopener">System architecture</a> maps the runtime boundary, data/control flow, cloud or local deployment surface, and operating assumptions for this repository.</li></ul>
+<h3>Service Architecture</h3>
+<ul><li><a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/service-architecture.md" rel="noopener">Service architecture</a> defines the cloud resources, account information, usage controls, and production guardrails needed to turn this repo into a scoped service without publishing public financial assumptions.</li></ul>
+<h3>Search And Service Surface</h3>
+<ul><li>Public entry: public templates, service brief samples, and architecture docs</li><li>Paid boundary: paid workshop pack, private control tower deployment, and governance evidence bundle</li><li>Canonical URL: https://enterprise-llm-kit.pages.dev/</li><li>Lead capture: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=enterprise-llm-adoption-kit&amp;inquiry=private-ai-readiness-sprint#private-inquiry</li><li>Resource route: https://kim3310-doeon-kim-portfolio.pages.dev/resources/enterprise-llm-adoption-kit/</li><li>Commercial route: https://kim3310-doeon-kim-portfolio.pages.dev/?offer=enterprise-llm-adoption-kit#service-offers</li><li>Machine-readable offer: <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/service-offer.json" rel="noopener">docs/service-offer.json</a></li><li>Search growth implementation: <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/search-growth-implementation.md" rel="noopener">docs/search-growth-implementation.md</a></li><li>Revenue architecture: <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/docs/revenue-architecture.md" rel="noopener">docs/revenue-architecture.md</a></li></ul></article>
+    <aside class="source-basis">
+      <strong>Source basis:</strong> <a href="https://github.com/KIM3310/enterprise-llm-adoption-kit/blob/main/README.md" rel="noopener">README.md</a>. Corrections can be proposed through the public repository without submitting private data.
+    </aside>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="site-footer-links"><a href="/">Home</a><a href="/guide.html">Project guide</a><a href="/architecture.html">Architecture</a><a href="/verification.html">Verification</a><a href="/publisher.html">Publisher</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://kim3310-doeon-kim-portfolio.pages.dev/">Resource atlas</a></div>
+      <p>Advertising may appear on this public editorial page after Google approves the site. Ads are not placed inside private, transactional, diagnostic, security-response, or operational workflows.</p>
+    </div>
+  </footer>
+</body>
+</html>

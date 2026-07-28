@@ -51,9 +51,19 @@ def test_search_discovery_files_cover_the_public_policy_surface():
     sitemap = ElementTree.parse(PUBLIC_DIR / "sitemap.xml")
     namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locations = {element.text for element in sitemap.findall("s:url/s:loc", namespace)}
-    expected = {f"{SITE_ORIGIN}/"} | {
-        f"{SITE_ORIGIN}/{route}" for route in POLICY_SURFACES
-    }
+    expected = (
+        {f"{SITE_ORIGIN}/"}
+        | {f"{SITE_ORIGIN}/{route}" for route in POLICY_SURFACES}
+        | {
+            f"{SITE_ORIGIN}/{route}"
+            for route in (
+                "guide.html",
+                "architecture.html",
+                "verification.html",
+                "publisher.html",
+            )
+        }
+    )
 
     assert locations == expected
 

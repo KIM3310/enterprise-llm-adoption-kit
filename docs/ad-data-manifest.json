@@ -6,7 +6,7 @@
   "audience": "enterprise AI governance teams",
   "public_resource": {
     "url": "https://kim3310-doeon-kim-portfolio.pages.dev/resources/enterprise-llm-adoption-kit/",
-    "live_demo": "https://enterprise-llm-kit.pages.dev",
+    "live_demo": "https://enterprise-llm-kit.pages.dev/",
     "readiness_checklist": [
       "Architecture Summary",
       "Runtime And Data Flow",
