@@ -7,7 +7,8 @@
     "dev": "vite --host 0.0.0.0 --port 5173",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0 --port 5173",
-    "verify": "npm run build"
+    "verify": "npm run build",
+    "pages:deploy": "npm run build && npx --yes wrangler@latest pages deploy dist --project-name=enterprise-llm-kit --branch=main"
   },
   "dependencies": {
     "react": "18.3.1",
