@@ -5,11 +5,25 @@ ratio, injection ratio, and daily cost.  Alerts are optionally
 dispatched to an external webhook (Slack, PagerDuty, etc.).
 """
 
+import math
 from typing import Dict, List
 
 import requests
 
 from .config import settings
+
+_ALERT_TIMEOUT_MIN_SEC = 1.0
+_ALERT_TIMEOUT_MAX_SEC = 30.0
+
+
+def _clamp_alert_timeout(value: object) -> float:
+    try:
+        timeout_sec = float(value)
+    except (TypeError, ValueError):
+        return 5.0
+    if not math.isfinite(timeout_sec):
+        return 5.0
+    return min(max(_ALERT_TIMEOUT_MIN_SEC, timeout_sec), _ALERT_TIMEOUT_MAX_SEC)
 
 
 def _policy_counts(summary: Dict) -> Dict[str, int]:
@@ -88,9 +102,9 @@ def dispatch_ops_alerts(alerts: List[Dict], summary: Dict, daily_cost_usd: float
         "daily_cost_usd": round(float(daily_cost_usd), 6),
     }
 
-    timeout_sec = float(getattr(settings, "ops_alert_webhook_timeout_sec", 5.0))
+    timeout_sec = _clamp_alert_timeout(getattr(settings, "ops_alert_webhook_timeout_sec", 5.0))
     try:
-        response = requests.post(webhook_url, json=payload, timeout=max(1.0, timeout_sec))
+        response = requests.post(webhook_url, json=payload, timeout=timeout_sec)  # nosec B113
         response.raise_for_status()
         return {"sent": len(alerts), "failed": 0}
     except requests.RequestException:

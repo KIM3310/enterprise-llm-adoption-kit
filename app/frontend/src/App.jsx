@@ -4761,8 +4761,8 @@ export default function App() {
           <p>Privacy: only operational telemetry required for governance workflows.</p>
           <p>Terms: guidance output must be reviewed by human operators before production decisions.</p>
           <p>
-            Links: <a href="/about.html">About</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> ·{" "}
-            <a href="/contact.html">Contact</a> · <a href="/compliance.html">Compliance</a>
+            Links: <a href="/about">About</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> ·{" "}
+            <a href="/contact">Contact</a> · <a href="/compliance">Compliance</a>
           </p>
         </div>
       </footer>

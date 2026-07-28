@@ -126,13 +126,23 @@ def test_execute_sql_and_query_rows_use_statement_execution(monkeypatch) -> None
     monkeypatch.setattr(da, "_build_workspace_client", lambda: FakeClient())
     monkeypatch.setattr(da, "_resolve_warehouse_id", lambda client: "wh-123")
 
-    statement_response = da._execute_sql("SELECT 1", timeout_sec=15)
-    rows = da._query_rows("SELECT event_type, dataset FROM eval_runs", timeout_sec=15, limit=5)
+    statement_response = da._execute_sql(
+        "SELECT :value",
+        timeout_sec=15,
+        parameters=[{"name": "value", "value": "1", "type": "INT"}],
+    )
+    rows = da._query_rows(
+        "SELECT event_type, dataset FROM eval_runs WHERE dataset = :dataset",
+        timeout_sec=15,
+        limit=5,
+        parameters=[{"name": "dataset", "value": "demo", "type": "STRING"}],
+    )
 
     assert statement_response is response
     assert recorded["kwargs"]["warehouse_id"] == "wh-123"
     assert recorded["kwargs"]["catalog"] == "workspace"
     assert recorded["kwargs"]["schema"] == "llm_ops"
+    assert recorded["kwargs"]["parameters"] == [{"name": "dataset", "value": "demo", "type": "STRING"}]
     assert rows == [{"event_type": "uc1", "dataset": "demo"}]
 
 
@@ -257,7 +267,11 @@ def test_ensure_delta_tables_emits_schema_and_table_ddl(monkeypatch) -> None:
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
     monkeypatch.setenv("DATABRICKS_CATALOG", "workspace")
     monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
-    monkeypatch.setattr(da, "_execute_sql", lambda statement, timeout_sec=30: statements.append(statement) or {})
+    monkeypatch.setattr(
+        da,
+        "_execute_sql",
+        lambda statement, timeout_sec=30, parameters=None: statements.append(statement) or {},
+    )
 
     da._ensure_delta_tables()
 
@@ -267,17 +281,25 @@ def test_ensure_delta_tables_emits_schema_and_table_ddl(monkeypatch) -> None:
 
 
 def test_store_and_query_delta_tables_build_expected_sql(monkeypatch) -> None:
-    statements = []
+    calls = []
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
     monkeypatch.setenv("DATABRICKS_CATALOG", "workspace")
     monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_ensure_tables_once", lambda: None)
-    monkeypatch.setattr(da, "_execute_sql", lambda statement, timeout_sec=30: statements.append(statement) or {})
+
+    def _record_execute(statement, timeout_sec=30, parameters=None):
+        calls.append({"statement": statement, "parameters": parameters or []})
+        return {}
+
+    monkeypatch.setattr(da, "_execute_sql", _record_execute)
     monkeypatch.setattr(
         da,
         "_query_rows",
-        lambda statement, timeout_sec=30, limit=1000: [{"event_type": "uc1", "dataset": "demo"}],
+        lambda statement, timeout_sec=30, limit=1000, parameters=None: calls.append(
+            {"statement": statement, "parameters": parameters or []}
+        )
+        or [{"event_type": "uc1", "dataset": "demo"}],
     )
 
     da.store_audit_event_delta(
@@ -312,8 +334,54 @@ def test_store_and_query_delta_tables_build_expected_sql(monkeypatch) -> None:
     )
     eval_rows = da.query_eval_runs(dataset="demo", since=datetime.now(timezone.utc), limit=5)
 
-    assert len(statements) == 2
-    assert "INSERT INTO `workspace`.`llm_ops`.`audit_events`" in statements[0]
-    assert "INSERT INTO `workspace`.`llm_ops`.`eval_runs`" in statements[1]
+    assert len(calls) == 4
+    assert calls[0]["statement"].startswith("INSERT INTO\n`workspace`.`llm_ops`.`audit_events`")
+    assert calls[1]["statement"].startswith("INSERT INTO\n`workspace`.`llm_ops`.`eval_runs`")
+    assert "user_id = :user_id" in calls[2]["statement"]
+    assert "dataset = :dataset" in calls[3]["statement"]
     assert audit_rows[0]["event_type"] == "uc1"
     assert eval_rows[0]["dataset"] == "demo"
+
+
+def test_delta_sql_uses_parameters_for_user_derived_values(monkeypatch) -> None:
+    calls = []
+    attack = "x'); DROP TABLE audit_events; --"
+    monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
+    monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
+    monkeypatch.setenv("DATABRICKS_CATALOG", "workspace")
+    monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
+    monkeypatch.setattr(da, "_ensure_tables_once", lambda: None)
+
+    def _record_execute(statement, timeout_sec=30, parameters=None):
+        calls.append({"statement": statement, "parameters": parameters or []})
+        return {}
+
+    def _record_query(statement, timeout_sec=30, limit=1000, parameters=None):
+        calls.append({"statement": statement, "parameters": parameters or []})
+        return []
+
+    monkeypatch.setattr(da, "_execute_sql", _record_execute)
+    monkeypatch.setattr(da, "_query_rows", _record_query)
+
+    da.store_audit_event_delta(event_id=attack, user_id=attack, metadata={"attack": attack})
+    da.store_eval_run_delta(run_id=attack, dataset=attack, metadata={"attack": attack})
+    da.query_audit_events(user_id=attack, event_type=attack, since=datetime.now(timezone.utc))
+    da.query_eval_runs(dataset=attack, since=datetime.now(timezone.utc))
+
+    statements = "\n".join(call["statement"] for call in calls)
+    assert attack not in statements
+    assert "DROP TABLE" not in statements
+    parameter_values = [param["value"] for call in calls for param in call["parameters"]]
+    assert attack in parameter_values
+
+
+def test_databricks_identifiers_are_strictly_validated(monkeypatch) -> None:
+    monkeypatch.setenv("DATABRICKS_CATALOG", "workspace;DROP")
+    monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
+
+    try:
+        da._table_fqn("audit_events")
+    except ValueError as exc:
+        assert "Invalid Databricks identifier" in str(exc)
+    else:  # pragma: no cover
+        raise AssertionError("expected invalid Databricks catalog to be rejected")

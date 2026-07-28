@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -68,13 +69,23 @@ def is_enabled() -> bool:
 _mlflow_initialized = False
 _sql_client: Any = None
 
+_IDENTIFIER_PATTERN = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
 
 def _quote(name: str) -> str:
-    return f"`{name.replace('`', '``')}`"
+    if not _IDENTIFIER_PATTERN.fullmatch(name):
+        raise ValueError(f"Invalid Databricks identifier: {name!r}")
+    return f"`{name}`"
 
 
-def _escape_sql_string(value: str) -> str:
-    return value.replace("'", "''")
+def _validated_identifier(name: str) -> str:
+    if not _IDENTIFIER_PATTERN.fullmatch(name):
+        raise ValueError(f"Invalid Databricks identifier: {name!r}")
+    return name
+
+
+def _sql_parameter(name: str, value: Any, value_type: str) -> Dict[str, Any]:
+    return {"name": name, "value": str(value), "type": value_type}
 
 
 def _table_fqn(table_name: str) -> str:
@@ -131,23 +142,37 @@ def _statement_error(response: Any) -> str:
     return getattr(error, "message", "") or str(error)
 
 
-def _execute_sql(statement: str, *, timeout_sec: int = 30) -> Any:
+def _execute_sql(
+    statement: str,
+    *,
+    timeout_sec: int = 30,
+    parameters: Optional[List[Dict[str, Any]]] = None,
+) -> Any:
     client = _build_workspace_client()
     settings = _settings()
-    response = client.statement_execution.execute_statement(
-        warehouse_id=_resolve_warehouse_id(client),
-        statement=statement,
-        catalog=settings["catalog"],
-        schema=settings["schema"],
-        wait_timeout=f"{min(max(5, timeout_sec), 50)}s",
-    )
+    request: Dict[str, Any] = {
+        "warehouse_id": _resolve_warehouse_id(client),
+        "statement": statement,
+        "catalog": _validated_identifier(settings["catalog"]),
+        "schema": _validated_identifier(settings["schema"]),
+        "wait_timeout": f"{min(max(5, timeout_sec), 50)}s",
+    }
+    if parameters:
+        request["parameters"] = parameters
+    response = client.statement_execution.execute_statement(**request)
     if _statement_state(response) != "SUCCEEDED":
         raise RuntimeError(_statement_error(response))
     return response
 
 
-def _query_rows(statement: str, *, timeout_sec: int = 30, limit: int = 1000) -> List[Dict[str, Any]]:
-    response = _execute_sql(statement, timeout_sec=timeout_sec)
+def _query_rows(
+    statement: str,
+    *,
+    timeout_sec: int = 30,
+    limit: int = 1000,
+    parameters: Optional[List[Dict[str, Any]]] = None,
+) -> List[Dict[str, Any]]:
+    response = _execute_sql(statement, timeout_sec=timeout_sec, parameters=parameters)
     schema = getattr(getattr(response, "manifest", None), "schema", None)
     columns = [column.name.lower() for column in getattr(schema, "columns", [])]
     rows = getattr(getattr(response, "result", None), "data_array", None) or []
@@ -347,31 +372,39 @@ def store_audit_event_delta(
     try:
         _ensure_tables_once()
         now = datetime.now(timezone.utc).isoformat()
-        payload = _escape_sql_string(json.dumps(metadata or {}))
-        event_id_sql = _escape_sql_string(event_id)
-        event_type_sql = _escape_sql_string(event_type)
-        user_id_sql = _escape_sql_string(user_id)
-        role_sql = _escape_sql_string(role)
-        endpoint_sql = _escape_sql_string(endpoint)
-        input_hash_sql = _escape_sql_string(input_hash)
-        output_hash_sql = _escape_sql_string(output_hash)
-        mode_sql = _escape_sql_string(mode)
+        audit_events_table = _table_fqn("audit_events")
+        statement = "\n".join(
+            [
+                "INSERT INTO",
+                audit_events_table,
+                "VALUES (",
+                "    :event_id,",
+                "    :event_type,",
+                "    :user_id,",
+                "    :role,",
+                "    :endpoint,",
+                "    :input_hash,",
+                "    :output_hash,",
+                "    :mode,",
+                "    :metadata,",
+                "    CAST(:created_at AS TIMESTAMP)",
+                ")",
+            ]
+        )
         _execute_sql(
-            f"""
-            INSERT INTO {_table_fqn('audit_events')}
-            VALUES (
-                '{event_id_sql}',
-                '{event_type_sql}',
-                '{user_id_sql}',
-                '{role_sql}',
-                '{endpoint_sql}',
-                '{input_hash_sql}',
-                '{output_hash_sql}',
-                '{mode_sql}',
-                '{payload}',
-                TIMESTAMP('{now}')
-            )
-            """
+            statement,
+            parameters=[
+                _sql_parameter("event_id", event_id, "STRING"),
+                _sql_parameter("event_type", event_type, "STRING"),
+                _sql_parameter("user_id", user_id, "STRING"),
+                _sql_parameter("role", role, "STRING"),
+                _sql_parameter("endpoint", endpoint, "STRING"),
+                _sql_parameter("input_hash", input_hash, "STRING"),
+                _sql_parameter("output_hash", output_hash, "STRING"),
+                _sql_parameter("mode", mode, "STRING"),
+                _sql_parameter("metadata", json.dumps(metadata or {}), "STRING"),
+                _sql_parameter("created_at", now, "STRING"),
+            ],
         )
     except Exception:
         logger.exception("Failed to store audit event in Delta table")
@@ -396,29 +429,43 @@ def store_eval_run_delta(
     try:
         _ensure_tables_once()
         now = datetime.now(timezone.utc).isoformat()
-        payload = _escape_sql_string(json.dumps(metadata or {}))
-        run_id_sql = _escape_sql_string(run_id)
-        run_name_sql = _escape_sql_string(run_name)
-        dataset_sql = _escape_sql_string(dataset)
-        mlflow_run_id_sql = _escape_sql_string(mlflow_run_id)
+        eval_runs_table = _table_fqn("eval_runs")
+        statement = "\n".join(
+            [
+                "INSERT INTO",
+                eval_runs_table,
+                "VALUES (",
+                "    :run_id,",
+                "    :run_name,",
+                "    :dataset,",
+                "    :total_samples,",
+                "    :avg_accuracy,",
+                "    :avg_groundedness,",
+                "    :avg_helpfulness,",
+                "    :avg_safety,",
+                "    :avg_latency_ms,",
+                "    :mlflow_run_id,",
+                "    :metadata,",
+                "    CAST(:created_at AS TIMESTAMP)",
+                ")",
+            ]
+        )
         _execute_sql(
-            f"""
-            INSERT INTO {_table_fqn('eval_runs')}
-            VALUES (
-                '{run_id_sql}',
-                '{run_name_sql}',
-                '{dataset_sql}',
-                {int(total_samples)},
-                {float(avg_accuracy)},
-                {float(avg_groundedness)},
-                {float(avg_helpfulness)},
-                {float(avg_safety)},
-                {float(avg_latency_ms)},
-                '{mlflow_run_id_sql}',
-                '{payload}',
-                TIMESTAMP('{now}')
-            )
-            """
+            statement,
+            parameters=[
+                _sql_parameter("run_id", run_id, "STRING"),
+                _sql_parameter("run_name", run_name, "STRING"),
+                _sql_parameter("dataset", dataset, "STRING"),
+                _sql_parameter("total_samples", int(total_samples), "INT"),
+                _sql_parameter("avg_accuracy", float(avg_accuracy), "DOUBLE"),
+                _sql_parameter("avg_groundedness", float(avg_groundedness), "DOUBLE"),
+                _sql_parameter("avg_helpfulness", float(avg_helpfulness), "DOUBLE"),
+                _sql_parameter("avg_safety", float(avg_safety), "DOUBLE"),
+                _sql_parameter("avg_latency_ms", float(avg_latency_ms), "DOUBLE"),
+                _sql_parameter("mlflow_run_id", mlflow_run_id, "STRING"),
+                _sql_parameter("metadata", json.dumps(metadata or {}), "STRING"),
+                _sql_parameter("created_at", now, "STRING"),
+            ],
         )
         logger.info("Stored eval run summary in Delta: %s", run_id)
     except Exception:
@@ -437,17 +484,28 @@ def query_audit_events(
     try:
         _ensure_tables_once()
         clauses: List[str] = []
+        parameters: List[Dict[str, Any]] = []
         if user_id:
-            clauses.append(f"user_id = '{_escape_sql_string(user_id)}'")
+            clauses.append("user_id = :user_id")
+            parameters.append(_sql_parameter("user_id", user_id, "STRING"))
         if event_type:
-            clauses.append(f"event_type = '{_escape_sql_string(event_type)}'")
+            clauses.append("event_type = :event_type")
+            parameters.append(_sql_parameter("event_type", event_type, "STRING"))
         if since:
-            clauses.append(f"created_at >= TIMESTAMP('{since.astimezone(timezone.utc).isoformat()}')")
+            clauses.append("created_at >= CAST(:since AS TIMESTAMP)")
+            parameters.append(_sql_parameter("since", since.astimezone(timezone.utc).isoformat(), "STRING"))
         where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
         safe_limit = max(1, min(limit, 10000))
-        return _query_rows(
-            f"SELECT * FROM {_table_fqn('audit_events')}{where} ORDER BY created_at DESC LIMIT {safe_limit}"
+        audit_events_table = _table_fqn("audit_events")
+        statement = " ".join(
+            [
+                "SELECT * FROM",
+                audit_events_table + where,
+                "ORDER BY created_at DESC LIMIT",
+                str(safe_limit),
+            ]
         )
+        return _query_rows(statement, parameters=parameters)
     except Exception:
         logger.exception("Failed to query audit events from Delta")
         return []
@@ -464,15 +522,25 @@ def query_eval_runs(
     try:
         _ensure_tables_once()
         clauses: List[str] = []
+        parameters: List[Dict[str, Any]] = []
         if dataset:
-            clauses.append(f"dataset = '{_escape_sql_string(dataset)}'")
+            clauses.append("dataset = :dataset")
+            parameters.append(_sql_parameter("dataset", dataset, "STRING"))
         if since:
-            clauses.append(f"created_at >= TIMESTAMP('{since.astimezone(timezone.utc).isoformat()}')")
+            clauses.append("created_at >= CAST(:since AS TIMESTAMP)")
+            parameters.append(_sql_parameter("since", since.astimezone(timezone.utc).isoformat(), "STRING"))
         where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
         safe_limit = max(1, min(limit, 10000))
-        return _query_rows(
-            f"SELECT * FROM {_table_fqn('eval_runs')}{where} ORDER BY created_at DESC LIMIT {safe_limit}"
+        eval_runs_table = _table_fqn("eval_runs")
+        statement = " ".join(
+            [
+                "SELECT * FROM",
+                eval_runs_table + where,
+                "ORDER BY created_at DESC LIMIT",
+                str(safe_limit),
+            ]
         )
+        return _query_rows(statement, parameters=parameters)
     except Exception:
         logger.exception("Failed to query eval runs from Delta")
         return []

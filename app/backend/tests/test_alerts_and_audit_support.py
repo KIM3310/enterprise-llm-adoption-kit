@@ -156,6 +156,41 @@ def test_dispatch_ops_alerts_failure_and_short_circuit(monkeypatch) -> None:
     ) == {"sent": 0, "failed": 1}
 
 
+def test_dispatch_ops_alerts_clamps_non_finite_and_out_of_range_timeouts(monkeypatch) -> None:
+    captured = []
+
+    class _Response:
+        def raise_for_status(self) -> None:
+            return None
+
+    def _fake_post(url, *, json, timeout):
+        captured.append(timeout)
+        return _Response()
+
+    monkeypatch.setattr(alerts.requests, "post", _fake_post)
+
+    for raw_timeout, expected in [
+        (0.01, 1.0),
+        (999.0, 30.0),
+        ("nan", 5.0),
+        ("not-a-number", 5.0),
+    ]:
+        monkeypatch.setattr(
+            alerts,
+            "settings",
+            SimpleNamespace(
+                ops_alert_webhook_url="https://hooks.example.test/ops",
+                ops_alert_webhook_timeout_sec=raw_timeout,
+            ),
+        )
+        assert alerts.dispatch_ops_alerts([{"code": "high_injection_ratio"}], {"requests": 1}, 1.0) == {
+            "sent": 1,
+            "failed": 0,
+        }
+
+    assert captured == [expected for _, expected in [(0.01, 1.0), (999.0, 30.0), ("nan", 5.0), ("not-a-number", 5.0)]]
+
+
 def test_build_payload_hashes_enterprise_mode(monkeypatch, tmp_path) -> None:
     audit = _load_audit_module(
         monkeypatch, tmp_path, mode="enterprise", retention_days=7

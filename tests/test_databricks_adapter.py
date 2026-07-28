@@ -8,6 +8,9 @@ workspace.
 import sys
 import types
 from datetime import datetime, timezone
+
+import pytest
+
 import app.databricks_adapter as da
 
 
@@ -81,14 +84,20 @@ def test_read_token_missing_file_returns_empty(monkeypatch, tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_quote_escapes_backticks():
-    assert da._quote("my`table") == "`my``table`"
+def test_quote_accepts_safe_identifiers_and_rejects_arbitrary_values():
     assert da._quote("clean_name") == "`clean_name`"
+    for invalid_identifier in ("my`table", "catalog.schema", "bad-name", "audit_events; DROP TABLE users"):
+        with pytest.raises(ValueError, match="Invalid Databricks identifier"):
+            da._quote(invalid_identifier)
 
 
-def test_escape_sql_string():
-    assert da._escape_sql_string("it's a test") == "it''s a test"
-    assert da._escape_sql_string("no quotes") == "no quotes"
+def test_sql_parameter_preserves_value_without_sql_escaping():
+    value = "it's a test'); DROP TABLE audit_events; --"
+    assert da._sql_parameter("event_id", value, "STRING") == {
+        "name": "event_id",
+        "value": value,
+        "type": "STRING",
+    }
 
 
 def test_table_fqn_builds_qualified_name(monkeypatch):
@@ -216,6 +225,7 @@ def test_resolve_warehouse_id_raises_when_empty(monkeypatch):
 
 
 def test_execute_sql_succeeds(monkeypatch):
+    calls = []
     response = types.SimpleNamespace(
         status=types.SimpleNamespace(
             state=types.SimpleNamespace(value="SUCCEEDED"),
@@ -225,16 +235,24 @@ def test_execute_sql_succeeds(monkeypatch):
 
     class FakeClient:
         statement_execution = types.SimpleNamespace(
-            execute_statement=lambda **kwargs: response
+            execute_statement=lambda **kwargs: calls.append(kwargs) or response
         )
 
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
+    monkeypatch.setenv("DATABRICKS_CATALOG", "main")
+    monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_build_workspace_client", lambda: FakeClient())
     monkeypatch.setattr(da, "_resolve_warehouse_id", lambda c: "wh-1")
 
-    result = da._execute_sql("SELECT 1")
+    value = "value' OR 1=1 --"
+    parameters = [da._sql_parameter("value", value, "STRING")]
+    result = da._execute_sql("SELECT :value", parameters=parameters)
+
     assert result is response
+    assert calls[0]["statement"] == "SELECT :value"
+    assert value not in calls[0]["statement"]
+    assert calls[0]["parameters"] == parameters
 
 
 def test_execute_sql_raises_on_failure(monkeypatch):
@@ -264,6 +282,7 @@ def test_execute_sql_raises_on_failure(monkeypatch):
 
 
 def test_query_rows_returns_dicts(monkeypatch):
+    calls = []
     response = types.SimpleNamespace(
         status=types.SimpleNamespace(
             state=types.SimpleNamespace(value="SUCCEEDED"),
@@ -283,17 +302,28 @@ def test_query_rows_returns_dicts(monkeypatch):
 
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
+    monkeypatch.setenv("DATABRICKS_CATALOG", "main")
+    monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_build_workspace_client", lambda: types.SimpleNamespace(
         statement_execution=types.SimpleNamespace(
-            execute_statement=lambda **kwargs: response
+            execute_statement=lambda **kwargs: calls.append(kwargs) or response
         )
     ))
     monkeypatch.setattr(da, "_resolve_warehouse_id", lambda c: "wh-1")
 
-    rows = da._query_rows("SELECT run_id, accuracy FROM eval_runs", limit=10)
+    dataset = "redteam_50' OR 1=1 --"
+    parameters = [da._sql_parameter("dataset", dataset, "STRING")]
+    rows = da._query_rows(
+        "SELECT run_id, accuracy FROM eval_runs WHERE dataset = :dataset",
+        limit=10,
+        parameters=parameters,
+    )
+
     assert len(rows) == 2
     assert rows[0]["run_id"] == "run-1"
     assert rows[1]["accuracy"] == "3.8"
+    assert dataset not in calls[0]["statement"]
+    assert calls[0]["parameters"] == parameters
 
 
 # ---------------------------------------------------------------------------
@@ -384,18 +414,24 @@ def test_ensure_delta_tables_creates_schema_and_tables(monkeypatch):
 
 
 def test_store_audit_event_delta_builds_insert(monkeypatch):
-    statements = []
+    calls = []
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
     monkeypatch.setenv("DATABRICKS_CATALOG", "main")
     monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_ensure_tables_once", lambda: None)
-    monkeypatch.setattr(da, "_execute_sql", lambda stmt, timeout_sec=30: statements.append(stmt))
+    monkeypatch.setattr(
+        da,
+        "_execute_sql",
+        lambda stmt, timeout_sec=30, parameters=None: calls.append((stmt, parameters)),
+    )
 
+    event_id = "evt-100'); DROP TABLE audit_events; --"
+    user_id = "analyst-1' OR 1=1 --"
     da.store_audit_event_delta(
-        event_id="evt-100",
+        event_id=event_id,
         event_type="uc1",
-        user_id="analyst-1",
+        user_id=user_id,
         role="Employee",
         endpoint="/uc1/architecture",
         input_hash="hash-in",
@@ -404,25 +440,38 @@ def test_store_audit_event_delta_builds_insert(monkeypatch):
         metadata={"injection_detected": False},
     )
 
-    assert len(statements) == 1
-    assert "INSERT INTO `main`.`llm_ops`.`audit_events`" in statements[0]
-    assert "evt-100" in statements[0]
-    assert "analyst-1" in statements[0]
+    assert len(calls) == 1
+    sql, parameters = calls[0]
+    assert sql.startswith("INSERT INTO\n`main`.`llm_ops`.`audit_events`")
+    assert ":event_id" in sql
+    assert ":user_id" in sql
+    assert event_id not in sql
+    assert user_id not in sql
+    assert "DROP TABLE" not in sql
+    parameters_by_name = {parameter["name"]: parameter for parameter in parameters}
+    assert parameters_by_name["event_id"]["value"] == event_id
+    assert parameters_by_name["user_id"]["value"] == user_id
 
 
 def test_store_eval_run_delta_builds_insert(monkeypatch):
-    statements = []
+    calls = []
     monkeypatch.setenv("DATABRICKS_HOST", "https://dbc.example.com")
     monkeypatch.setenv("DATABRICKS_AUTH_TYPE", "databricks-cli")
     monkeypatch.setenv("DATABRICKS_CATALOG", "main")
     monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_ensure_tables_once", lambda: None)
-    monkeypatch.setattr(da, "_execute_sql", lambda stmt, timeout_sec=30: statements.append(stmt))
+    monkeypatch.setattr(
+        da,
+        "_execute_sql",
+        lambda stmt, timeout_sec=30, parameters=None: calls.append((stmt, parameters)),
+    )
 
+    run_name = "nightly-eval'); DELETE FROM eval_runs; --"
+    dataset = "redteam_50' OR 1=1 --"
     da.store_eval_run_delta(
         run_id="run-200",
-        run_name="nightly-eval",
-        dataset="redteam_50",
+        run_name=run_name,
+        dataset=dataset,
         total_samples=50,
         avg_accuracy=4.1,
         avg_groundedness=3.9,
@@ -433,11 +482,18 @@ def test_store_eval_run_delta_builds_insert(monkeypatch):
         metadata={"source": "ci"},
     )
 
-    assert len(statements) == 1
-    assert "INSERT INTO `main`.`llm_ops`.`eval_runs`" in statements[0]
-    assert "run-200" in statements[0]
-    assert "nightly-eval" in statements[0]
-    assert "mlflow-xyz" in statements[0]
+    assert len(calls) == 1
+    sql, parameters = calls[0]
+    assert sql.startswith("INSERT INTO\n`main`.`llm_ops`.`eval_runs`")
+    assert ":run_name" in sql
+    assert ":dataset" in sql
+    assert run_name not in sql
+    assert dataset not in sql
+    assert "DELETE FROM" not in sql
+    parameters_by_name = {parameter["name"]: parameter for parameter in parameters}
+    assert parameters_by_name["run_name"]["value"] == run_name
+    assert parameters_by_name["dataset"]["value"] == dataset
+    assert parameters_by_name["mlflow_run_id"]["value"] == "mlflow-xyz"
 
 
 def test_store_audit_event_delta_noop_when_disabled(monkeypatch):
@@ -460,29 +516,40 @@ def test_query_audit_events_with_filters(monkeypatch):
     monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_ensure_tables_once", lambda: None)
 
-    captured_sql = []
+    calls = []
     monkeypatch.setattr(
         da,
         "_query_rows",
-        lambda stmt, timeout_sec=30, limit=1000: captured_sql.append(stmt) or [
-            {"event_type": "uc1", "user_id": "analyst-1"}
-        ],
+        lambda stmt, timeout_sec=30, limit=1000, parameters=None: calls.append(
+            (stmt, parameters)
+        )
+        or [{"event_type": "uc1", "user_id": "analyst-1"}],
     )
 
+    user_id = "analyst-1' OR 1=1 --"
+    event_type = "uc1'); DROP TABLE audit_events; --"
+    since = datetime(2026, 3, 1, tzinfo=timezone.utc)
     rows = da.query_audit_events(
-        user_id="analyst-1",
-        event_type="uc1",
-        since=datetime(2026, 3, 1, tzinfo=timezone.utc),
+        user_id=user_id,
+        event_type=event_type,
+        since=since,
         limit=25,
     )
 
     assert len(rows) == 1
     assert rows[0]["user_id"] == "analyst-1"
-    sql = captured_sql[0]
-    assert "user_id = 'analyst-1'" in sql
-    assert "event_type = 'uc1'" in sql
-    assert "created_at >= TIMESTAMP" in sql
+    sql, parameters = calls[0]
+    assert "user_id = :user_id" in sql
+    assert "event_type = :event_type" in sql
+    assert "created_at >= CAST(:since AS TIMESTAMP)" in sql
     assert "LIMIT 25" in sql
+    assert user_id not in sql
+    assert event_type not in sql
+    assert "DROP TABLE" not in sql
+    parameters_by_name = {parameter["name"]: parameter for parameter in parameters}
+    assert parameters_by_name["user_id"]["value"] == user_id
+    assert parameters_by_name["event_type"]["value"] == event_type
+    assert parameters_by_name["since"]["value"] == since.isoformat()
 
 
 def test_query_eval_runs_with_filters(monkeypatch):
@@ -492,21 +559,29 @@ def test_query_eval_runs_with_filters(monkeypatch):
     monkeypatch.setenv("DATABRICKS_DELTA_SCHEMA", "llm_ops")
     monkeypatch.setattr(da, "_ensure_tables_once", lambda: None)
 
-    captured_sql = []
+    calls = []
     monkeypatch.setattr(
         da,
         "_query_rows",
-        lambda stmt, timeout_sec=30, limit=1000: captured_sql.append(stmt) or [
-            {"run_id": "run-200", "dataset": "redteam_50", "avg_accuracy": "4.1"}
-        ],
+        lambda stmt, timeout_sec=30, limit=1000, parameters=None: calls.append(
+            (stmt, parameters)
+        )
+        or [{"run_id": "run-200", "dataset": "redteam_50", "avg_accuracy": "4.1"}],
     )
 
-    rows = da.query_eval_runs(dataset="redteam_50", limit=10)
+    dataset = "redteam_50'); DROP TABLE eval_runs; --"
+    rows = da.query_eval_runs(dataset=dataset, limit=10)
+
     assert len(rows) == 1
     assert rows[0]["dataset"] == "redteam_50"
-    sql = captured_sql[0]
-    assert "dataset = 'redteam_50'" in sql
+    sql, parameters = calls[0]
+    assert "dataset = :dataset" in sql
     assert "LIMIT 10" in sql
+    assert dataset not in sql
+    assert "DROP TABLE" not in sql
+    assert parameters == [
+        {"name": "dataset", "value": dataset, "type": "STRING"},
+    ]
 
 
 def test_query_audit_events_empty_when_disabled(monkeypatch):
