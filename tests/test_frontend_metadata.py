@@ -57,10 +57,10 @@ def test_search_discovery_files_cover_the_public_policy_surface():
         | {
             f"{SITE_ORIGIN}/{route}"
             for route in (
-                "guide.html",
-                "architecture.html",
-                "verification.html",
-                "publisher.html",
+                "guide",
+                "architecture",
+                "verification",
+                "publisher",
             )
         }
     )
