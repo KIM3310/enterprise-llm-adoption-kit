@@ -8,7 +8,10 @@ if str(ROOT_DIR) not in sys.path:
 
 from app.config import settings
 from app.control_tower import build_control_tower_decision
-from app.diagnostics import run_startup_diagnostics
+from app.diagnostics import (
+    run_startup_diagnostics,
+    summarize_startup_diagnostics,
+)
 from app.models import ControlTowerDecisionRequest, ControlTowerSignals, PlatformTargets
 from app.rag import RAGStore
 from app.storage import (
@@ -16,6 +19,21 @@ from app.storage import (
     get_recent_service_events,
     init_db,
 )
+
+
+def build_debug_smoke_output(
+    diagnostics: dict,
+    sample_decision: dict,
+    recent_decisions: list,
+    recent_service_events: list,
+) -> dict:
+    """Build smoke output without emitting diagnostic details or stored records."""
+    return {
+        "diagnostics": summarize_startup_diagnostics(diagnostics),
+        "sample_decision": sample_decision,
+        "recent_decision_count": len(recent_decisions),
+        "recent_service_event_count": len(recent_service_events),
+    }
 
 
 def main() -> None:
@@ -51,12 +69,12 @@ def main() -> None:
     )
     decision = build_control_tower_decision(payload)
 
-    output = {
-        "diagnostics": diagnostics,
-        "sample_decision": decision,
-        "recent_decisions": get_recent_control_tower_decisions(limit=3),
-        "recent_service_events": get_recent_service_events(limit=5),
-    }
+    output = build_debug_smoke_output(
+        diagnostics=diagnostics,
+        sample_decision=decision,
+        recent_decisions=get_recent_control_tower_decisions(limit=3),
+        recent_service_events=get_recent_service_events(limit=5),
+    )
     print(json.dumps(output, indent=2, ensure_ascii=True))
 
 
