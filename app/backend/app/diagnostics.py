@@ -24,6 +24,37 @@ CHECK_SEVERITY_POLICY = {
     "auth_config": "critical",
     "storage_backend": "critical",
 }
+STARTUP_STATUSES = {"healthy", "degraded", "critical"}
+
+
+def summarize_startup_diagnostics(report: Dict) -> Dict:
+    """Return an allowlisted status summary suitable for logs and CLI output.
+
+    Detailed check output can contain configuration or exception data. Keep it in
+    the in-memory diagnostics report, while exposing only fixed check names and
+    status values to unstructured output sinks.
+    """
+    raw_status = report.get("overall_status")
+    overall_status = (
+        raw_status
+        if isinstance(raw_status, str) and raw_status in STARTUP_STATUSES
+        else "unknown"
+    )
+
+    def _known_failures(key: str) -> List[str]:
+        raw_failures = report.get(key, [])
+        if not isinstance(raw_failures, (list, tuple, set)):
+            return []
+        return [name for name in CHECK_SEVERITY_POLICY if name in raw_failures]
+
+    return {
+        "ok": bool(report.get("ok", False)),
+        "startup_ready": bool(report.get("startup_ready", False)),
+        "overall_status": overall_status,
+        "failed_checks": _known_failures("failed_checks"),
+        "failed_critical_checks": _known_failures("failed_critical_checks"),
+        "failed_warning_checks": _known_failures("failed_warning_checks"),
+    }
 
 
 def run_startup_diagnostics(rag_store: object, sqlite_path: str, audit_log_path: str) -> Dict:
@@ -180,11 +211,10 @@ def _auth_config_check() -> Dict:
                     "error": "enterprise mode requires a non-default JWT secret",
                 },
             }
-        kids = list(getattr(settings, "jwt_secrets", {}).keys())
         return {
             "name": "auth_config",
             "ok": True,
-            "details": {"auth_mode": mode, "kids": kids},
+            "details": {"auth_mode": mode},
         }
 
     return {
