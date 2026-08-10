@@ -9,7 +9,12 @@ types of PII were found.
 import re
 from typing import Dict, Tuple
 
-EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+# Require the start of a local-part run. Without this boundary, a failed match on
+# a long run such as ``%%%%...`` is retried at every character, producing
+# quadratic backtracking on attacker-controlled request bodies.
+EMAIL_RE = re.compile(
+    r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+)
 PHONE_RE = re.compile(
     r"(?:\+?\d{1,3}[\s-]?)?(?:\(?\d{2,4}\)?[\s-]?)?\d{3,4}[\s-]?\d{4}"
 )
