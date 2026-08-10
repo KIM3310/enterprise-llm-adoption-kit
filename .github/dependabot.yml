@@ -4,8 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "wednesday"
+      time: "08:40"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
@@ -23,8 +23,8 @@ updates:
     directory: "/app/frontend"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "thursday"
+      time: "08:40"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
@@ -42,8 +42,8 @@ updates:
     directory: "/app/backend"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "friday"
+      time: "08:40"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
@@ -62,7 +62,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:00"
+      time: "08:50"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
@@ -81,8 +81,8 @@ updates:
     directory: "/app/frontend"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "tuesday"
+      time: "08:50"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
@@ -101,8 +101,8 @@ updates:
     directory: "/infra/aws/terraform"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "wednesday"
+      time: "08:50"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
@@ -120,8 +120,8 @@ updates:
     directory: "/infra/gcp/terraform"
     schedule:
       interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      day: "thursday"
+      time: "08:50"
       timezone: "Asia/Seoul"
     open-pull-requests-limit: 5
     groups:
