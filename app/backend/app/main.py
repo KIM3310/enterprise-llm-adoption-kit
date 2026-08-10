@@ -37,7 +37,10 @@ from .control_tower_service import (
     ControlTowerDecisionBuildError,
     ControlTowerService,
 )
-from .diagnostics import run_startup_diagnostics
+from .diagnostics import (
+    run_startup_diagnostics,
+    summarize_startup_diagnostics,
+)
 from .injection import detect_injection
 from .llm_adapter import (
     StubLLMAdapter,
@@ -759,12 +762,13 @@ def _run_startup(app: FastAPI) -> None:
     else:
         level = "ERROR"
         log_level = logging.ERROR
-    logger.log(log_level, "startup diagnostics: %s", report)
+    diagnostics_summary = summarize_startup_diagnostics(report)
+    logger.log(log_level, "startup diagnostics: %s", diagnostics_summary)
     _safe_record_service_event(
         level=level,
         component="startup",
         message=f"startup diagnostics completed ({overall_status})",
-        context=report,
+        context=diagnostics_summary,
     )
 
 
