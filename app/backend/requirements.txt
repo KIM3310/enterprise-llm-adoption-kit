@@ -10,8 +10,8 @@ prometheus_client==0.26.0
 requests==2.34.2
 httpx==0.28.1
 urllib3==2.7.0
-cryptography==49.0.0
-pyOpenSSL==26.3.0
+cryptography==50.0.0
+pyOpenSSL==26.4.0
 opentelemetry-api==1.44.0
 opentelemetry-sdk==1.44.0
 opentelemetry-instrumentation-fastapi==0.65b0
@@ -20,5 +20,5 @@ pytest==9.1.1
 pytest-cov==7.1.0
 snowflake-connector-python==4.7.1
 mlflow-skinny==3.14.0
-GitPython==3.1.57
+GitPython==3.1.58
 databricks-sdk==0.122.0
