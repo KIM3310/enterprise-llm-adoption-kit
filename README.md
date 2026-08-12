@@ -1,14 +1,16 @@
 # Enterprise LLM Adoption Kit
 
+[English](README.md) | [한국어](README.ko.md)
+
 [![CI](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/ci.yml)
 [![Security Scan](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/security-scan.yml/badge.svg)](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/security-scan.yml)
 [![Docker](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/KIM3310/enterprise-llm-adoption-kit/actions/workflows/docker-publish.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-**Production-grade governance toolkit for enterprise LLM deployments** -- RBAC, prompt-injection detection, PII redaction, audit logging, eval harness, and multi-cloud LLM routing, all wired into a single FastAPI + React application with Kubernetes-ready infrastructure.
+**Production-oriented governance reference for enterprise LLM deployments** -- RBAC, prompt-injection detection, PII redaction, audit logging, eval harness, and multi-cloud LLM routing, all wired into a single FastAPI + React application with Kubernetes-ready infrastructure.
 
-> All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates enterprise-grade LLM governance patterns end to end.
+> All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates production-oriented LLM governance patterns end to end.
 
 Technical review pack: [`docs/architecture-pack.md`](docs/architecture-pack.md)
 
@@ -18,7 +20,7 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 
 ## Three-Minute Proof
 
-1. Open [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md) to see the production test boundary.
+1. Open [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md) to see the deployment test boundary.
 2. Inspect the governance path: RBAC, prompt-injection checks, PII redaction, audit logging, and eval gates.
 3. Run `make verify` to cover backend quality, smoke checks, and frontend build.
 4. Keep synthetic data and environment-gated live providers explicit in any technical review.
@@ -28,7 +30,6 @@ Demo video: [https://youtu.be/yMq03b0js0E](https://youtu.be/yMq03b0js0E)
 | Lens | Current answer |
 |---|---|
 | Users | Enterprise AI adoption, IT governance, security, platform, and operations teams that need controlled LLM rollout. |
-| Technical path | Validate the demo, README, architecture notes, and quality gate before deeper workflow review. |
 | System scope | RBAC, prompt-injection checks, PII redaction, audit logs, eval gates, Snowflake/Databricks adapters, and deployment scaffolding in one runnable kit. |
 | Operating boundary | Synthetic rollout scenarios by default; external providers and enterprise data adapters are environment-gated. |
 | Evaluation path | `make verify`, [`docs/architecture-pack.md`](docs/architecture-pack.md), and [`docs/architecture_assets/poc_success_criteria.md`](docs/architecture_assets/poc_success_criteria.md). |
