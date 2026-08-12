@@ -30,9 +30,10 @@ The important design choice is that the governance path remains observable even 
 ## Demo Path
 
 ```bash
-make install
-make test
-python scripts/run_scenario_local.sh
+make verify
+make demo-local
+# In a second terminal after the local demo is healthy:
+make scenario-demo-local
 ```
 
 For a quick code read, inspect:
