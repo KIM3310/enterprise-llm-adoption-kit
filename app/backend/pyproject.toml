@@ -12,9 +12,9 @@ authors = [{ name = "Kim" }]
 license = { text = "MIT" }
 dependencies = [
   "fastapi==0.141.1",
-  "starlette==1.4.1",
+  "starlette==1.6.0",
   "uvicorn[standard]==0.52.1",
-  "boto3==1.43.66",
+  "boto3==1.43.68",
   "pydantic==2.13.4",
   "pyjwt==2.13.0",
   "chromadb==0.6.3",
@@ -39,7 +39,7 @@ dev = [
 ]
 databricks = [
   "mlflow-skinny==3.15.1",
-  "GitPython==3.1.58",
+  "GitPython==3.1.59",
   "databricks-sdk==0.125.0",
 ]
 
