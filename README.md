@@ -8,6 +8,8 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
+**Public demo identity:** The deployed review surface is branded **LLM Adoption Atelier**; this repository is the implementation and governance kit behind that demo.
+
 **Production-oriented governance reference for enterprise LLM deployments** -- RBAC, prompt-injection detection, PII redaction, audit logging, eval harness, and multi-cloud LLM routing, all wired into a single FastAPI + React application with Kubernetes-ready infrastructure.
 
 > All rollout data and review scenarios are synthetic. The goal is a reviewable, runnable validation kit that demonstrates production-oriented LLM governance patterns end to end.
@@ -156,7 +158,7 @@ cd app/backend && .venv/bin/python -m app
 
 # 2. Frontend (separate terminal)
 cd app/frontend
-npm install && npm run dev        # starts on http://localhost:5173
+npm ci && npm run dev             # starts on http://localhost:5173
 
 # 3. Verify everything
 make verify                       # syntax, deps, pytest, smoke, frontend build
@@ -285,7 +287,7 @@ enterprise-llm-adoption-kit/
 
 - `make verify` runs the backend syntax/dependency checks, Python suite, smoke diagnostics, and frontend production build.
 - `app/backend/.venv/bin/python -m pytest tests app/backend/tests -q` exercises the backend services, adapters, runtime scorecards, and UI metadata contracts.
-- `cd app/frontend && pnpm build` produces the static frontend bundle used by the Cloudflare Pages deployment path.
+- `cd app/frontend && npm run build` produces the static frontend bundle used by the Cloudflare Pages deployment path.
 
 ---
 
