@@ -3,7 +3,9 @@ FROM python:3.11-slim
 WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN python -m pip install --no-cache-dir --upgrade "pip>=26.1.2" "setuptools>=83.0.0" && \
+    python -m pip install --no-cache-dir -r /app/requirements.txt && \
+    python -m pip check
 
 COPY app /app/app
 COPY data /app/data
