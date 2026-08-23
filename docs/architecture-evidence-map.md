@@ -9,6 +9,7 @@ Use this page as the short path through the repository. It keeps the review grou
 | Field | Notes |
 |---|---|
 | Lane | Enterprise AI governance |
+| Public demo identity | **LLM Adoption Atelier** is the deployed review surface; **Enterprise LLM Adoption Kit** is its repository and governance-kit identity. |
 | Core idea | Governance toolkit with RBAC, redaction, prompt-injection checks, evals, and rollout controls. |
 | Primary reader | Enterprise AI, IT governance, security, platform, and operations teams. |
 | Stack | Terraform, Docker |

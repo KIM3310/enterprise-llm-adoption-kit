@@ -4,6 +4,8 @@ Note: 로컬에서 재현 가능한 엔터프라이즈 LLM 도입 검증 키트�
 
 영문 버전: `README.md`
 
+**공개 데모 브랜드:** 배포된 검토 화면의 이름은 **LLM Adoption Atelier**이며, 이 저장소는 해당 데모를 구현하고 운영 거버넌스를 설명하는 키트입니다.
+
 ## 데모 영상
 - YouTube: https://youtu.be/yMq03b0js0E
 
@@ -128,7 +130,7 @@ python3 -m app
 2) Frontend
 ```
 cd app/frontend
-npm install
+npm ci
 npm run dev
 ```
 3) 접속: `http://localhost:5173`

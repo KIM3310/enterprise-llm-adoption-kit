@@ -55,7 +55,7 @@ $(BACKEND_STAMP): $(BACKEND_DIR)/pyproject.toml $(BACKEND_DIR)/requirements.txt 
 frontend-install: $(FRONTEND_STAMP)
 
 $(FRONTEND_STAMP): $(FRONTEND_DIR)/package.json $(FRONTEND_DIR)/package-lock.json
-	@cd $(FRONTEND_DIR) && $(NPM) install $(NPM_INSTALL_FLAGS)
+	@cd $(FRONTEND_DIR) && $(NPM) ci $(NPM_INSTALL_FLAGS)
 	@touch $(FRONTEND_STAMP)
 
 demo:
