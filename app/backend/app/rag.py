@@ -159,7 +159,7 @@ class RAGStore:
         groups = sorted(set(allowed_groups) & VALID_ACCESS_GROUPS)
         if not groups or top_k <= 0:
             return []
-        parameters = groups + [""] * (3 - len(groups))
+        parameters = groups + [groups[0]] * (3 - len(groups))
         parameters.extend([system or "", system or "", env or "", env or ""])
         with closing(self._connect()) as connection:
             rows = connection.execute(

@@ -56,6 +56,8 @@ def test_access_filters_precede_top_k_ranking(tmp_path):
         [
             document("private", "admin", "secret token"),
             document("ops", "ops", "secret token"),
+            document("unclassified", "", "secret token"),
+            document("unknown", "unknown", "secret token"),
             document("public", "employee", "general handover"),
         ]
     )
