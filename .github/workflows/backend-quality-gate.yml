@@ -42,7 +42,7 @@ jobs:
         env:
           QUALITY_SQLITE_PATH: /tmp/ellm_backend_quality_ci.db
           QUALITY_AUDIT_LOG_PATH: /tmp/ellm_backend_quality_ci_audit.log
-          QUALITY_CHROMA_DIR: /tmp/ellm_backend_quality_ci_chroma
+          QUALITY_RAG_SQLITE_PATH: /tmp/ellm_backend_quality_ci_rag.sqlite3
         run: ./scripts/quality_gate.sh
 
       - name: Backend smoke boot

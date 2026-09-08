@@ -22,6 +22,10 @@ app/backend/data/app.db-*
 app/backend/data/app.db-shm
 app/backend/data/app.db-wal
 app/backend/data/chroma/
+app/backend/data/rag.sqlite3
+app/backend/data/rag.sqlite3-*
+app/data/rag.sqlite3
+app/data/rag.sqlite3-*
 
 # Terraform (never commit state)
 **/.terraform/

@@ -1,13 +1,15 @@
-"""RAG (Retrieval-Augmented Generation) store with ChromaDB and local fallback.
+"""SQLite-backed local RAG with deterministic hash embeddings and RBAC filters.
 
-Manages document ingestion, normalization, indexing, and RBAC-filtered
-retrieval.  When ChromaDB is unavailable, falls back to an in-memory
-cosine-similarity search using hash-based embeddings.
+The portable index is rebuilt from normalized JSONL and ranked by cosine
+similarity. This offline implementation is intended for small demo corpora.
 """
 
 import json
 import logging
 import os
+import sqlite3
+from contextlib import closing
+from pathlib import Path
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -16,19 +18,8 @@ import numpy as np
 
 from .config import settings, DATA_DIR
 
-try:
-    import chromadb
-    from chromadb.config import Settings as ChromaSettings
-except Exception as exc:  # noqa: BLE001
-    chromadb = None  # type: ignore[assignment]
-    ChromaSettings = None  # type: ignore[assignment]
-    CHROMA_IMPORT_ERROR = str(exc)
-else:
-    CHROMA_IMPORT_ERROR = ""
-
 RAW_DOCS_PATH = str(DATA_DIR / "handover_raw.jsonl")
 NORM_DOCS_PATH = str(DATA_DIR / "handover_normalized.jsonl")
-COLLECTION_NAME = "handover_docs"
 
 
 DEFAULT_SCHEMA = {
@@ -60,7 +51,9 @@ class HashEmbedding:
         for text in input:
             vec = np.zeros(self.dim, dtype=float)
             for token in text.lower().split():
-                digest = hashlib.md5(token.encode("utf-8"), usedforsecurity=False).hexdigest()
+                digest = hashlib.md5(
+                    token.encode("utf-8"), usedforsecurity=False
+                ).hexdigest()
                 idx = int(digest, 16) % self.dim
                 vec[idx] += 1.0
             norm = np.linalg.norm(vec)
@@ -81,112 +74,78 @@ class RetrievedChunk:
 
 
 class RAGStore:
-    """Document retrieval store with ChromaDB or in-memory fallback backend."""
+    """Persistent local retrieval with permission filters applied before ranking.
 
-    def __init__(self) -> None:
-        os.makedirs(settings.chroma_persist_dir, exist_ok=True)
+    Connections are scoped to operations so FastAPI worker threads can share the
+    store safely. SQLite transactions keep readers on a complete index during a
+    rebuild. The normalized JSONL corpus remains the source of truth.
+    """
+
+    def __init__(self, db_path: Optional[str] = None) -> None:
+        self._path = Path(db_path or settings.rag_sqlite_path)
+        self._path.parent.mkdir(parents=True, exist_ok=True)
         self._embedder = HashEmbedding()
-        self._backend = "chromadb"
-        self._local_entries: List[Dict[str, object]] = []
-
-        if chromadb is None or ChromaSettings is None:
-            self._backend = "local"
-            logging.warning(
-                "chromadb unavailable; using local in-memory retrieval fallback. reason=%s",
-                CHROMA_IMPORT_ERROR or "unknown",
+        with closing(self._connect()) as connection, connection:
+            connection.execute("PRAGMA journal_mode=WAL")
+            connection.execute(
+                """CREATE TABLE IF NOT EXISTS rag_chunks (
+                    doc_id TEXT NOT NULL,
+                    field_path TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    access_group TEXT NOT NULL,
+                    system TEXT NOT NULL,
+                    env TEXT NOT NULL,
+                    embedding TEXT NOT NULL,
+                    PRIMARY KEY (doc_id, field_path)
+                )"""
             )
-            self.client = None
-            self.collection = None
-            return
+            connection.execute(
+                "CREATE INDEX IF NOT EXISTS rag_scope ON rag_chunks (access_group, system, env)"
+            )
 
-        logging.getLogger("chromadb.telemetry.product.posthog").disabled = True
-        self.client = chromadb.PersistentClient(
-            path=settings.chroma_persist_dir,
-            settings=ChromaSettings(anonymized_telemetry=False),
-        )
-        self.collection = self.client.get_or_create_collection(
-            COLLECTION_NAME, embedding_function=self._embedder
-        )
+    def _connect(self):
+        connection = sqlite3.connect(str(self._path), timeout=10)
+        connection.row_factory = sqlite3.Row
+        return connection
 
     def backend_name(self) -> str:
-        """Return the active backend name (``chromadb`` or ``local``)."""
-        return str(self._backend)
+        return "sqlite"
 
     def chunk_count(self) -> int:
-        """Return the number of indexed chunks."""
-        if self._backend == "chromadb":
-            try:
-                return int(self.collection.count())
-            except Exception:
-                return 0
-        return int(len(self._local_entries))
+        with closing(self._connect()) as connection:
+            return int(
+                connection.execute("SELECT COUNT(*) FROM rag_chunks").fetchone()[0]
+            )
 
     def ensure_index(self) -> None:
-        """Ensure the index is populated, loading from disk if empty."""
-        if self._backend == "chromadb":
-            if self.collection.count() > 0:
-                return
-        else:
-            if self._local_entries:
-                return
-        docs = load_normalized_docs()
-        self._index_docs(docs)
+        """Bootstrap an empty index from JSONL without opening any legacy cache."""
+        if self.chunk_count() == 0:
+            self.rebuild_index()
 
     def rebuild_index(self, docs: Optional[List[Dict]] = None) -> int:
-        """Drop and rebuild the index, returning the number of chunks indexed."""
+        """Atomically replace the index; errors leave the previous index intact."""
         normalized_docs = docs if docs is not None else load_normalized_docs()
-        self._reset_collection()
-        return self._index_docs(normalized_docs)
-
-    def _reset_collection(self) -> None:
-        if self._backend != "chromadb":
-            self._local_entries = []
-            return
-
-        try:
-            self.client.delete_collection(COLLECTION_NAME)
-        except Exception:
-            pass
-        self.collection = self.client.get_or_create_collection(
-            COLLECTION_NAME, embedding_function=self._embedder
-        )
-
-    def _index_docs(self, docs: List[Dict]) -> int:
-        ids = []
-        documents = []
-        metadatas = []
-        local_items: List[Dict[str, object]] = []
-        for doc in docs:
-            doc_id = doc["doc_id"]
+        rows = []
+        for doc in normalized_docs:
             for field_path, content in _iter_fields(doc):
-                if not content:
-                    continue
-                row_id = f"{doc_id}:{field_path}"
-                metadata = {
-                    "doc_id": doc_id,
-                    "field_path": field_path,
-                    "access_group": doc.get("access_group", ""),
-                    "system": doc.get("system", ""),
-                    "env": doc.get("env", ""),
-                }
-                ids.append(f"{doc_id}:{field_path}")
-                documents.append(content)
-                metadatas.append(metadata)
-                if self._backend != "chromadb":
-                    vector = np.array(self._embedder([content])[0], dtype=float)
-                    local_items.append(
-                        {
-                            "id": row_id,
-                            "document": content,
-                            "metadata": metadata,
-                            "vector": vector,
-                        }
+                if content:
+                    rows.append(
+                        (
+                            doc["doc_id"],
+                            field_path,
+                            content,
+                            doc.get("access_group", ""),
+                            doc.get("system", ""),
+                            doc.get("env", ""),
+                            json.dumps(self._embedder([content])[0]),
+                        )
                     )
-        if ids and self._backend == "chromadb":
-            self.collection.add(ids=ids, documents=documents, metadatas=metadatas)
-        if self._backend != "chromadb":
-            self._local_entries.extend(local_items)
-        return len(ids)
+        with closing(self._connect()) as connection, connection:
+            connection.execute("DELETE FROM rag_chunks")
+            connection.executemany(
+                "INSERT INTO rag_chunks VALUES (?, ?, ?, ?, ?, ?, ?)", rows
+            )
+        return len(rows)
 
     def query(
         self,
@@ -196,73 +155,41 @@ class RAGStore:
         env: Optional[str],
         top_k: int = 5,
     ) -> List[RetrievedChunk]:
-        """Retrieve the top-k chunks matching *text*, filtered by RBAC groups."""
-        where = {"access_group": {"$in": allowed_groups}}
-        if system:
-            where["system"] = system
-        if env:
-            where["env"] = env
-
-        if self._backend == "chromadb":
-            try:
-                results = self.collection.query(
-                    query_texts=[text], n_results=top_k, where=where
-                )
-            except Exception:
-                results = self.collection.query(query_texts=[text], n_results=top_k)
-            chunks: List[RetrievedChunk] = []
-            for doc, meta in zip(
-                results.get("documents", [[]])[0], results.get("metadatas", [[]])[0]
-            ):
-                if meta.get("access_group") not in allowed_groups:
-                    continue
-                if system and meta.get("system") != system:
-                    continue
-                if env and meta.get("env") != env:
-                    continue
-                chunks.append(
-                    RetrievedChunk(
-                        doc_id=meta.get("doc_id", ""),
-                        field_path=meta.get("field_path", ""),
-                        content=doc,
-                        metadata=meta,
-                    )
-                )
-            return chunks
-
-        query_vec = np.array(self._embedder([text])[0], dtype=float)
-        scored: List[Tuple[float, Dict[str, object]]] = []
-        for item in self._local_entries:
-            metadata = item["metadata"]
-            if not isinstance(metadata, dict):
-                continue
-            if metadata.get("access_group") not in allowed_groups:
-                continue
-            if system and metadata.get("system") != system:
-                continue
-            if env and metadata.get("env") != env:
-                continue
-            vector = item.get("vector")
-            if not isinstance(vector, np.ndarray):
-                continue
-            score = float(np.dot(query_vec, vector))
-            scored.append((score, item))
-
-        scored.sort(key=lambda row: row[0], reverse=True)
-        chunks: List[RetrievedChunk] = []
-        for _score, item in scored[: max(1, int(top_k))]:
-            metadata = item["metadata"]
-            if not isinstance(metadata, dict):
-                continue
-            chunks.append(
-                RetrievedChunk(
-                    doc_id=str(metadata.get("doc_id", "")),
-                    field_path=str(metadata.get("field_path", "")),
-                    content=str(item.get("document", "")),
-                    metadata=metadata,
-                )
+        """Rank only authorized rows. Database errors never trigger an unfiltered retry."""
+        groups = sorted(set(allowed_groups) & VALID_ACCESS_GROUPS)
+        if not groups or top_k <= 0:
+            return []
+        parameters = groups + [groups[0]] * (3 - len(groups))
+        parameters.extend([system or "", system or "", env or "", env or ""])
+        with closing(self._connect()) as connection:
+            rows = connection.execute(
+                """SELECT * FROM rag_chunks
+                   WHERE access_group IN (?, ?, ?)
+                     AND (? = '' OR system = ?)
+                     AND (? = '' OR env = ?)
+                   ORDER BY doc_id, field_path""",
+                parameters,
+            ).fetchall()
+        query_vector = np.array(self._embedder([text])[0], dtype=float)
+        scored = sorted(
+            rows,
+            key=lambda row: float(
+                np.dot(query_vector, np.array(json.loads(row["embedding"])))
+            ),
+            reverse=True,
+        )
+        return [
+            RetrievedChunk(
+                doc_id=row["doc_id"],
+                field_path=row["field_path"],
+                content=row["content"],
+                metadata={
+                    key: row[key]
+                    for key in ("doc_id", "field_path", "access_group", "system", "env")
+                },
             )
-        return chunks
+            for row in scored[:top_k]
+        ]
 
 
 def load_raw_docs() -> List[Dict]:
@@ -278,10 +205,14 @@ def load_raw_docs() -> List[Dict]:
             try:
                 payload = json.loads(stripped)
             except json.JSONDecodeError:
-                logging.warning("Skipping invalid JSON in %s line %s", RAW_DOCS_PATH, index)
+                logging.warning(
+                    "Skipping invalid JSON in %s line %s", RAW_DOCS_PATH, index
+                )
                 continue
             if not isinstance(payload, dict):
-                logging.warning("Skipping non-object JSON in %s line %s", RAW_DOCS_PATH, index)
+                logging.warning(
+                    "Skipping non-object JSON in %s line %s", RAW_DOCS_PATH, index
+                )
                 continue
             docs.append(payload)
     return docs
@@ -303,8 +234,10 @@ def _normalize_text_list(value: object) -> List[str]:
 def _normalize_owner(value: object) -> Dict[str, str]:
     if not isinstance(value, dict):
         return {"name": "", "team": "", "contact": ""}
+
     def _safe(value: object) -> str:
         return "" if value is None else str(value).strip()
+
     return {
         "name": _safe(value.get("name", "")),
         "team": _safe(value.get("team", "")),
@@ -349,9 +282,7 @@ def validate_normalized_doc(doc: Dict) -> None:
     if not doc.get("access_group"):
         raise ValueError("access_group is required")
     if doc["access_group"] not in VALID_ACCESS_GROUPS:
-        raise ValueError(
-            f"access_group must be one of {sorted(VALID_ACCESS_GROUPS)}"
-        )
+        raise ValueError(f"access_group must be one of {sorted(VALID_ACCESS_GROUPS)}")
 
 
 def parse_jsonl_to_normalized_docs(jsonl_text: str) -> List[Dict]:
@@ -395,10 +326,22 @@ def write_normalized_docs(docs: List[Dict]) -> int:
 
 def summarize_normalized_docs(docs: List[Dict]) -> Dict[str, object]:
     """Return a summary of systems, envs, and access groups across all documents."""
-    systems = sorted({str(doc.get("system", "")).strip().lower() for doc in docs if doc.get("system")})
-    envs = sorted({str(doc.get("env", "")).strip().lower() for doc in docs if doc.get("env")})
+    systems = sorted(
+        {
+            str(doc.get("system", "")).strip().lower()
+            for doc in docs
+            if doc.get("system")
+        }
+    )
+    envs = sorted(
+        {str(doc.get("env", "")).strip().lower() for doc in docs if doc.get("env")}
+    )
     groups = sorted(
-        {str(doc.get("access_group", "")).strip().lower() for doc in docs if doc.get("access_group")}
+        {
+            str(doc.get("access_group", "")).strip().lower()
+            for doc in docs
+            if doc.get("access_group")
+        }
     )
     return {
         "doc_count": len(docs),
@@ -421,10 +364,14 @@ def load_normalized_docs() -> List[Dict]:
                 try:
                     payload = json.loads(stripped)
                 except json.JSONDecodeError:
-                    logging.warning("Skipping invalid JSON in %s line %s", NORM_DOCS_PATH, index)
+                    logging.warning(
+                        "Skipping invalid JSON in %s line %s", NORM_DOCS_PATH, index
+                    )
                     continue
                 if not isinstance(payload, dict):
-                    logging.warning("Skipping non-object JSON in %s line %s", NORM_DOCS_PATH, index)
+                    logging.warning(
+                        "Skipping non-object JSON in %s line %s", NORM_DOCS_PATH, index
+                    )
                     continue
                 docs.append(payload)
         return docs

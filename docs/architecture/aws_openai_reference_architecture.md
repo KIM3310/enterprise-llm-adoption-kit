@@ -2,7 +2,7 @@
 This document is a **reference architecture** for running the Enterprise LLM Adoption Kit in a real enterprise environment on AWS, using the OpenAI API through the existing adapter (`LLM_PROVIDER=openai`).
 
 Note:
-- This repo **implements** only the local demo architecture (FastAPI + Vite + Chroma + SQLite).
+- This repo **implements** only the local demo architecture (FastAPI + Vite + SQLite).
 - The AWS design below is **conceptual** and provided for project / architecture discussion.
 - All datasets and scenarios remain synthetic/hypothetical.
 

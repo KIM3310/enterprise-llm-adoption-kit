@@ -232,8 +232,8 @@ class Settings:
         min_value=0.0,
     )
 
-    chroma_persist_dir: str = os.getenv(
-        "CHROMA_PERSIST_DIR", str(DATA_DIR / "chroma")
+    rag_sqlite_path: str = os.getenv(
+        "RAG_SQLITE_PATH", str(DATA_DIR / "rag.sqlite3")
     )
 
     audit_log_path: str = os.getenv(

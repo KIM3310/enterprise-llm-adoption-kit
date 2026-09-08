@@ -39,7 +39,7 @@ Note: 로컬에서 재현 가능한 엔터프라이즈 LLM 도입 검증 키트�
 - RBAC 기반 접근 제어 (retrieval 단계에서 적용)
 - Prompt injection 탐지 + safety refusal
 - PII redaction 및 감사 로그(enterprise 모드 해시)
-- RAG-style retrieval (Chroma + deterministic hash embeddings)
+- RAG-style retrieval (SQLite + deterministic hash embeddings)
 - Evals 리포트 + baseline diff
 - LLMOps 지표 (latency, token, usage, policy events)
 - 통합 패턴: Slack/Jira 스타일 ingestion 엔드포인트(UI에서 시뮬레이션 가능)
@@ -49,7 +49,7 @@ Note: 로컬에서 재현 가능한 엔터프라이즈 LLM 도입 검증 키트�
 ## 아키텍처 요약 (로컬 데모)
 - FastAPI 백엔드: UC1/UC2 흐름, audit log, metrics, integrations
 - React(Vite) 프론트엔드 데모 UI
-- Chroma 로컬 RAG 저장소
+- SQLite 로컬 RAG 저장소
 - SQLite 일일 비용 집계
 
 ## 트러블슈팅 & 검증 노트 (재현 가능한 체크)
@@ -57,7 +57,7 @@ Note: 로컬에서 재현 가능한 엔터프라이즈 LLM 도입 검증 키트�
 - Safety guardrails: refusal 규칙 + injection 탐지. 확인: `tests/test_safety_guardrails.py`, `tests/test_injection.py`.
 - 감사 로그 데이터 처리: enterprise 모드에서 입력/출력 해시 저장. 확인: `tests/test_data_handling_mode.py`.
 - RAG cold-start: 인덱스 자동 빌드 + normalized 데이터 생성. 확인: 데모 실행 후 UC1 응답에 citations 표시 여부 확인.
-- Python 3.14 호환성: `chromadb` import가 깨지는 경우(pydantic-v1 이슈)에도 deterministic local retrieval 백엔드로 자동 폴백되어 데모 흐름이 계속 동작합니다.
+- 로컬 검색은 SQLite와 결정적 해시 임베딩을 사용하며, 검색 순위를 계산하기 전에 접근 권한을 필터링합니다.
 - LLM 신뢰성: provider 오류 시 exponential backoff 재시도 + `/metrics` 지표 기록.
 
 ## 이 프로젝트가 보여주는 것
@@ -280,7 +280,7 @@ make quality-backend
 - Console: UC1/UC2를 직접 호출하고 `/audit/summary`, `/ops/runtime`를 로드해 검증합니다(권한 필요).
 
 ## 공개 전 정리 (푸시 전에)
-이 레포는 공개 가능한 형태로 설계했습니다: 런타임 데이터(SQLite DB, audit log, Chroma persistence)는 로컬에서 생성되며 git에서 무시됩니다.
+이 레포는 공개 가능한 형태로 설계했습니다: 런타임 데이터(SQLite DB, audit log, RAG index)는 로컬에서 생성되며 git에서 무시됩니다.
 
 ```bash
 make sanitize
@@ -289,3 +289,11 @@ make sanitize
 ## KR evals
 - KR dataset: `evals/datasets/kr_enterprise_30.jsonl`
 - KR eval run: `python3 evals/runner/run_eval.py --dataset evals/datasets/kr_enterprise_30.jsonl`
+
+### 로컬 검색 저장소 변경
+
+`RAG_SQLITE_PATH`로 SQLite 검색 인덱스 위치를 설정합니다(기본 `app/backend/data/rag.sqlite3`).
+빈 인덱스는 기존 `handover_normalized.jsonl`에서 다시 생성하며 기존 Chroma 캐시는 읽거나 삭제하지 않습니다.
+업그레이드 전 JSONL 원본을 백업하고 새 의존성 환경이나 컨테이너를 사용하세요. Chroma에 직접 기록한 별도 데이터는 JSONL로 내보내야 합니다.
+`CHROMA_PERSIST_DIR`는 더 이상 사용하지 않습니다. 대규모 운영용 검색 서비스와 달리, 이 데모의 검색 비용은 허용된 청크 수에 비례합니다.
+자세한 변경 근거와 보안 권고는 [영문 안내](README.md#local-retrieval-storage-migration)를 참고하세요.

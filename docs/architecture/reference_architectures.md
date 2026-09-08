@@ -3,7 +3,7 @@ See `docs/architecture/llm_deployment_options.md` for API vs Workspace guidance.
 See `docs/architecture/integration_patterns.md` for common enterprise patterns.
 
 ## Implemented (This Repo)
-- Local dev: FastAPI + Vite + Chroma + SQLite
+- Local dev: FastAPI + Vite + SQLite
 - Mock JWT RBAC, audit logs, redaction, eval runner
 
 ## AWS + OpenAI (Conceptual + IaC Draft)
