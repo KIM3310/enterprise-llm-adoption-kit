@@ -42,7 +42,7 @@ echo "[3/4] unit/integration tests (pytest)"
 echo "[4/4] smoke diagnostics"
 export SQLITE_PATH="${QUALITY_SQLITE_PATH:-/tmp/ellm_backend_quality.db}"
 export AUDIT_LOG_PATH="${QUALITY_AUDIT_LOG_PATH:-/tmp/ellm_backend_quality_audit.log}"
-export CHROMA_PERSIST_DIR="${QUALITY_CHROMA_DIR:-/tmp/ellm_backend_quality_chroma}"
+export RAG_SQLITE_PATH="${QUALITY_RAG_SQLITE_PATH:-/tmp/ellm_backend_quality_rag.sqlite3}"
 "${PYTHON_BIN}" scripts/debug_smoke.py >/tmp/ellm_backend_quality_smoke.json
 head -n 20 /tmp/ellm_backend_quality_smoke.json
 

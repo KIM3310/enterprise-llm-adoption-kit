@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-08
+
+- Replace the vulnerable ChromaDB dependency with a persistent SQLite RAG index. Apply authorization filters before ranking, rebuild atomically, and preserve the existing JSONL corpus and legacy cache.
+- Restrict production smoke checkout to trusted main to resolve the Actions cache-poisoning warning.
+- Upgrade Browserslist to 4.28.9 to resolve the frontend dependency audit.
+- Include the pending Uvicorn, boto3 and Databricks SDK dependency updates.
+
 All notable changes to the Enterprise LLM Adoption Kit are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

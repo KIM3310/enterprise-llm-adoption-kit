@@ -117,7 +117,7 @@ smoke-backend: backend-install
 	JWT_SECRET=enterprise-llm-test-secret-32-byte-minimum \
 	SQLITE_PATH=/tmp/enterprise-llm-adoption-kit-smoke.db \
 	AUDIT_LOG_PATH=/tmp/enterprise-llm-adoption-kit-smoke-audit.log \
-	CHROMA_PERSIST_DIR=/tmp/enterprise-llm-adoption-kit-smoke-chroma \
+	RAG_SQLITE_PATH=/tmp/enterprise-llm-adoption-kit-smoke-rag.sqlite3 \
 	.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port $$PORT >$$LOG 2>&1 & \
 	pid=$$!; \
 	trap 'kill $$pid >/dev/null 2>&1 || true' EXIT INT TERM; \

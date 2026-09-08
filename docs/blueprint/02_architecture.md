@@ -24,7 +24,7 @@
                 v                    v                  v
      +------------------+   +-------------------+   +------------------+
      | Vector Store     |   | SQLite / Files    |   | Runbook Store    |
-     | (Chroma/FAISS)   |   | (requests, docs)  |   | (local JSON)     |
+     | (SQLite index)   |   | (requests, docs)  |   | (local JSON)     |
      +------------------+   +-------------------+   +------------------+
                 |
                 | (optional) external provider
@@ -53,7 +53,7 @@
 
 ## Core Architectural Decisions
 - **FastAPI** for explicit API contracts and testability
-- **Local vector DB** (Chroma or FAISS) for RAG with metadata filters
+- **Local SQLite index** for RAG with metadata filters and exact cosine ranking
 - **Pluggable LLM adapter** with deterministic stub default
 - **JSON-structured audit logs** for compliance and analytics
 - **Minimal React UI** (Vite) for focused demonstration
