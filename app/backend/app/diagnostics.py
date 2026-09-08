@@ -171,7 +171,7 @@ def _rag_check(rag_store) -> Dict:
         if hasattr(rag_store, "backend_name"):
             backend = str(rag_store.backend_name())
         else:
-            backend = "chromadb"
+            backend = "unknown"
         return {
             "name": "rag_collection",
             "ok": count > 0,

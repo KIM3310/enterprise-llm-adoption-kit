@@ -80,7 +80,7 @@ flowchart TB
     end
 
     subgraph Core["Application Core"]
-        RAG["RAG Retrieval<br/><i>ChromaDB + hash embeddings</i>"]
+        RAG["RAG Retrieval<br/><i>SQLite + hash embeddings</i>"]
         LLM["LLM Router<br/><i>OpenAI / Ollama / Bedrock / Stub</i>"]
         TOOLS["Tool Executor<br/><i>allowlisted tools only</i>"]
         RAG --> LLM
@@ -122,10 +122,10 @@ flowchart TB
 | **Backend API** | Python 3.11+, FastAPI, Uvicorn, Pydantic |
 | **Frontend** | React 18, Vite |
 | **Auth** | JWT (HS256) with key rotation, OIDC (RS256) via JWKS discovery |
-| **RAG** | ChromaDB, deterministic hash embeddings, in-memory fallback |
+| **RAG** | SQLite, deterministic hash embeddings, persistent local index |
 | **LLM Providers** | OpenAI, Ollama, AWS Bedrock, stub (offline deterministic) |
 | **Eval** | Custom harness -- accuracy, groundedness, helpfulness, safety scoring |
-| **Storage** | SQLite, Chroma, JSONL event logs |
+| **Storage** | SQLite, JSONL event logs |
 | **Data Platform** | Snowflake (eval + audit), Databricks (MLflow + Delta Lake) |
 | **Observability** | Prometheus, Grafana, OpenTelemetry (OTLP), Datadog-ready |
 | **Infrastructure** | Docker Compose, Kubernetes (HPA, TLS ingress, AlertManager), Terraform (AWS + GCP) |
@@ -190,7 +190,7 @@ kubectl apply -f infra/k8s/
 | **Safety Policy Engine** | 22 regex patterns targeting exfiltration, escalation, and adversarial prompts (ReDoS-safe) | [`app/backend/app/safety.py`](app/backend/app/safety.py) |
 | **PII Redaction** | Email, phone, and ID masking with per-category event tracking | [`app/backend/app/redaction.py`](app/backend/app/redaction.py) |
 | **Audit Logging** | Structured JSON logs with SHA-256 hashing in enterprise mode and auto-retention pruning | [`app/backend/app/audit.py`](app/backend/app/audit.py) |
-| **RAG Retrieval** | ChromaDB + deterministic hash embeddings with RBAC-filtered document access | [`app/backend/app/rag.py`](app/backend/app/rag.py) |
+| **RAG Retrieval** | SQLite + deterministic hash embeddings with RBAC-filtered document access | [`app/backend/app/rag.py`](app/backend/app/rag.py) |
 | **Eval Harness** | Accuracy, groundedness, helpfulness, safety scoring with baseline diffs and red-team datasets | [`evals/runner/`](evals/runner/) |
 | **LLMOps Metrics** | Request latency, token counts, usage tracking, policy events via Prometheus | [`app/backend/app/metrics.py`](app/backend/app/metrics.py) |
 | **Circuit Breaker** | LLM provider failure isolation with configurable threshold and cooldown | [`app/backend/app/llm_adapter.py`](app/backend/app/llm_adapter.py) |
@@ -250,7 +250,7 @@ enterprise-llm-adoption-kit/
         audit.py           # Structured audit logging with SHA-256 hashing
         auth.py            # JWT/OIDC authentication
         llm_adapter.py     # Multi-provider LLM router with circuit breaker
-        rag.py             # ChromaDB RAG with RBAC-filtered retrieval
+        rag.py             # SQLite RAG with RBAC-filtered retrieval
         snowflake_adapter.py
         databricks_adapter.py
         metrics.py         # Prometheus metric definitions
@@ -348,3 +348,23 @@ MIT
 - Boundary: ads allowed only on public governance checklist pages; policy consoles, audit logs, eval runs, and admin flows are ad-free
 - Consent defaults off, DNT/GPC fail closed, and personal or sensitive data is never sold.
 <!-- KIM3310:AD-DATA-PIVOT:END -->
+
+### Local retrieval storage migration
+
+The local RAG index uses SQLite at `RAG_SQLITE_PATH` (default: `app/backend/data/rag.sqlite3`).
+On first startup, an empty index is rebuilt from `handover_normalized.jsonl`, or normalized from
+`handover_raw.jsonl` when needed. Admin imports already persist this JSONL source. Keep a backup
+of the source files before upgrading; data written directly to an old vector database must be
+exported separately into the documented JSONL format.
+
+Existing Chroma cache directories are left untouched and are never loaded. `CHROMA_PERSIST_DIR`
+is no longer used; set `RAG_SQLITE_PATH` to a writable persistent volume when deploying. ChromaDB
+was removed because advisories [GHSA-36p7-vc44-83pf](https://github.com/advisories/GHSA-36p7-vc44-83pf),
+[GHSA-xph7-9rjv-w5fr](https://github.com/advisories/GHSA-xph7-9rjv-w5fr), and
+[GHSA-2wm9-hf6c-p5cr](https://github.com/advisories/GHSA-2wm9-hf6c-p5cr) had no patched release
+as of 2026-09-08. Use a fresh dependency environment/image to remove old transitive packages.
+
+This offline demo computes exact cosine similarity over authorized chunks using deterministic
+hash embeddings. Query cost is linear in the number of eligible chunks; large production corpora
+need a separately evaluated retrieval service. SQLite rebuilds are transactional, and access
+group, system and environment filters are bound SQL parameters applied before ranking.

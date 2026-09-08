@@ -134,7 +134,7 @@ resource "aws_ecs_task_definition" "backend" {
         { name = "LLM_PROVIDER", value = local.llm_provider },
         { name = "DATA_HANDLING_MODE", value = "enterprise" },
         { name = "AUDIT_LOG_PATH", value = "/tmp/audit.log" },
-        { name = "CHROMA_PERSIST_DIR", value = "/tmp/chroma" },
+        { name = "RAG_SQLITE_PATH", value = "/tmp/rag.sqlite3" },
         { name = "SQLITE_PATH", value = "/tmp/app.db" }
       ]
       secrets = local.llm_provider == "openai" ? [
